@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'asciimath/cli'
+::Asciimath::CLI.run(ARGV)
