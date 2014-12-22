@@ -44,10 +44,24 @@ TEST_CASES = {
         '<math><munderover><mo>&#x2211;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>k</mi><mo>=</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mo>&#x22EF;</mo><mo>+</mo><mi>n</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mrow><mo>(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></mrow><mn>2</mn></mfrac></math>',
 }
 
+module AsciimathHelper
+  def expect_mathml(asciimath, mathml)
+    expect(Asciimath.parse(asciimath).to_mathml).to eq(mathml)
+  end
+end
+
+RSpec.configure do |c|
+  c.include AsciimathHelper
+end
+
 describe "Asciimath::MathMLBuilder" do
   TEST_CASES.each_pair do |asciimath, mathml|
     it "should produce identical output to asciimathml.js for '#{asciimath}'" do
-      expect(Asciimath.parse(asciimath).to_mathml).to eq(mathml)
+      expect_mathml(asciimath, mathml)
     end
+  end
+
+  it 'should not generate mo elements for {: and :}' do
+    expect_mathml '{:(a,b),(c,d):}', '<math><mrow><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable></mrow></math>'
   end
 end

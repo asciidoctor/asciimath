@@ -244,8 +244,8 @@ module Asciimath
         ':)' => {:value => '&#x232A;', :type => :rparen},
         '<<' => {:value => '&#x2329;', :type => :lparen},
         '>>' => {:value => '&#x232A;', :type => :rparen},
-        '{:' => {:value => '{:', :type => :lparen},
-        ':}' => {:value => ':}', :type => :rparen},
+        '{:' => {:value => nil, :type => :lparen},
+        ':}' => {:value => nil, :type => :rparen},
 
         # Miscellaneous symbols
         'int' => {:value => '&#x222B;', :type => :operator},

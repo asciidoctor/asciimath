@@ -74,7 +74,7 @@ module Asciimath
               end
             when :matrix
               mrow do
-                mo(expression[:lparen])
+                mo(expression[:lparen]) if expression[:lparen]
                 mtable do
                   expression[:rows].each do |row|
                     mtr do
@@ -86,7 +86,7 @@ module Asciimath
                     end
                   end
                 end
-                mo(expression[:rparen])
+                mo(expression[:rparen]) if expression[:rparen]
               end
           end
       end
