@@ -26,7 +26,7 @@ require 'strscan'
 # When parsing the 'constant' the parser will try to find the longest matching string in the symbol
 # table starting at the current position of the parser. If no matching string can be found the
 # character at the current position of the parser is interpreted as an identifier instead.
-module Asciimath
+module AsciiMath
   # Internal: Splits an ASCIIMath expression into a sequence of tokens.
   # Each token is represented as a Hash containing the keys :value and :type.
   # The :value key is used to store the text associated with each token.

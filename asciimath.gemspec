@@ -5,11 +5,11 @@ require 'asciimath/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "asciimath"
-  spec.version       = Asciimath::VERSION
+  spec.version       = AsciiMath::VERSION
   spec.authors       = ["Pepijn Van Eeckhoudt"]
   spec.email         = ["pepijn@vaneeckhoudt.net"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{AsciiMath parser and converter}
+  spec.description   = %q{A pure Ruby AsciiMath parsing and conversion library.}
   spec.homepage      = ""
   spec.license       = "MIT"
 

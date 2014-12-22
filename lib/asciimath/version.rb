@@ -1,3 +1,3 @@
-module Asciimath
-  VERSION = "0.0.1"
+module AsciiMath
+  VERSION = "1.0.0.preview.1"
 end

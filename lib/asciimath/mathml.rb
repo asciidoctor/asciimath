@@ -1,4 +1,4 @@
-module Asciimath
+module AsciiMath
   class MathMLBuilder
     def initialize(prefix)
       @prefix = prefix
