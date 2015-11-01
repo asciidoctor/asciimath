@@ -66,6 +66,7 @@ module AsciiMath
       @symbols = symbols
       lookahead = @symbols.keys.map { |k| k.length }.max
       @symbol_regexp = /([^\s0-9]{1,#{lookahead}})/
+      @push_back = nil
     end
 
     # Public: Read the next token from the ASCIIMath expression and move the tokenizer
