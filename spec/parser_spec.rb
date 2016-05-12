@@ -43,7 +43,9 @@ TEST_CASES = {
     'sum_(k=1)^n k = 1+2+ cdots +n=(n(n+1))/2' =>
         '<math><munderover><mo>&#x2211;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>k</mi><mo>=</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mo>&#x22EF;</mo><mo>+</mo><mi>n</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mrow><mo>(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></mrow><mn>2</mn></mfrac></math>',
     '"Скорость"=("Расстояние")/("Время")' =>
-        '<math><mtext>Скорость</mtext><mo>=</mo><mfrac><mtext>Расстояние</mtext><mtext>Время</mtext></mfrac></math>'
+        '<math><mtext>Скорость</mtext><mo>=</mo><mfrac><mtext>Расстояние</mtext><mtext>Время</mtext></mfrac></math>',
+    'bb (a + b) + cc c = fr (d^n)' =>
+        '<math><mstyle mathvariant=\"bold\"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></mstyle><mo>+</mo><mstyle mathvariant=\"script\"><mi>c</mi></mstyle><mo>=</mo><mstyle mathvariant=\"fraktur\"><msup><mi>d</mi><mi>n</mi></msup></mstyle></math>'
 }
 
 version = RUBY_VERSION.split('.').map { |s| s.to_i }

@@ -38,6 +38,7 @@ module AsciiMath
   # - :number a number
   # - :operator a mathematical operator symbol
   # - :unary a unary operator (e.g., sqrt, text, ...)
+  # - :font a unary font command (e.g., bb, cc, ...)
   # - :infix an infix operator (e.g, /, _, ^, ...)
   # - :binary a binary operator (e.g., frac, root, ...)
   # - :accent an accent character
@@ -350,6 +351,12 @@ module AsciiMath
         # Other
         'sqrt' => {:value => :sqrt, :type => :unary},
         'text' => {:value => :text, :type => :unary},
+        'bb' => {:value => :bold, :type => :font},
+        'bbb' => {:value => :double_struck, :type => :font},
+        'cc' => {:value => :script, :type => :font},
+        'tt' => {:value => :monospace, :type => :font},
+        'fr' => {:value => :fraktur, :type => :font},
+        'sf' => {:value => :sans_serif, :type => :font},
         'frac' => {:value => :frac, :type => :binary},
         'root' => {:value => :root, :type => :binary},
         'stackrel' => {:value => :over, :type => :binary},
@@ -481,9 +488,9 @@ module AsciiMath
         when :accent
           s = parse_simple_expression(tok, depth)
           {:type => :binary, :s1 => s, :s2 => {:type => :operator, :c => t1[:value]}, :operator => t1[:position]}
-        when :unary
+        when :unary, :font
           s = parse_simple_expression(tok, depth)
-          {:type => :unary, :s => s, :operator => t1[:value]}
+          {:type => t1[:type], :s => s, :operator => t1[:value]}
         when :binary
           s1 = parse_simple_expression(tok, depth)
           s2 = parse_simple_expression(tok, depth)

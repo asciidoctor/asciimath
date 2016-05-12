@@ -54,6 +54,11 @@ module AsciiMath
               else
                 append(expression[:e])
               end
+            when :font
+              style = expression[:operator]
+              tag("mstyle", :mathvariant => style.to_s.gsub('_', '-')) do
+                append(expression[:s], :single_child => true, :strip_paren => true)
+              end
             when :unary
               operator = expression[:operator]
               tag("m#{operator}") do
@@ -103,7 +108,7 @@ module AsciiMath
       @mathml << '<' << @prefix << tag.to_s
 
       attrs.each_pair do |key, value|
-        @mathml << ' ' << key << '="' << value << '"'
+        @mathml << ' ' << key.to_s << '="' << value.to_s << '"'
       end
 
 
