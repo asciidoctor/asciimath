@@ -45,7 +45,7 @@ TEST_CASES = {
     '"Скорость"=("Расстояние")/("Время")' =>
         '<math><mtext>Скорость</mtext><mo>=</mo><mfrac><mtext>Расстояние</mtext><mtext>Время</mtext></mfrac></math>',
     'bb (a + b) + cc c = fr (d^n)' =>
-        '<math><mstyle mathvariant=\"bold\"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></mstyle><mo>+</mo><mstyle mathvariant=\"script\"><mi>c</mi></mstyle><mo>=</mo><mstyle mathvariant=\"fraktur\"><msup><mi>d</mi><mi>n</mi></msup></mstyle></math>'
+        '<math><mstyle mathvariant="bold"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></mstyle><mo>+</mo><mstyle mathvariant="script"><mi>c</mi></mstyle><mo>=</mo><mstyle mathvariant="fraktur"><msup><mi>d</mi><mi>n</mi></msup></mstyle></math>'
 }
 
 version = RUBY_VERSION.split('.').map { |s| s.to_i }
