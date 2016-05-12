@@ -1,14 +1,15 @@
 # AsciiMath
 
-An [AsciiMath](http://asciimath.org) parser and MathML generator written in pure Ruby.
+An http://asciimath.org[AsciiMath] parser and MathML generator written in pure Ruby.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-```ruby
+[source,ruby]
+----
 gem 'asciimath'
-```
+----
 
 And then execute:
 
@@ -24,23 +25,26 @@ Or install it yourself as:
 
 First require the library.
 
-```
+[source,ruby]
+----
 require 'asciimath'
-```
+----
 
 Then parse an AsciiMath string.
 
-```
+[source,ruby]
+----
 parsed_expression = AsciiMath.parse(asciimath)
-```
+----
 
 The parsed expression is a set of nested Array and Hash objects.
 
 This expression can then be converted to MathML.
 
-```
+[source,ruby]
+----
 math_ml = parsed_expression.to_mathml
-```
+----
 
 The MathML code is returned as a String.
 
@@ -48,16 +52,17 @@ The MathML code is returned as a String.
 
 The AsciiMath parser and MathML converter can be invoked via the command line as follows:
 
-```
+[source]
+----
 asciimath "an asciimath string"
-```
+----
 
 This command will print out the generated MathML code on stdout.
 
 ## Contributing
 
-1. Fork it ( https://github.com/pepijnve/asciimath/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+. Fork it (https://github.com/pepijnve/asciimath/fork)
+. Create your feature branch (`git checkout -b my-new-feature`)
+. Commit your changes (`git commit -am 'Add some feature'`)
+. Push to the branch (`git push origin my-new-feature`)
+. Create a new Pull Request
