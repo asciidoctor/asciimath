@@ -42,7 +42,15 @@ TEST_CASES = {
         '<math><mrow><mo>(</mo><mtable><mtr><mtd><msub><mi>a</mi><mn>11</mn></msub></mtd><mtd><mo>&#x22EF;</mo></mtd><mtd><msub><mi>a</mi><mrow><mn>1</mn><mi>n</mi></mrow></msub></mtd></mtr><mtr><mtd><mo>&#x22EE;</mo></mtd><mtd><mo>&#x22F1;</mo></mtd><mtd><mo>&#x22EE;</mo></mtd></mtr><mtr><mtd><msub><mi>a</mi><mrow><mi>m</mi><mn>1</mn></mrow></msub></mtd><mtd><mo>&#x22EF;</mo></mtd><mtd><msub><mi>a</mi><mrow><mi>m</mi><mi>n</mi></mrow></msub></mtd></mtr></mtable><mo>)</mo></mrow></math>',
     'sum_(k=1)^n k = 1+2+ cdots +n=(n(n+1))/2' =>
         '<math><munderover><mo>&#x2211;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>k</mi><mo>=</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mo>&#x22EF;</mo><mo>+</mo><mi>n</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mrow><mo>(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></mrow><mn>2</mn></mfrac></math>',
+    '"Скорость"=("Расстояние")/("Время")' =>
+        '<math><mtext>Скорость</mtext><mo>=</mo><mfrac><mtext>Расстояние</mtext><mtext>Время</mtext></mfrac></math>'
 }
+
+version = RUBY_VERSION.split('.').map { |s| s.to_i }
+
+if version[0] > 1 || version[1] > 8
+  TEST_CASES['Скорость=(Расстояние)/(Время)'] = '<math><mi>С</mi><mi>к</mi><mi>о</mi><mi>р</mi><mi>о</mi><mi>с</mi><mi>т</mi><mi>ь</mi><mo>=</mo><mfrac><mrow><mi>Р</mi><mi>а</mi><mi>с</mi><mi>с</mi><mi>т</mi><mi>о</mi><mi>я</mi><mi>н</mi><mi>и</mi><mi>е</mi></mrow><mrow><mi>В</mi><mi>р</mi><mi>е</mi><mi>м</mi><mi>я</mi></mrow></mfrac></math>'
+end
 
 module AsciiMathHelper
   def expect_mathml(asciimath, mathml)

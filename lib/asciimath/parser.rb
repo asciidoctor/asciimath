@@ -53,7 +53,6 @@ module AsciiMath
   #
   class Tokenizer
     WHITESPACE = /^\s+/
-    NUMBER_START = /[-0-9]/
     NUMBER = /-?[0-9]+(?:\.[0-9]+)?/
     TEXT = /"[^"]+"/
 
@@ -87,7 +86,7 @@ module AsciiMath
       case @string.peek(1)
         when '"'
           read_text
-        when NUMBER_START
+        when '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
           read_number() || read_symbol
         else
           read_symbol()
@@ -125,6 +124,17 @@ module AsciiMath
       end
     end
 
+    if String.method_defined?(:bytesize)
+      def bytesize(s)
+        s.bytesize
+      end
+    else
+      def bytesize(s)
+        s.length
+      end
+    end
+
+
     # Private: Reads a symbol token from the input string. This method first creates
     # a String from the input String starting from the current position with a length
     # that matches that of the longest key in the symbol table. It then looks up that
@@ -143,7 +153,7 @@ module AsciiMath
         until s.length == 1 || @symbols.include?(s)
           s.chop!
         end
-        @string.pos = position + s.length
+        @string.pos = position + bytesize(s)
         @symbols[s] || {:value => s, :type => :identifier}
       end
     end
@@ -160,6 +170,12 @@ module AsciiMath
         yield s
       else
         s
+      end
+    end
+
+    if String.respond_to?(:byte_size)
+      def byte_size(s)
+        s.byte_size
       end
     end
   end
