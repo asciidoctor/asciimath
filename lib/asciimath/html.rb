@@ -96,7 +96,7 @@ module AsciiMath
                 matrixWidth  = "grid-template-columns:repeat(" + expression[:rows][0].length.to_s + ",1fr);"
                 matrixHeight = "grid-template-rows:repeat(" + expression[:rows].length.to_s + ",1fr);"
                 
-                self.matrix(style: matrixWidth + matrixHeight) do
+                self.matrix({:style => (matrixWidth + matrixHeight)}) do
                   expression[:rows].each do |row|
                     row.each do |col|
                       append(col)
