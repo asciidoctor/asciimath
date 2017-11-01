@@ -1,6 +1,15 @@
 # AsciiMath
+ifndef::env-site[:status:]
 
 An http://asciimath.org[AsciiMath] parser and MathML generator written in pure Ruby.
+
+ifdef::status[]
+[discrete]
+## Status
+
+image:https://travis-ci.org/pepijnve/asciimath.svg?branch=master["Linux Build Status", link="https://travis-ci.org/pepijnve/asciimath"]
+image:https://img.shields.io/gem/v/asciimath.svg?label=gem%20version[Gem Version, link=https://rubygems.org/gems/asciimath]
+endif::status[]
 
 ## Installation
 
