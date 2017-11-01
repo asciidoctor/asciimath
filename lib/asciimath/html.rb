@@ -26,31 +26,31 @@ module AsciiMath
     def append(expression, opts = {})
       case expression
         when Array
-          self.row do
+          row do
             expression.each { |e| append(e) }
           end
         when Hash
           case expression[:type]
             when :operator
-              self.operator(expression[:c])
+              operator(expression[:c])
             when :identifier
-              self.identifier(expression[:c])
+              identifier(expression[:c])
             when :number
-              self.number(expression[:c])
+              number(expression[:c])
             when :text
-              self.text(expression[:c])
+              text(expression[:c])
             when :paren
               paren = !opts[:strip_paren]
               if paren
                 if opts[:single_child]
-                  self.brace(expression[:lparen]) if expression[:lparen]
+                  brace(expression[:lparen]) if expression[:lparen]
                   append(expression[:e], :single_child => true)
-                  self.brace(expression[:rparen]) if expression[:rparen]
+                  brace(expression[:rparen]) if expression[:rparen]
                 else
-                  self.row do
-                    self.brace(expression[:lparen]) if expression[:lparen]
+                  row do
+                    brace(expression[:lparen]) if expression[:lparen]
                     append(expression[:e], :single_child => true)
-                    self.brace(expression[:rparen]) if expression[:rparen]
+                    brace(expression[:rparen]) if expression[:rparen]
                   end
                 end
               else
@@ -90,20 +90,20 @@ module AsciiMath
                 underover(expression[:s1],expression[:s2],expression[:s3])
               end
             when :matrix
-              self.row do
+              row do
                 # TODO: Figure out how big the brace should be and insert something to that effect...
-                self.brace(expression[:lparen]) if expression[:lparen]
-                matrixWidth  = "grid-template-columns:repeat(" + expression[:rows][0].length.to_s + ",1fr);"
-                matrixHeight = "grid-template-rows:repeat(" + expression[:rows].length.to_s + ",1fr);"
+                brace(expression[:lparen]) if expression[:lparen]
+                matrix_width  = "grid-template-columns:repeat(" + expression[:rows][0].length.to_s + ",1fr);"
+                matrix_height = "grid-template-rows:repeat(" + expression[:rows].length.to_s + ",1fr);"
                 
-                self.matrix({:style => (matrixWidth + matrixHeight)}) do
+                matrix({:style => (matrixWidth + matrixHeight)}) do
                   expression[:rows].each do |row|
                     row.each do |col|
                       append(col)
                     end
                   end
                 end
-                self.brace(expression[:rparen]) if expression[:rparen]
+                brace(expression[:rparen]) if expression[:rparen]
               end
           end
       end
@@ -111,35 +111,35 @@ module AsciiMath
     
     def subsup(base, sub, sup)
       append(base)
-      self.column do
+      column do
         if sup
-          self.smaller do
+          smaller do
             append(sup, :strip_paren => true)
           end
         else
-          self.smaller("&zwj;")
+          smaller("&zwj;")
         end
         if sub
-          self.smaller do
+          smaller do
             append(sub, :strip_paren => true)
           end
         else
-          self.smaller("&zwj;")
+          smaller("&zwj;")
         end
       end
     end
     
     def underover(base, under, over)
-      self.blank("&zwj;")
-      self.column do
+      blank("&zwj;")
+      column do
         if over
-          self.smaller do
+          smaller do
             append(over, :strip_paren => true)
           end
         end
         append(base)
         if under
-          self.smaller do
+          smaller do
             append(under, :strip_paren => true)
           end
         end
@@ -147,21 +147,21 @@ module AsciiMath
     end
         
     def fraction(numerator, denominator)
-      self.blank("&zwj;")
-      self.fraction do
-        self.fraction_row do
-          self.fraction_cell do
-            self.smaller do
-              self.row do
+      blank("&zwj;")
+      fraction do
+        fraction_row do
+          fraction_cell do
+            smaller do
+              row do
                 append(numerator, :strip_paren => true)
               end
             end
           end
         end
-        self.fraction_row do
-          self.fraction_cell do
-            self.smaller do
-              self.row do
+        fraction_row do
+          fraction_cell do
+            smaller do
+              row do
                 append(denominator, :strip_paren => true)
               end
             end
@@ -187,7 +187,7 @@ module AsciiMath
       if block_given? || text
         @html << '>'
         @html << text
-        yield self if block_given?
+        yield if block_given?
         @html << '</span>'
       else
         @html << '/>'
