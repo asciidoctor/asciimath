@@ -144,8 +144,10 @@ describe "AsciiMath::MathMLBuilder" do
     it "should produce identical output to asciimathml.js for '#{asciimath}'" do
       expect_mathml(asciimath, output[:mathml])
     end
-    it "should produce html that looks like the output from asciimathml.js for '#{asciimath}'" do
-      expect_html(asciimath, output[:html])
+    if output[:html] != "Unsupported"
+      it "should produce html that looks like the output from asciimathml.js for '#{asciimath}'" do
+        expect_html(asciimath, output[:html])
+      end
     end
   end
 
