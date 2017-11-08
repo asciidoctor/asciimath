@@ -99,7 +99,9 @@ module AsciiMath
                 matrix({:style => (matrix_width + matrix_height)}) do
                   expression[:rows].each do |row|
                     row.each do |col|
-                      append(col)
+                      row do
+                        append(col)
+                      end
                     end
                   end
                 end
