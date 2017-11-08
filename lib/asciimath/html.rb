@@ -92,7 +92,11 @@ module AsciiMath
             when :matrix
               row do
                 # TODO: Figure out how big the brace should be and insert something to that effect...
-                brace(expression[:lparen]) if expression[:lparen]
+                if expression[:lparen]
+                  brace(expression[:lparen])
+                else
+                  blank("&zwj;")
+                end
                 matrix_width  = "grid-template-columns:repeat(" + expression[:rows][0].length.to_s + ",1fr);"
                 matrix_height = "grid-template-rows:repeat(" + expression[:rows].length.to_s + ",1fr);"
                 
@@ -105,7 +109,11 @@ module AsciiMath
                     end
                   end
                 end
-                brace(expression[:rparen]) if expression[:rparen]
+                if expression[:rparen]
+                  brace(expression[:rparen])
+                else
+                  blank("&zwj;")
+                end
               end
           end
       end
