@@ -66,15 +66,15 @@ module AsciiMath
             when :binary
               operator = expression[:operator]
               if operator == :frac
-                fraction(expression[:s1],expression[:s2])
+                append_fraction(expression[:s1],expression[:s2])
               elsif operator == :sub
-                subsup(expression[:s1],expression[:s2],nil)
+                append_subsup(expression[:s1],expression[:s2],nil)
               elsif operator == :sup
-                subsup(expression[:s1],nil,expression[:s2])
+                append_subsup(expression[:s1],nil,expression[:s2])
               elsif operator == :under
-                underover(expression[:s1],expression[:s2],nil)
+                append_underover(expression[:s1],expression[:s2],nil)
               elsif operator == :over
-                underover(expression[:s1],nil,expression[:s2])
+                append_underover(expression[:s1],nil,expression[:s2])
               else
                 tag(operator) do
                   append(expression[:s1], :strip_paren => true)
@@ -84,10 +84,10 @@ module AsciiMath
             when :ternary
               operator = expression[:operator]
               if operator == :subsup
-                subsup(expression[:s1],expression[:s2],expression[:s3])
+                append_subsup(expression[:s1],expression[:s2],expression[:s3])
               elsif operator == :underover
                 # TODO: Handle over/under braces in some way? SVG maybe?
-                underover(expression[:s1],expression[:s2],expression[:s3])
+                append_underover(expression[:s1],expression[:s2],expression[:s3])
               end
             when :matrix
               row do
@@ -109,7 +109,7 @@ module AsciiMath
       end
     end
     
-    def subsup(base, sub, sup)
+    def append_subsup(base, sub, sup)
       append(base)
       column do
         if sup
@@ -129,24 +129,28 @@ module AsciiMath
       end
     end
     
-    def underover(base, under, over)
+    def append_underover(base, under, over)
       blank("&zwj;")
       column do
-        if over
-          smaller do
+        smaller do
+          if over
             append(over, :strip_paren => true)
+          else
+            blank("&zwj;")
           end
         end
         append(base)
-        if under
-          smaller do
+        smaller do
+          if under
             append(under, :strip_paren => true)
+          else
+            blank("&zwj;")
           end
         end
       end
     end
         
-    def fraction(numerator, denominator)
+    def append_fraction(numerator, denominator)
       blank("&zwj;")
       fraction do
         fraction_row do
