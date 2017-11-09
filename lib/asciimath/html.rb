@@ -124,7 +124,7 @@ module AsciiMath
     
     def append_subsup(base, sub, sup)
       append(base)
-      column do
+      subsup do
         if sup
           smaller do
             append(sup, :strip_paren => true)
@@ -144,7 +144,7 @@ module AsciiMath
     
     def append_underover(base, under, over)
       blank("&zwj;")
-      column do
+      underover do
         smaller do
           if over
             append(over, :strip_paren => true)
