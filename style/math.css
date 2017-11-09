@@ -55,7 +55,6 @@
 	font-style: italic;
 }
 .math-brace {
-    font-size: 200%;
     transform: scale(0.5,1.0);
 }
 .math-blank {
