@@ -91,9 +91,12 @@ module AsciiMath
               end
             when :matrix
               row do
-                # TODO: Figure out how big the brace should be and insert something to that effect...
+                # Figures out a font size for the braces, based on the height of the matrix.
+                # NOTE: This does not currently consider the size of each element within the matrix.
+                brace_height = "font-size: " + expression[:rows].length.to_s + "00%;"
+                
                 if expression[:lparen]
-                  brace(expression[:lparen])
+                  brace(expression[:lparen], {:style => brace_height})
                 else
                   blank("&zwj;")
                 end
@@ -110,7 +113,7 @@ module AsciiMath
                   end
                 end
                 if expression[:rparen]
-                  brace(expression[:rparen])
+                  brace(expression[:rparen], {:style => brace_height})
                 else
                   blank("&zwj;")
                 end
