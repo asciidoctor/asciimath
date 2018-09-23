@@ -1,5 +1,17 @@
 = Asciimath Changelog
 
+== 1.0.6
+
+Bug fixes::
+
+  * Resolve 'undefined variable' error when parsing empty `paren` expressions (@tuttieee)
+
+== 1.0.5
+
+Enhancements::
+
+  * Add experimental HTML output (@Tobski)
+
 == 1.0.4
 
 Enhancements::
