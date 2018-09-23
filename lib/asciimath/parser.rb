@@ -477,7 +477,7 @@ module AsciiMath
           t2 = tok.next_token
           case t2[:type]
             when :rparen, :lrparen
-              {:type => :paren, :e => e, :lparen => t1[:value], :rparen => t2[:value]}
+              {:type => :paren, :e => nil, :lparen => t1[:value], :rparen => t2[:value]}
             else
               tok.push_back(t2)
 

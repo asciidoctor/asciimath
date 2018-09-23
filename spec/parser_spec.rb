@@ -112,6 +112,11 @@ TEST_CASES = {
     {
         :mathml => '<math><mstyle mathvariant="bold"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></mstyle><mo>+</mo><mstyle mathvariant="script"><mi>c</mi></mstyle><mo>=</mo><mstyle mathvariant="fraktur"><msup><mi>d</mi><mi>n</mi></msup></mstyle></math>',
         :html => 'Unsupported'
+    },
+    'max()' =>
+    {
+        :mathml => '<math><mo>max</mo><mrow><mo>(</mo><mo>)</mo></mrow></math>',
+        :html => '<span class="math-inline"><span class="math-row"><span class="math-operator">max</span><span class="math-row"><span class="math-brace">(</span><span class="math-brace">)</span></span></span></span>'
     }
 }
 
