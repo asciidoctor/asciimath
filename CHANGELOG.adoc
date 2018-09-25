@@ -1,5 +1,11 @@
 = Asciimath Changelog
 
+== 1.0.7.next
+
+Bug fixes::
+
+  * Issue #6: Mark standard functions as identifiers instead of operators
+
 == 1.0.6
 
 Bug fixes::

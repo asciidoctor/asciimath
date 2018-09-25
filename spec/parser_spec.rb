@@ -115,8 +115,8 @@ TEST_CASES = {
     },
     'max()' =>
     {
-        :mathml => '<math><mo>max</mo><mrow><mo>(</mo><mo>)</mo></mrow></math>',
-        :html => '<span class="math-inline"><span class="math-row"><span class="math-operator">max</span><span class="math-row"><span class="math-brace">(</span><span class="math-brace">)</span></span></span></span>'
+        :mathml => '<math><mi>max</mi><mrow><mo>(</mo><mo>)</mo></mrow></math>',
+        :html => '<span class="math-inline"><span class="math-row"><span class="math-identifier">max</span><span class="math-row"><span class="math-brace">(</span><span class="math-brace">)</span></span></span></span>'
     }
 }
 
