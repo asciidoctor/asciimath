@@ -6,7 +6,7 @@ TEST_CASES = {
     'x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)' =>
     {
         :mathml => '<math><mi>x</mi><mo>+</mo><mfrac><mi>b</mi><mrow><mn>2</mn><mi>a</mi></mrow></mfrac><mo>&lt;</mo><mo>&#xB1;</mo><msqrt><mrow><mfrac><msup><mi>b</mi><mn>2</mn></msup><mrow><mn>4</mn><msup><mi>a</mi><mn>2</mn></msup></mrow></mfrac><mo>&#x2212;</mo><mfrac><mi>c</mi><mi>a</mi></mfrac></mrow></msqrt></math>',
-        :html => 'Unsupported',
+        :html => nil,
     },
     'a^2 + b^2 = c^2' =>
     {
@@ -16,7 +16,7 @@ TEST_CASES = {
     'x = (-b+-sqrt(b^2-4ac))/(2a)' =>
     {
         :mathml => '<math><mi>x</mi><mo>=</mo><mfrac><mrow><mo>&#x2212;</mo><mi>b</mi><mo>&#xB1;</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mn>-4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>',
-        :html => 'Unsupported'
+        :html => nil
     },
     'm = (y_2 - y_1)/(x_2 - x_1) = (Deltay)/(Deltax)' =>
     {
@@ -111,7 +111,7 @@ TEST_CASES = {
     'bb (a + b) + cc c = fr (d^n)' =>
     {
         :mathml => '<math><mstyle mathvariant="bold"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></mstyle><mo>+</mo><mstyle mathvariant="script"><mi>c</mi></mstyle><mo>=</mo><mstyle mathvariant="fraktur"><msup><mi>d</mi><mi>n</mi></msup></mstyle></math>',
-        :html => 'Unsupported'
+        :html => nil
     },
     'max()' =>
     {
@@ -121,6 +121,9 @@ TEST_CASES = {
     'text("foo")' => {
         :mathml => '<math><mtext>"foo"</mtext></math>',
         :html => '<span class="math-inline"><span class="math-row"><span class="math-text">"foo"</span></span></span>'
+    },
+    'ubrace(1 + 2) obrace(3 + 4' => {
+        :mathml => '<math><munder><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow><mo>&#x23DF;</mo></munder><mover><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mo>&#x23DE;</mo></mover></math>'
     }
 }
 
@@ -153,7 +156,7 @@ describe "AsciiMath::MathMLBuilder" do
     it "should produce identical output to asciimathml.js for '#{asciimath}'" do
       expect_mathml(asciimath, output[:mathml])
     end
-    if output[:html] != "Unsupported"
+    if output[:html]
       it "should produce html that looks like the output from asciimathml.js for '#{asciimath}'" do
         expect_html(asciimath, output[:html])
       end

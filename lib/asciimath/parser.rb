@@ -361,6 +361,8 @@ module AsciiMath
         'vec' => {:value => "\u2192", :type => :accent, :position => :over},
         'dot' => {:value => '.', :type => :accent, :position => :over},
         'ddot' => {:value => '..', :type => :accent, :position => :over},
+        'obrace' => {:value => "\u23DE", :type => :accent, :position => :over},
+        'ubrace' => {:value => "\u23DF", :type => :accent, :position => :under},
 
         # Arrows
         'uarr' => {:value => "\u2191", :type => :operator},
