@@ -5,6 +5,7 @@
 Bug fixes::
 
   * Issue #6: Mark standard functions as identifiers instead of operators
+  * Issue #7: Correct parsing of TeX altenative style (`text()`) text strings
 
 == 1.0.6
 

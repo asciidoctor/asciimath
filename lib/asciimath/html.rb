@@ -23,6 +23,8 @@ module AsciiMath
 
     private
 
+    ZWJ = "\u8205"
+
     def append(expression, opts = {})
       case expression
         when Array
@@ -98,7 +100,7 @@ module AsciiMath
                 if expression[:lparen]
                   brace(expression[:lparen], {:style => brace_height})
                 else
-                  blank("&zwj;")
+                  blank(ZWJ)
                 end
                 matrix_width  = "grid-template-columns:repeat(" + expression[:rows][0].length.to_s + ",1fr);"
                 matrix_height = "grid-template-rows:repeat(" + expression[:rows].length.to_s + ",1fr);"
@@ -115,7 +117,7 @@ module AsciiMath
                 if expression[:rparen]
                   brace(expression[:rparen], {:style => brace_height})
                 else
-                  blank("&zwj;")
+                  blank(ZWJ)
                 end
               end
           end
@@ -130,26 +132,26 @@ module AsciiMath
             append(sup, :strip_paren => true)
           end
         else
-          smaller("&zwj;")
+          smaller(ZWJ)
         end
         if sub
           smaller do
             append(sub, :strip_paren => true)
           end
         else
-          smaller("&zwj;")
+          smaller(ZWJ)
         end
       end
     end
     
     def append_underover(base, under, over)
-      blank("&zwj;")
+      blank(ZWJ)
       underover do
         smaller do
           if over
             append(over, :strip_paren => true)
           else
-            blank("&zwj;")
+            blank(ZWJ)
           end
         end
         append(base)
@@ -157,14 +159,14 @@ module AsciiMath
           if under
             append(under, :strip_paren => true)
           else
-            blank("&zwj;")
+            blank(ZWJ)
           end
         end
       end
     end
         
     def append_fraction(numerator, denominator)
-      blank("&zwj;")
+      blank(ZWJ)
       fraction do
         fraction_row do
           fraction_cell do
@@ -203,7 +205,7 @@ module AsciiMath
 
       if block_given? || text
         @html << '>'
-        @html << text
+        @html << text.encode(Encoding::US_ASCII, :xml => :text) if text
         yield if block_given?
         @html << '</span>'
       else

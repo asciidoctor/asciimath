@@ -114,7 +114,7 @@ module AsciiMath
 
       if block_given? || text
         @mathml << '>'
-        @mathml << text
+        @mathml << text.encode(Encoding::US_ASCII, :xml => :text) if text
         yield self if block_given?
         @mathml << '</' << @prefix << tag.to_s << '>'
       else
