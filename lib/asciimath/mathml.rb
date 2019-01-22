@@ -114,7 +114,19 @@ module AsciiMath
 
       if block_given? || text
         @mathml << '>'
-        @mathml << text.encode(Encoding::US_ASCII, :xml => :text) if text
+        text.each_codepoint do |cp|
+          if cp == 38
+            @mathml << "&amp;"
+          elsif cp == 60
+            @mathml << "&lt;"
+          elsif cp == 62
+            @mathml << "&gt;"
+          elsif cp > 127
+            @mathml << "&#x#{cp.to_s(16).upcase};"
+          else
+            @mathml << cp
+          end
+        end
         yield self if block_given?
         @mathml << '</' << @prefix << tag.to_s << '>'
       else

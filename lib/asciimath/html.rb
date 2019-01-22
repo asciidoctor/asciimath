@@ -205,7 +205,19 @@ module AsciiMath
 
       if block_given? || text
         @html << '>'
-        @html << text.encode(Encoding::US_ASCII, :xml => :text) if text
+        text.each_codepoint do |cp|
+          if cp == 38
+            @html << "&amp;"
+          elsif cp == 60
+            @html << "&lt;"
+          elsif cp == 62
+            @html << "&gt;"
+          elsif cp > 127
+            @html << "&#x#{cp.to_s(16).upcase};"
+          else
+            @html << cp
+          end
+        end
         yield if block_given?
         @html << '</span>'
       else
