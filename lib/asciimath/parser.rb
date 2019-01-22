@@ -53,7 +53,7 @@ module AsciiMath
   # it applies.
   #
   class Tokenizer
-    WHITESPACE = /^\s+/
+    WHITESPACE = /\s+/
     NUMBER = /-?[0-9]+(?:\.[0-9]+)?/
     QUOTED_TEXT = /"[^"]*"/
     TEX_TEXT = /text\([^)]*\)/
