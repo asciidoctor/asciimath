@@ -23,7 +23,7 @@ module AsciiMath
 
     private
 
-    ZWJ = "\u8205"
+    ZWJ = "\u200D"
 
     def append(expression, opts = {})
       case expression
