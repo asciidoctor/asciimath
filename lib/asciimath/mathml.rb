@@ -17,94 +17,109 @@ module AsciiMath
 
     private
 
-    def append(expression, opts = {})
-      case expression
-        when Array
-          if expression.length <= 1 || opts[:single_child]
-            expression.each { |e| append(e) }
-          else
-            mrow do
-              expression.each { |e| append(e) }
+    def mfenced_args(expression)
+      args = {}
+      args[:open] = expression[:lparen] if expression[:lparen]
+      args[:close] = expression[:rparen] if expression[:rparen]
+      args[:open] ||= "" if args[:close]
+      args[:close] ||= "" if args[:open]
+      args
+    end
+
+    def append_mtable(expression)
+      mtable do
+        expression[:rows].each do |row|
+          mtr do
+            row.each do |col|
+              mtd do
+                append(col)
+              end
             end
           end
-        when Hash
-          case expression[:type]
-            when :operator
-              mo(expression[:c])
-            when :identifier
-              mi(expression[:c])
-            when :number
-              mn(expression[:c])
-            when :text
-              mtext(expression[:c])
-            when :paren
-              paren = !opts[:strip_paren]
-              args = {}
-              args[:open] = expression[:lparen] if expression[:lparen]
-              args[:close] = expression[:rparen] if expression[:rparen]
-              args[:open] ||= "" if args[:close]
-              args[:close] ||= "" if args[:open]
-              if paren
-                if args.empty?
+        end
+      end
+    end
+
+    def append(expression, opts = {})
+      case expression
+      when Array
+        if expression.length <= 1 || opts[:single_child]
+          expression.each { |e| append(e) }
+        else
+          mrow do
+            expression.each { |e| append(e) }
+          end
+        end
+      when Hash
+        case expression[:type]
+        when :operator
+          mo(expression[:c])
+        when :identifier
+          mi(expression[:c])
+        when :number
+          mn(expression[:c])
+        when :text
+          mtext(expression[:c])
+        when :paren
+          paren = !opts[:strip_paren]
+          args = mfenced_args(expression)
+          if paren
+            if args.empty?
+              append(expression[:e], :single_child => true)
+            else
+              args[:separators] = ""
+              if opts[:single_child]
+                mfenced(args) do
                   append(expression[:e], :single_child => true)
-                else
-                  args[:separators] = ""
-                  if opts[:single_child]
-                    mfenced(args) do
-                      append(expression[:e], :single_child => true)
-                    end
-                  else
-                    mrow do
-                      mfenced(args) do
-                        append(expression[:e], :single_child => true)
-                      end
-                    end
-                  end
                 end
               else
-                append(expression[:e])
-              end
-            when :font
-              style = expression[:operator]
-              tag("mstyle", :mathvariant => style.to_s.gsub('_', '-')) do
-                append(expression[:s], :single_child => true, :strip_paren => true)
-              end
-            when :unary
-              operator = expression[:operator]
-              tag("m#{operator}") do
-                append(expression[:s], :single_child => true, :strip_paren => true)
-              end
-            when :binary
-              operator = expression[:operator]
-              tag("m#{operator}") do
-                append(expression[:s1], :strip_paren => (operator != :sub && operator != :sup))
-                append(expression[:s2], :strip_paren => true)
-              end
-            when :ternary
-              operator = expression[:operator]
-              tag("m#{operator}") do
-                append(expression[:s1])
-                append(expression[:s2], :strip_paren => true)
-                append(expression[:s3], :strip_paren => true)
-              end
-            when :matrix
-              mrow do
-                mo(expression[:lparen]) if expression[:lparen]
-                mtable do
-                  expression[:rows].each do |row|
-                    mtr do
-                      row.each do |col|
-                        mtd do
-                          append(col)
-                        end
-                      end
-                    end
+                mrow do
+                  mfenced(args) do
+                    append(expression[:e], :single_child => true)
                   end
                 end
-                mo(expression[:rparen]) if expression[:rparen]
               end
             end
+          else
+            append(expression[:e])
+          end
+        when :font
+          style = expression[:operator]
+          tag("mstyle", :mathvariant => style.to_s.gsub('_', '-')) do
+            append(expression[:s], :single_child => true, :strip_paren => true)
+          end
+        when :unary
+          operator = expression[:operator]
+          tag("m#{operator}") do
+            append(expression[:s], :single_child => true, :strip_paren => true)
+          end
+        when :binary
+          operator = expression[:operator]
+          tag("m#{operator}") do
+            append(expression[:s1], :strip_paren => (operator != :sub && operator != :sup))
+            append(expression[:s2], :strip_paren => true)
+          end
+        when :ternary
+          operator = expression[:operator]
+          tag("m#{operator}") do
+            append(expression[:s1])
+            append(expression[:s2], :strip_paren => true)
+            append(expression[:s3], :strip_paren => true)
+          end
+        when :matrix
+          mrow do
+            args = mfenced_args(expression)
+            if args.empty?
+              append_mtable(expression)
+            else
+              args[:separators] = ""
+              mfenced(args) do
+                append_mtable(expression)
+              end
+            end
+          end
         end
+      end
     end
 
     def method_missing(meth, *args, &block)
