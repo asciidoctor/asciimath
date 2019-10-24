@@ -39,16 +39,26 @@ module AsciiMath
               mtext(expression[:c])
             when :paren
               paren = !opts[:strip_paren]
+              args = {}
+              args[:open] = expression[:lparen] if expression[:lparen]
+              args[:close] = expression[:rparen] if expression[:rparen]
+              args[:open] ||= "" if args[:close]
+              args[:close] ||= "" if args[:open]
               if paren
-                if opts[:single_child]
-                  mo(expression[:lparen]) if expression[:lparen]
+                if args.empty?
                   append(expression[:e], :single_child => true)
-                  mo(expression[:rparen]) if expression[:rparen]
                 else
-                  mrow do
-                    mo(expression[:lparen]) if expression[:lparen]
-                    append(expression[:e], :single_child => true)
-                    mo(expression[:rparen]) if expression[:rparen]
+                  args[:separators] = ""
+                  if opts[:single_child]
+                    mfenced(args) do
+                      append(expression[:e], :single_child => true)
+                    end
+                  else
+                    mrow do
+                      mfenced(args) do
+                        append(expression[:e], :single_child => true)
+                      end
+                    end
                   end
                 end
               else
@@ -93,8 +103,8 @@ module AsciiMath
                 end
                 mo(expression[:rparen]) if expression[:rparen]
               end
-          end
-      end
+            end
+        end
     end
 
     def method_missing(meth, *args, &block)
