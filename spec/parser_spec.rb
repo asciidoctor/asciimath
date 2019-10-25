@@ -124,6 +124,12 @@ TEST_CASES = {
     },
     'ubrace(1 + 2) obrace(3 + 4' => {
         :mathml => '<math><munder><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow><mo>&#x23DF;</mo></munder><mover><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mo>&#x23DE;</mo></mover></math>'
+    },
+    "s'_i = {(- 1, if s_i > s_(i + 1)),( + 1, if s_i <= s_(i + 1)):}" => {
+        :mathml => '<math><mi>s</mi><msub><mi>\'</mi><mi>i</mi></msub><mo>=</mo><mrow><mo>{</mo><mtable><mtr><mtd><mrow><mo>&#x2212;</mo><mn>1</mn></mrow></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&gt;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr><mtr><mtd><mrow><mo>+</mo><mn>1</mn></mrow></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&#x2264;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr></mtable></mrow></math>'
+    },
+    "s'_i = {(, if s_i > s_(i + 1)),( + 1,):}" => {
+        :mathml => '<math><mi>s</mi><msub><mi>\'</mi><mi>i</mi></msub><mo>=</mo><mrow><mo>{</mo><mtable><mtr><mtd></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&gt;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr><mtr><mtd><mrow><mo>+</mo><mn>1</mn></mrow></mtd><mtd></mtd></mtr></mtable></mrow></math>'
     }
 }
 
@@ -154,17 +160,22 @@ end
 
 describe "AsciiMath::MathMLBuilder" do
   TEST_CASES.each_pair do |asciimath, output|
-    it "should produce identical output to asciimathml.js for '#{asciimath}'" do
+    it "should produce MathML that looks like the output from asciimathml.js for '#{asciimath}'" do
       expect_mathml(asciimath, output[:mathml])
-    end
-    if output[:html]
-      it "should produce html that looks like the output from asciimathml.js for '#{asciimath}'" do
-        expect_html(asciimath, output[:html])
-      end
     end
   end
 
   it 'should not generate mo elements for {: and :}' do
     expect_mathml '{:(a,b),(c,d):}', '<math><mrow><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable></mrow></math>'
+  end
+end
+
+describe "AsciiMath::HTMLBuilder" do
+  TEST_CASES.each_pair do |asciimath, output|
+    if output[:html]
+      it "should produce HTML that looks like the output from asciimathml.js for '#{asciimath}'" do
+        expect_html(asciimath, output[:html])
+      end
+    end
   end
 end

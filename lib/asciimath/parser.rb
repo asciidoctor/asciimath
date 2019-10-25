@@ -541,13 +541,39 @@ module AsciiMath
     end
 
     def convert_to_matrix(expression)
-      return expression unless matrix? expression
+      return expression unless expression.is_a?(Hash) && expression[:type] == :paren
 
-      rows = expression[:e].select.with_index { |obj, i| i.even? }.map do |row|
-        row[:e].select.with_index { |obj, i| i.even? }
+      rows, separators = expression[:e].partition.with_index { |obj, i| i.even? }
+      return expression unless rows.length > 1 &&
+          rows.length > separators.length &&
+          separators.all? { |item| is_matrix_separator(item) } &&
+          (rows.all? { |item| item[:type] == :paren && item[:lparen] == '(' && item[:rparen] == ')' } ||
+              rows.all? { |item| item[:type] == :paren && item[:lparen] == '[' && item[:rparen] == ']' })
+
+      rows = rows.map do |row|
+        chunks = []
+        current_chunk = []
+        row[:e].each do |item|
+          if is_matrix_separator(item)
+            chunks << current_chunk
+            current_chunk = []
+          else
+            current_chunk << item
+          end
+        end
+
+        chunks << current_chunk
+
+        chunks.map {|c| c.length == 1 ? c[0] : c }.to_a
       end
 
+      return expression unless rows.all? { |row| row.length == rows[0].length }
+
       {:type => :matrix, :rows => rows, :lparen => expression[:lparen], :rparen => expression[:rparen]}
+    end
+
+    def is_matrix_separator(item)
+      item[:type] == :identifier && item[:c] == ','
     end
 
     def matrix?(expression)
@@ -557,7 +583,7 @@ module AsciiMath
 
       rows.length > 1 &&
           rows.length > separators.length &&
-          separators.all? { |item| item[:type] == :identifier && item[:c] == ',' } &&
+          separators.all?(&method(:is_matrix_separator)) &&
           (rows.all? { |item| item[:type] == :paren && item[:lparen] == '(' && item[:rparen] == ')' } ||
               rows.all? { |item| item[:type] == :paren && item[:lparen] == '[' && item[:rparen] == ']' }) &&
           rows.all? { |item| item[:e].length == rows[0][:e].length } &&
@@ -570,7 +596,7 @@ module AsciiMath
       cols, separators = expression.partition.with_index { |obj, i| i.even? }
 
       cols.all? { |item| item[:type] != :identifier || item[:c] != ',' } &&
-          separators.all? { |item| item[:type] == :identifier && item[:c] == ',' }
+          separators.all?(&method(:is_col_separator))
     end
   end
 
