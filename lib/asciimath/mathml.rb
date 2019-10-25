@@ -79,7 +79,7 @@ module AsciiMath
               end
             when :matrix
               mrow do
-                mo(expression[:lparen]) if expression[:lparen]
+                mo(expression[:lparen], :stretchy => true, :fence => true) if expression[:lparen]
                 mtable do
                   expression[:rows].each do |row|
                     mtr do
@@ -91,7 +91,7 @@ module AsciiMath
                     end
                   end
                 end
-                mo(expression[:rparen]) if expression[:rparen]
+                mo(expression[:rparen], :stretchy => true, :fence => true) if expression[:rparen]
               end
           end
       end
