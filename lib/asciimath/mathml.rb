@@ -38,18 +38,9 @@ module AsciiMath
             when :text
               mtext(expression[:c])
             when :paren
-              paren = !opts[:strip_paren]
-              if paren
-                if opts[:single_child]
-                  mo(expression[:lparen]) if expression[:lparen]
-                  append(expression[:e], :single_child => true)
-                  mo(expression[:rparen]) if expression[:rparen]
-                else
-                  mrow do
-                    mo(expression[:lparen]) if expression[:lparen]
-                    append(expression[:e], :single_child => true)
-                    mo(expression[:rparen]) if expression[:rparen]
-                  end
+              if !opts[:strip_paren]
+                fenced(expression[:lparen], expression[:rparen]) do
+                  append(expression[:e])
                 end
               else
                 append(expression[:e])
@@ -78,8 +69,7 @@ module AsciiMath
                 append(expression[:s3], :strip_paren => true)
               end
             when :matrix
-              mrow do
-                mo(expression[:lparen], :stretchy => true, :fence => true) if expression[:lparen]
+              fenced(expression[:lparen], expression[:rparen]) do
                 mtable do
                   expression[:rows].each do |row|
                     mtr do
@@ -91,7 +81,6 @@ module AsciiMath
                     end
                   end
                 end
-                mo(expression[:rparen], :stretchy => true, :fence => true) if expression[:rparen]
               end
           end
       end
@@ -99,6 +88,16 @@ module AsciiMath
 
     def method_missing(meth, *args, &block)
       tag(meth, *args, &block)
+    end
+
+    def fenced(lparen, rparen, &block)
+      if lparen || rparen
+        mfenced(:open => lparen || '', :close => rparen || '') do
+          yield self
+        end
+      else
+        yield self
+      end
     end
 
     def tag(tag, *args)
