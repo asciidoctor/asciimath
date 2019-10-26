@@ -1,5 +1,12 @@
 = Asciimath Changelog
 
+== 1.0.9
+
+Bug fixes::
+
+  * Issue #13: Improve matrix parsing
+  * Output `mfenced` tags instead of `mo` pairs to improve MathML compatbility with Microsoft Office (@opoudjis)
+
 == 1.0.8
 
 Bug fixes::
@@ -12,7 +19,6 @@ Bug fixes::
 
   * Issue #6: Mark standard functions as identifiers instead of operators
   * Issue #7: Correct parsing of TeX altenative style (`text()`) text strings
-  * Issue #13: Improve matrix parsing
 
 == 1.0.6
 
