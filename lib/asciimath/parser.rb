@@ -228,6 +228,7 @@ module AsciiMath
         'nnn' => {:value => "\u22C2", :type => :operator, :underover => true},
         'uu' => {:value => "\u222A", :type => :operator},
         'uuu' => {:value => "\u22C3", :type => :operator, :underover => true},
+        '\'' => {:value => "\u2032", :type => :operator},
 
         # Relation symbols
         '=' => {:value => '=', :type => :operator},

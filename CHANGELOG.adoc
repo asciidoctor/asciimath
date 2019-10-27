@@ -1,5 +1,11 @@
 = Asciimath Changelog
 
+== 1.0.10
+
+Bug fixes::
+
+  * Issue #14: translate `'` to the Unicode prime character (U+2032)
+
 == 1.0.9
 
 Bug fixes::
