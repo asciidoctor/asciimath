@@ -115,8 +115,8 @@ TEST_CASES = {
     },
     'max()' =>
     {
-        :mathml => '<math><mi>max</mi><mfenced open="(" close=")"></mfenced></math>',
-        :html => '<span class="math-inline"><span class="math-row"><span class="math-identifier">max</span><span class="math-row"><span class="math-brace">(</span><span class="math-brace">)</span></span></span></span>'
+        :mathml => '<math><mo>max</mo><mfenced open="(" close=")"></mfenced></math>',
+        :html => '<span class="math-inline"><span class="math-row"><span class="math-operator">max</span><span class="math-row"><span class="math-brace">(</span><span class="math-brace">)</span></span></span></span>'
     },
     'text("foo")' => {
         :mathml => '<math><mtext>"foo"</mtext></math>',
@@ -134,6 +134,26 @@ TEST_CASES = {
     '{:(a,b),(c,d):}' => {
         :mathml => '<math><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable></math>'
     },
+    'overset (a + b) (c + d)' => {
+        :mathml => '<math><mover><mrow><mi>c</mi><mo>+</mo><mi>d</mi></mrow><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></mover></math>',
+        :html => '<span class="math-inline"><span class="math-row"><span class="math-blank">&#x200D;</span><span class="math-underover"><span class="math-smaller"><span class="math-row"><span class="math-identifier">a</span><span class="math-operator">+</span><span class="math-identifier">b</span></span></span><span class="math-row"><span class="math-brace">(</span><span class="math-row"><span class="math-identifier">c</span><span class="math-operator">+</span><span class="math-identifier">d</span></span><span class="math-brace">)</span></span><span class="math-smaller"><span class="math-blank">&#x200D;</span></span></span></span></span>'
+    },
+    'underset a b' => {
+        :mathml => '<math><munder><mi>b</mi><mi>a</mi></munder></math>',
+        :html => '<span class="math-inline"><span class="math-row"><span class="math-blank">&#x200D;</span><span class="math-underover"><span class="math-smaller"><span class="math-blank">&#x200D;</span></span><span class="math-identifier">b</span><span class="math-smaller"><span class="math-identifier">a</span></span></span></span></span>'
+    },
+    'sin a_c^b' => {
+        :mathml => '<math><msubsup><mrow><mi>sin</mi><mi>a</mi></mrow><mi>c</mi><mi>b</mi></msubsup></math>',
+        :html => '<span class="math-inline"><span class="math-row"><span class="math-row"><span class="math-identifier">sin</span><span class="math-identifier">a</span></span><span class="math-subsup"><span class="math-smaller"><span class="math-identifier">b</span></span><span class="math-smaller"><span class="math-identifier">c</span></span></span></span></span>'
+    },
+    'max a_c^b' => {
+        :mathml => '<math><mo>max</mo><msubsup><mi>a</mi><mi>c</mi><mi>b</mi></msubsup></math>',
+        :html => '<span class="math-inline"><span class="math-row"><span class="math-operator">max</span><span class="math-identifier">a</span><span class="math-subsup"><span class="math-smaller"><span class="math-identifier">b</span></span><span class="math-smaller"><span class="math-identifier">c</span></span></span></span></span>'
+    },
+    'norm a_c^b' => {
+        :mathml => '<math><msubsup><mfenced open="&#x2225;" close="&#x2225;"><mi>a</mi></mfenced><mi>c</mi><mi>b</mi></msubsup></math>',
+        :html => '<span class="math-inline"><span class="math-row"><span class="math-row"><span class="math-brace">&#x2225;</span><span class="math-identifier">a</span><span class="math-brace">&#x2225;</span></span><span class="math-subsup"><span class="math-smaller"><span class="math-identifier">b</span></span><span class="math-smaller"><span class="math-identifier">c</span></span></span></span></span>'
+    }
 }
 
 version = RUBY_VERSION.split('.').map { |s| s.to_i }

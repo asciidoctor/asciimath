@@ -209,11 +209,13 @@ module AsciiMath
         '***' => {:value => "\u22C6", :type => :operator},
         '//' => {:value => '/', :type => :operator},
         '\\\\' => {:value => '\\', :type => :operator},
+        'setminus' => {:value => '\\', :type => :operator},
         'xx' => {:value => "\u00D7", :type => :operator},
-        '-:' => {:value => "\u00F7", :type => :operator},
         '|><' => {:value => "\u22C9", :type => :operator},
         '><|' => {:value => "\u22CA", :type => :operator},
         '|><|' => {:value => "\u22C8", :type => :operator},
+        '-:' => {:value => "\u00F7", :type => :operator},
+        'divide' => {:value => "\u00F7", :type => :operator},
         '@' => {:value => "\u26AC", :type => :operator},
         'o+' => {:value => "\u2295", :type => :operator},
         'ox' => {:value => "\u2297", :type => :operator},
@@ -228,7 +230,6 @@ module AsciiMath
         'nnn' => {:value => "\u22C2", :type => :operator, :underover => true},
         'uu' => {:value => "\u222A", :type => :operator},
         'uuu' => {:value => "\u22C3", :type => :operator, :underover => true},
-        '\'' => {:value => "\u2032", :type => :operator},
 
         # Relation symbols
         '=' => {:value => '=', :type => :operator},
@@ -243,6 +244,7 @@ module AsciiMath
         '>=' => {:value => "\u2265", :type => :operator},
         'ge' => {:value => "\u2265", :type => :operator},
         '-<' => {:value => "\u227A", :type => :operator},
+        '-lt' => {:value => "\u227A", :type => :operator},
         '>-' => {:value => "\u227B", :type => :operator},
         '-<=' => {:value => "\u2AAF", :type => :operator},
         '>-=' => {:value => "\u2AB0", :type => :operator},
@@ -278,12 +280,15 @@ module AsciiMath
         ']' => {:value => ']', :type => :rparen},
         '{' => {:value => '{', :type => :lparen},
         '}' => {:value => '}', :type => :rparen},
+        '|' => {:value => '|', :type => :lrparen},
+        ':|:' => {:value => '|', :type => :operator},
+        '|:' => {:value => '|', :type => :lparen},
+        ':|' => {:value => '|', :type => :rparen},
+        '||' => {:value => '||', :type => :lrparen},
         '(:' => {:value => "\u2329", :type => :lparen},
         ':)' => {:value => "\u232A", :type => :rparen},
         '<<' => {:value => "\u2329", :type => :lparen},
         '>>' => {:value => "\u232A", :type => :rparen},
-        '|' => {:value => '|', :type => :lrparen},
-        '||' => {:value => '||', :type => :lrparen},
         '{:' => {:value => nil, :type => :lparen},
         ':}' => {:value => nil, :type => :rparen},
 
@@ -302,8 +307,13 @@ module AsciiMath
         'aleph' => {:value => "\u2135", :type => :operator},
         '...' => {:value => '...', :type => :operator},
         ':.' => {:value => "\u2234", :type => :operator},
+        ':\'' => {:value => "\u2235", :type => :operator},
         '/_' => {:value => "\u2220", :type => :operator},
+        '/_\\' => {:value => "\u25B3", :type => :operator},
+        '\'' => {:value => "\u2032", :type => :operator},
+        'tilde' => {:value => "~", :type => :accent, :position => :over},
         '\\ ' => {:value => "\u00A0", :type => :operator},
+        'frown' => {:value => '\u2322', :type => :operator},
         'quad' => {:value => '\u00A0\u00A0', :type => :operator},
         'qquad' => {:value => '\u00A0\u00A0\u00A0\u00A0', :type => :operator},
         'cdots' => {:value => "\u22EF", :type => :operator},
@@ -320,50 +330,56 @@ module AsciiMath
         'QQ' => {:value => "\u211A", :type => :operator},
         'RR' => {:value => "\u211D", :type => :operator},
         'ZZ' => {:value => "\u2124", :type => :operator},
-
-        'lim' => {:value => 'lim', :type => :operator, :underover => true},
-        'Lim' => {:value => 'Lim', :type => :operator, :underover => true},
-
-        # Standard functions
-        'sin' => {:value => 'sin', :type => :identifier},
-        'cos' => {:value => 'cos', :type => :identifier},
-        'tan' => {:value => 'tan', :type => :identifier},
-        'sec' => {:value => 'sec', :type => :identifier},
-        'csc' => {:value => 'csc', :type => :identifier},
-        'cot' => {:value => 'cot', :type => :identifier},
-        'arcsin' => {:value => 'arcsin', :type => :identifier},
-        'arccos' => {:value => 'arccos', :type => :identifier},
-        'arctan' => {:value => 'arctan', :type => :identifier},
-        'sinh' => {:value => 'sinh', :type => :identifier},
-        'cosh' => {:value => 'cosh', :type => :identifier},
-        'tanh' => {:value => 'tanh', :type => :identifier},
-        'sech' => {:value => 'sech', :type => :identifier},
-        'csch' => {:value => 'csch', :type => :identifier},
-        'coth' => {:value => 'coth', :type => :identifier},
-        'exp' => {:value => 'exp', :type => :identifier},
-        'log' => {:value => 'log', :type => :identifier},
-        'ln' => {:value => 'ln', :type => :identifier},
-        'det' => {:value => 'det', :type => :identifier},
-        'dim' => {:value => 'dim', :type => :identifier},
-        'mod' => {:value => 'mod', :type => :identifier},
-        'gcd' => {:value => 'gcd', :type => :identifier},
-        'lcm' => {:value => 'lcm', :type => :identifier},
-        'lub' => {:value => 'lub', :type => :identifier},
-        'glb' => {:value => 'glb', :type => :identifier},
-        'min' => {:value => 'min', :type => :identifier, :underover => true},
-        'max' => {:value => 'max', :type => :identifier, :underover => true},
         'f' => {:value => 'f', :type => :identifier},
         'g' => {:value => 'g', :type => :identifier},
 
-        # Accents
-        'hat' => {:value => "\u005E", :type => :accent, :position => :over},
-        'bar' => {:value => "\u00AF", :type => :accent, :position => :over},
-        'ul' => {:value => '_', :type => :accent, :position => :under},
-        'vec' => {:value => "\u2192", :type => :accent, :position => :over},
-        'dot' => {:value => '.', :type => :accent, :position => :over},
-        'ddot' => {:value => '..', :type => :accent, :position => :over},
-        'obrace' => {:value => "\u23DE", :type => :accent, :position => :over},
-        'ubrace' => {:value => "\u23DF", :type => :accent, :position => :under},
+
+        # Standard functions
+        'lim' => {:value => 'lim', :type => :operator, :underover => true},
+        'Lim' => {:value => 'Lim', :type => :operator, :underover => true},
+        'min' => {:value => 'min', :type => :operator, :underover => true},
+        'max' => {:value => 'max', :type => :operator, :underover => true},
+        'sin' => {:value => 'sin', :type => :func},
+        'Sin' => {:value => 'Sin', :type => :func},
+        'cos' => {:value => 'cos', :type => :func},
+        'Cos' => {:value => 'Cos', :type => :func},
+        'tan' => {:value => 'tan', :type => :func},
+        'Tan' => {:value => 'Tan', :type => :func},
+        'sinh' => {:value => 'sinh', :type => :func},
+        'Sinh' => {:value => 'Sinh', :type => :func},
+        'cosh' => {:value => 'cosh', :type => :func},
+        'Cosh' => {:value => 'Cosh', :type => :func},
+        'tanh' => {:value => 'tanh', :type => :func},
+        'Tanh' => {:value => 'Tanh', :type => :func},
+        'cot' => {:value => 'cot', :type => :func},
+        'Cot' => {:value => 'Cot', :type => :func},
+        'sec' => {:value => 'sec', :type => :func},
+        'Sec' => {:value => 'Sec', :type => :func},
+        'csc' => {:value => 'csc', :type => :func},
+        'Csc' => {:value => 'Csc', :type => :func},
+        'arcsin' => {:value => 'arcsin', :type => :func},
+        'arccos' => {:value => 'arccos', :type => :func},
+        'arctan' => {:value => 'arctan', :type => :func},
+        'coth' => {:value => 'coth', :type => :func},
+        'sech' => {:value => 'sech', :type => :func},
+        'csch' => {:value => 'csch', :type => :func},
+        'exp' => {:value => 'exp', :type => :func},
+        'abs' => {:value => 'abs', :type => :func, :wrap_left => '|', :wrap_right => '|'},
+        'Abs' => {:value => 'Abs', :type => :func, :wrap_left => '|', :wrap_right => '|'},
+        'norm' => {:value => 'norm', :type => :func, :wrap_left => "\u2225", :wrap_right => "\u2225"},
+        'floor' => {:value => 'floor', :type => :func, :wrap_left => "\u230A", :wrap_right => "\u230B"},
+        'ceil' => {:value => 'ceil', :type => :func, :wrap_left => "\u2308", :wrap_right => "\u2309"},
+        'log' => {:value => 'log', :type => :func},
+        'Log' => {:value => 'Log', :type => :func},
+        'ln' => {:value => 'ln', :type => :func},
+        'Ln' => {:value => 'Ln', :type => :func},
+        'det' => {:value => 'det', :type => :func},
+        'dim' => {:value => 'dim', :type => :func},
+        'mod' => {:value => 'mod', :type => :func},
+        'gcd' => {:value => 'gcd', :type => :func},
+        'lcm' => {:value => 'lcm', :type => :func},
+        'lub' => {:value => 'lub', :type => :func},
+        'glb' => {:value => 'glb', :type => :func},
 
         # Arrows
         'uarr' => {:value => "\u2191", :type => :operator},
@@ -382,7 +398,25 @@ module AsciiMath
 
         # Other
         'sqrt' => {:value => :sqrt, :type => :unary},
+        'root' => {:value => :root, :type => :binary},
+        'frac' => {:value => :frac, :type => :binary},
+        '/' => {:value => :frac, :type => :infix},
+        'stackrel' => {:value => :over, :type => :binary, :switch_operands => true},
+        'overset' => {:value => :over, :type => :binary, :switch_operands => true},
+        'underset' => {:value => :under, :type => :binary, :switch_operands => true},
+        '_' => {:value => :sub, :type => :infix},
+        '^' => {:value => :sup, :type => :infix},
+        'hat' => {:value => "\u005E", :type => :accent, :position => :over},
+        'bar' => {:value => "\u00AF", :type => :accent, :position => :over},
+        'vec' => {:value => "\u2192", :type => :accent, :position => :over},
+        'dot' => {:value => '.', :type => :accent, :position => :over},
+        'ddot' => {:value => '..', :type => :accent, :position => :over},
+        'overarc' => {:value => "\u23DC", :type => :accent, :position => :over},
+        'ul' => {:value => '_', :type => :accent, :position => :under},
+        'ubrace' => {:value => "\u23DF", :type => :accent, :position => :under},
+        'obrace' => {:value => "\u23DE", :type => :accent, :position => :over},
         'text' => {:value => :text, :type => :unary},
+
         'bb' => {:value => :bold, :type => :font},
         'bbb' => {:value => :double_struck, :type => :font},
         'ii' => {:value => :italic, :type => :font},
@@ -396,12 +430,6 @@ module AsciiMath
         'bsf' => {:value => :bold_sans_serif, :type => :font},
         'sfi' => {:value => :sans_serif_italic, :type => :font},
         'sfbi' => {:value => :sans_serif_bold_italic, :type => :font},
-        'frac' => {:value => :frac, :type => :binary},
-        'root' => {:value => :root, :type => :binary},
-        'stackrel' => {:value => :over, :type => :binary},
-        '/' => {:value => :frac, :type => :infix},
-        '_' => {:value => :sub, :type => :infix},
-        '^' => {:value => :sup, :type => :infix},
 
         # Greek letters
         'alpha' => {:value => "\u03b1", :type => :identifier},
@@ -530,10 +558,21 @@ module AsciiMath
         when :unary, :font
           s = parse_simple_expression(tok, depth)
           {:type => t1[:type], :s => s, :operator => t1[:value]}
+        when :func
+          s = parse_simple_expression(tok, depth)
+          if t1[:wrap_left] || t1[:wrap_right]
+            {:type => :paren, :e => s, :lparen => t1[:wrap_left], :rparen => t1[:wrap_right]}
+          else
+            {:type => :unary, :s => s, :identifier => t1[:value]}
+          end
         when :binary
           s1 = parse_simple_expression(tok, depth)
           s2 = parse_simple_expression(tok, depth)
-          {:type => :binary, :s1 => s1, :s2 => s2, :operator => t1[:value]}
+          if t1[:switch_operands]
+            {:type => :binary, :s1 => s2, :s2 => s1, :operator => t1[:value]}
+          else
+            {:type => :binary, :s1 => s1, :s2 => s2, :operator => t1[:value]}
+          end
         when :eof
           nil
         else

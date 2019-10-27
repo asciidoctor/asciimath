@@ -61,9 +61,17 @@ module AsciiMath
             when :font
               #TODO - currently ignored
             when :unary
+              identifier = expression[:identifier]
               operator = expression[:operator]
-              tag(operator) do
-                append(expression[:s], :single_child => true, :strip_paren => true)
+              if identifier
+                row do
+                  identifier(identifier)
+                  append(expression[:s], :single_child => true, :strip_paren => true)
+                end
+              else
+                tag(operator) do
+                  append(expression[:s], :single_child => true, :strip_paren => true)
+                end
               end
             when :binary
               operator = expression[:operator]

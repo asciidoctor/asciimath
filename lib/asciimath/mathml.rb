@@ -51,9 +51,17 @@ module AsciiMath
                 append(expression[:s], :single_child => true, :strip_paren => true)
               end
             when :unary
+              identifier = expression[:identifier]
               operator = expression[:operator]
-              tag("m#{operator}") do
-                append(expression[:s], :single_child => true, :strip_paren => true)
+              if identifier
+                mrow do
+                  mi(identifier)
+                  append(expression[:s], :single_child => true, :strip_paren => true)
+                end
+              else
+                tag("m#{operator}") do
+                  append(expression[:s], :single_child => true, :strip_paren => true)
+                end
               end
             when :binary
               operator = expression[:operator]
@@ -107,29 +115,35 @@ module AsciiMath
       @mathml << '<' << @prefix << tag.to_s
 
       attrs.each_pair do |key, value|
-        @mathml << ' ' << key.to_s << '="' << value.to_s << '"'
+        @mathml << ' ' << key.to_s << '="'
+        append_escaped(value.to_s)
+        @mathml << '"'
       end
 
 
       if block_given? || text
         @mathml << '>'
-        text.each_codepoint do |cp|
-          if cp == 38
-            @mathml << "&amp;"
-          elsif cp == 60
-            @mathml << "&lt;"
-          elsif cp == 62
-            @mathml << "&gt;"
-          elsif cp > 127
-            @mathml << "&#x#{cp.to_s(16).upcase};"
-          else
-            @mathml << cp
-          end
-        end
+        append_escaped(text)
         yield self if block_given?
         @mathml << '</' << @prefix << tag.to_s << '>'
       else
         @mathml << '/>'
+      end
+    end
+
+    def append_escaped(text)
+      text.each_codepoint do |cp|
+        if cp == 38
+          @mathml << "&amp;"
+        elsif cp == 60
+          @mathml << "&lt;"
+        elsif cp == 62
+          @mathml << "&gt;"
+        elsif cp > 127
+          @mathml << "&#x#{cp.to_s(16).upcase};"
+        else
+          @mathml << cp
+        end
       end
     end
   end
