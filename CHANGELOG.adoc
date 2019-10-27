@@ -4,7 +4,7 @@
 
 Bug fixes::
 
-  * Issue #14: translate `'` to the Unicode prime character (U+2032)
+  * Issue #14: add support for additional symbols and functions that are supported by Asciimath JS
 
 == 1.0.9
 
