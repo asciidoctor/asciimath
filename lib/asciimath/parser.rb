@@ -505,10 +505,10 @@ module AsciiMath
           if t1[:value] == :sub && t2[:value] == :sup
             s3 = parse_simple_expression(tok, depth)
             operator = s1[:underover] ? :underover : :subsup
-            e << {:type => :ternary, :operator => operator, :s1 => s1, :s2 => s2, :s3 => s3}
+            e << {:type => :ternary, :operator => operator, :s1 => s1, :s2 => unwrap_paren(s2), :s3 => unwrap_paren(s3)}
           else
             operator = s1[:underover] ? (t1[:value] == :sub ? :under : :over) : t1[:value]
-            e << {:type => :binary, :operator => operator, :s1 => s1, :s2 => s2}
+            e << {:type => :binary, :operator => operator, :s1 => unwrap_paren(s1), :s2 => unwrap_paren(s2)}
             tok.push_back(t2)
             if (t2[:type] == :lrparen || t2[:type] == :rparen) && depth > 0
               break
@@ -552,22 +552,29 @@ module AsciiMath
                   {:type => :paren, :e => e, :lparen => t1[:value]}
               end
           end
+        when :rparen
+          if depth > 0
+            tok.push_back(t1)
+            nil
+          else
+            {:type => :operator, :c => t1[:value]}
+          end
         when :accent
-          s = parse_simple_expression(tok, depth)
+          s = unwrap_paren(parse_simple_expression(tok, depth))
           {:type => :binary, :s1 => s, :s2 => {:type => :operator, :c => t1[:value]}, :operator => t1[:position]}
         when :unary, :font
-          s = parse_simple_expression(tok, depth)
+          s = unwrap_paren(parse_simple_expression(tok, depth))
           {:type => t1[:type], :s => s, :operator => t1[:value]}
         when :func
           s = parse_simple_expression(tok, depth)
           if t1[:wrap_left] || t1[:wrap_right]
-            {:type => :paren, :e => s, :lparen => t1[:wrap_left], :rparen => t1[:wrap_right]}
+            {:type => :paren, :e => s, :lparen => t1[:wrap_left], :rparen => t1[:wrap_right], :no_unwrap => true}
           else
             {:type => :unary, :s => s, :identifier => t1[:value]}
           end
         when :binary
-          s1 = parse_simple_expression(tok, depth)
-          s2 = parse_simple_expression(tok, depth)
+          s1 = unwrap_paren(parse_simple_expression(tok, depth))
+          s2 = unwrap_paren(parse_simple_expression(tok, depth))
           if t1[:switch_operands]
             {:type => :binary, :s1 => s2, :s2 => s1, :operator => t1[:value]}
           else
@@ -577,6 +584,14 @@ module AsciiMath
           nil
         else
           {:type => t1[:type], :c => t1[:value], :underover => t1[:underover]}
+      end
+    end
+
+    def unwrap_paren(expression)
+      if expression[:type] == :paren && !expression[:no_unwrap]
+        expression[:e]
+      else
+        expression
       end
     end
 

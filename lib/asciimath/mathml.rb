@@ -11,7 +11,7 @@ module AsciiMath
 
     def append_expression(expression, attrs = {})
       math('', attrs) do
-        append(expression, :single_child => true)
+        append(expression, :avoid_row => true)
       end
     end
 
@@ -20,7 +20,7 @@ module AsciiMath
     def append(expression, opts = {})
       case expression
         when Array
-          if expression.length <= 1 || opts[:single_child]
+          if expression.length <= 1 || opts[:avoid_row]
             expression.each { |e| append(e) }
           else
             mrow do
@@ -38,17 +38,13 @@ module AsciiMath
             when :text
               mtext(expression[:c])
             when :paren
-              if !opts[:strip_paren]
-                fenced(expression[:lparen], expression[:rparen]) do
-                  append(expression[:e])
-                end
-              else
+              fenced(expression[:lparen], expression[:rparen]) do
                 append(expression[:e])
               end
             when :font
               style = expression[:operator]
               tag("mstyle", :mathvariant => style.to_s.gsub('_', '-')) do
-                append(expression[:s], :single_child => true, :strip_paren => true)
+                append(expression[:s])
               end
             when :unary
               identifier = expression[:identifier]
@@ -56,25 +52,25 @@ module AsciiMath
               if identifier
                 mrow do
                   mi(identifier)
-                  append(expression[:s], :single_child => true, :strip_paren => true)
+                  append(expression[:s], :avoid_row => true)
                 end
               else
                 tag("m#{operator}") do
-                  append(expression[:s], :single_child => true, :strip_paren => true)
+                  append(expression[:s])
                 end
               end
             when :binary
               operator = expression[:operator]
               tag("m#{operator}") do
-                append(expression[:s1], :strip_paren => (operator != :sub && operator != :sup))
-                append(expression[:s2], :strip_paren => true)
+                append(expression[:s1])
+                append(expression[:s2])
               end
             when :ternary
               operator = expression[:operator]
               tag("m#{operator}") do
                 append(expression[:s1])
-                append(expression[:s2], :strip_paren => true)
-                append(expression[:s3], :strip_paren => true)
+                append(expression[:s2])
+                append(expression[:s3])
               end
             when :matrix
               fenced(expression[:lparen], expression[:rparen]) do
