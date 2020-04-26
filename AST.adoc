@@ -1,0 +1,122 @@
+= Asciimath Grammar and AST
+
+== Grammar
+
+The syntax for ASCIIMath in EBNF style notation is
+
+[source]
+----
+expr = ( simp ( fraction | sub | super ) )+
+simp = constant | paren_expr | unary_expr | binary_expr | text
+fraction = '/' simp
+super = '^' simp
+sub =  '_' simp super?
+paren_expr = lparen expr rparen
+lparen = '(' | '[' | '{' | '(:' | '{:'
+rparen = ')' | ']' | '}' | ':)' | ':}'
+unary_expr = unary_op simp
+unary_op = 'sqrt' | 'text'
+binary_expr = binary_op simp simp
+binary_op = 'frac' | 'root' | 'stackrel'
+text = '"' [^"]* '"'
+constant = number | symbol | identifier
+number = '-'? [0-9]+ ( '.' [0-9]+ )?
+symbol = /* any string in the symbol table */
+identifier = [A-z]
+----
+
+== Abstract Syntax Tree
+
+The parser returns an Array of expressions.
+Each expression is a Hash of one of the following forms.
+
+[source]
+----
+{
+    :type => :paren
+    :e => // expression between parens
+    :lparen => // left paren value
+    :rparen => // right paren value
+}
+----
+
+[source]
+----
+{
+    :type => :matrix
+    :rows => array of arrays of expressions
+    :lparen => // left paren value
+    :rparen => // right paren value
+}
+----
+
+[source]
+----
+{
+    :type => :operator
+    :c => // operator value
+}
+----
+
+[source]
+----
+{
+    :type => :unary
+    :s => // expression of the unary expression
+    :operator => // operator value
+}
+----
+
+[source]
+----
+{
+    :type => :binary
+    :s1 => // first expression of the binary expression
+    :s2 => // second expression of the binary expression
+    :operator => // the operator to use
+}
+----
+
+[source]
+----
+{
+    :type => :ternary
+    :s1 => // first expression of the binary expression
+    :s2 => // second expression of the binary expression
+    :s3 => // third expression of the binary expression
+    :operator => // the operator to use
+}
+----
+
+[source]
+----
+{
+    :type => :font
+    :s => // expression of the unary expression
+    :operator => // the operator to use
+}
+----
+
+[source]
+----
+{
+    :type => :text
+    :value => // text literal value
+}
+----
+
+[source]
+----
+{
+    :type => :number
+    :value => // number value
+}
+----
+
+[source]
+----
+{
+    :type => :identifier
+    :value => // identifier value
+}
+----
