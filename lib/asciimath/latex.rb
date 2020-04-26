@@ -45,82 +45,97 @@ module AsciiMath
     }
 
     OPERATORS = {
-        "⋅"   => "\\cdot",
-        "∗"   => "\\ast",
-        "⋆"   => "\\star",
-        "\\"  => "\\backslash",
-        "×"   => "\\times",
-        "÷"   => "\\div",
-        "⋉"   => "\\ltimes",
-        "⋊"   => "\\rtimes",
-        "⋈"   => "\\bowtie",
-        "∘"   => "\\circ",
-        "⊕"   => "\\oplus",
-        "⊗"   => "\\otimes",
-        "⊙"   => "\\odot",
-        "∑"   => "\\Sigma",
-        "∏"   => "\\Pi",
-        "∧"   => "\\wedge",
-        "⋀"   => "\\bidwedge",
-        "∨"   => "\\vee",
-        "⋁"   => "\\bigvee",
-        "∩"   => "\\cap",
-        "⋂"   => "\\bigcap",
-        "∪"   => "\\cup",
-        "⋃"   => "\\bigcup",
-        "≠"   => "\\ne",
-        "<"   => "\\lt",
-        ">"   => "\\gt",
-        "≤"   => "\\le",
-        "≥"   => "\\ge",
-        "≺"   => "\\prec",
-        "⪯"   => "\\preceq",
-        "≻"   => "\\succ",
-        "⪰"   => "\\succeq",
-        "∈"   => "\\in",
-        "∉"   => "\\notin",
-        "⊂"   => "\\subset",
-        "⊃"   => "\\supset",
-        "⊆"   => "\\subseteq",
-        "⊇"   => "\\supseteq",
-        "≡"   => "\\equiv",
-        "≅"   => "\\cong",
-        "≈"   => "\\approx",
-        "∝"   => "\\propto",
-        "∫"   => "\\int", 
-        "∮"   => "\\oint",
-        "∂"   => "\\partial",
-        "∇"   => "\\nabla",
-        "±"   => "\\pm",
-        "∴"   => "\\therefore",
-        "∵"   => "\\because",
-        "..." => "\\ldots",
-        "⋯"   => "\\cdots",
-        "⋮"   => "\\vdots",
-        "⋱"   => "\\ddots",
-        "∠"   => "\\angle",
-        "⌢"   => "\\frown",
-        "△"   => "\\triangle",
-        "⋄"   => "\\diamond",
-        "□"   => "\\square",
-        "⌊"   => "\\lfloor",
-        "⌋"   => "\\rfloor",
-        "⌈"   => "\\lceiling",
-        "⌉"   => "\\rceiling",
-        "ℂ"   => "\\mathbb{C}",
-        "ℕ"   => "\\mathbb{N}",
-        "ℚ"   => "\\mathbb{Q}",
-        "ℝ"   => "\\mathbb{R}",
-        "ℤ"   => "\\mathbb{Z}",
-        "¬"   => "\\neg",
-        "⇒"   => "\\Rightarrow",
-        "⇔"   => "\\Leftrightarrow",
-        "∀"   => "\\forall",
-        "∃"   => "\\exists",
-        "⊥"   => "\\bot",
-        "⊤"   => "\\top",
-        "⊢"   => "\\vdash",
-        "⊨"   => "\\models"
+        "⋅"    => "cdot",
+        "∗"    => "ast",
+        "⋆"    => "star",
+        "\\"   => "backslash",
+        "×"    => "times",
+        "÷"    => "div",
+        "⋉"    => "ltimes",
+        "⋊"    => "rtimes",
+        "⋈"    => "bowtie",
+        "∘"    => "circ",
+        "⊕"    => "oplus",
+        "⊗"    => "otimes",
+        "⊙"    => "odot",
+        "∑"    => "Sigma",
+        "∏"    => "Pi",
+        "∧"    => "wedge",
+        "⋀"    => "bidwedge",
+        "∨"    => "vee",
+        "⋁"    => "bigvee",
+        "∩"    => "cap",
+        "⋂"    => "bigcap",
+        "∪"    => "cup",
+        "⋃"    => "bigcup",
+        "≠"    => "ne",
+        "<"    => "lt",
+        ">"    => "gt",
+        "≤"    => "le",
+        "≥"    => "ge",
+        "≺"    => "prec",
+        "⪯"    => "preceq",
+        "≻"    => "succ",
+        "⪰"    => "succeq",
+        "∈"    => "in",
+        "∉"    => "notin",
+        "⊂"    => "subset",
+        "⊃"    => "supset",
+        "⊆"    => "subseteq",
+        "⊇"    => "supseteq",
+        "≡"    => "equiv",
+        "≅"    => "cong",
+        "≈"    => "approx",
+        "∝"    => "propto",
+        "∫"    => "int", 
+        "∮"    => "oint",
+        "∂"    => "partial",
+        "∇"    => "nabla",
+        "±"    => "pm",
+        "∴"    => "therefore",
+        "∵"    => "because",
+        "..."  => "ldots",
+        "⋯"    => "cdots",
+        "⋮"    => "vdots",
+        "⋱"    => "ddots",
+        "∠"    => "angle",
+        "⌢"    => "frown",
+        "△"    => "triangle",
+        "⋄"    => "diamond",
+        "□"    => "square",
+        "⌊"    => "lfloor",
+        "⌋"    => "rfloor",
+        "⌈"    => "lceiling",
+        "⌉"    => "rceiling",
+        "ℂ"    => "mathbb{C}",
+        "ℕ"    => "mathbb{N}",
+        "ℚ"    => "mathbb{Q}",
+        "ℝ"    => "mathbb{R}",
+        "ℤ"    => "mathbb{Z}",
+        "¬"    => "neg",
+        "⇒"    => "Rightarrow",
+        "⇔"    => "Leftrightarrow",
+        "∀"    => "forall",
+        "∃"    => "exists",
+        "⊥"    => "bot",
+        "⊤"    => "top",
+        "⊢"    => "vdash",
+        "⊨"    => "models",
+        "↑"    => "uparrow",
+        "↓"    => "downarrow",
+        "→"    => "rightarrow",
+        "↣"    => "rightarrowtail",
+        "↠"    => "twoheadrightarrow",
+        "⤖"    => "twoheadrightarrowtail",
+        "↦"    => "mapsto",
+        "←"    => "leftarrow",
+        "↔"    => "leftrightarrow",
+        "⇐"    => "Leftarrow",
+        "¯"    => "widebar",
+        :frac  => "frac",
+        :sqrt  => "sqrt",
+        :over  => "overset",
+        :under => "underset"
     }
 
     PARENS = {
@@ -137,7 +152,7 @@ module AsciiMath
         "⌈" => "\\lceiling",
         "⌉" => "\\rceiling",
         "|" => "|",
-        "∥" =>"\\parallel",
+        "∥" => "\\parallel",
         nil => "."
     }
 
@@ -160,35 +175,27 @@ module AsciiMath
     end
 
     def append_expression(expression, attrs = {})
-      tag("math") do
+      macrocall("math") do
         append(expression, :avoid_row => true)
       end
     end
 
     private
 
-    def append(expression, opts = {})
+    def append(expression, opts = {}, separator = " ")
       puts expression
 
       case expression
         when Array
           len = expression.length - 1
-          expression.each_with_index do |e, i| 
-             append(e)
-             @latex << " " if i != len
+          expression.each_with_index do |e, i|
+             append(e, separator)
+             @latex << separator if i != len
           end
         when Hash
           case expression[:type]
             when :operator
-              c = expression[:c]
-
-              if OPERATORS.has_key? c
-                  @latex << OPERATORS[c]
-              else
-                  @latex << c
-              end
-
-              @latex << " "
+                operation(expression[:c])
             when :identifier
               c = expression[:c]
 
@@ -205,58 +212,55 @@ module AsciiMath
               end
             when :paren
               parens(expression[:lparen], expression[:rparen]) do
-                append(expression[:e])
+                append(expression[:e], separator)
               end
             when :font
               font(expression[:operator]) do
-                append(expression[:s])
+                append(expression[:s], separator)
               end
             when :unary
               identifier = expression[:identifier]
               operator = expression[:operator]
               if identifier
-                mrow do
-                  mi(identifier)
-                  append(expression[:s], :avoid_row => true)
-                end
+                operation(expression[:operator], identifier)
               else
-                tag("m#{operator}") do
-                  append(expression[:s])
-                end
+                operation(expression[:operator], expression[:s])
               end
             when :binary
-              operator = expression[:operator]
-              tag("m#{operator}") do
-                append(expression[:s1])
-                append(expression[:s2])
+              s1 = expression[:s1]
+              s2 = expression[:s2]
+
+              if s2.is_a?(Hash) and s2.has_key? :underover
+                operation(expression[:operator], s1, s2)
+              else
+                operation(expression[:operator], s2, s1)
               end
             when :ternary
               operator = expression[:operator]
-              tag("m#{operator}") do
-                append(expression[:s1])
-                append(expression[:s2])
-                append(expression[:s3])
-              end
+              s1 = expression[:s1]
+              s2 = expression[:s2]
+              s2 = expression[:s3]
+              operation(expression[:operator], s1, s2, s3)
             when :matrix
-              fenced(expression[:lparen], expression[:rparen]) do
-                mtable do
-                  expression[:rows].each do |row|
-                    mtr do
-                      row.each do |col|
-                        mtd do
-                          append(col)
-                        end
-                      end
-                    end
-                  end
+              rows = expression[:rows]
+              len = rows.length - 1
+              
+              @latex << "\\begin{matrix} "
+
+              parens(expression[:lparen], expression[:rparen]) do
+                rows.each_with_index do |row, i|
+                    append(row, {}, " & ")
+                    @latex << " \\\\ " if i != len
                 end
               end
+
+              @latex << "\\end{matrix}"
           end
       end
     end
 
     def method_missing(meth, *args, &block)
-      tag(meth, *args, &block)
+      macrocall(meth, *args, &block)
     end
 
     def parens(lparen, rparen, &block)
@@ -270,23 +274,27 @@ module AsciiMath
     end
 
     def font(font, &block)
-        tag(FONTS[font], &block)
+        macrocall(FONTS[font], &block)
     end
 
-    def fenced(lparen, rparen, &block)
-      if lparen || rparen
-        mfenced(:open => lparen || '', :close => rparen || '') do
-          yield self
+    def operation(operator, *args)
+        if OPERATORS.has_key? operator
+            @latex << ?\\ << OPERATORS[operator]
+        else
+            @latex << operator
         end
-      else
-        yield self
-      end
+
+        for arg in args do
+            @latex << "{ "
+            append(arg)
+            @latex << " }"
+        end
     end
 
-    def tag(tag, *args)
+    def macrocall(macro, *args)
       text = args.last.is_a?(String) ? args.pop : ''
 
-      @latex << "\\#{tag}{ "
+      @latex << "\\#{macro}{ "
 
       if block_given? || text
         yield self if block_given?
