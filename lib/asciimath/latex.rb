@@ -174,15 +174,15 @@ module AsciiMath
       @latex
     end
 
-    def append_expression(expression, attrs = {})
-      macrocall("math") do
-        append(expression, :avoid_row => true)
-      end
+    def append_expression(expression)
+      append(expression)
+      self
     end
 
     private
 
-    def append(expression, opts = {}, separator = " ")
+    def append(expression, separator = " ")
+      # TODO: Remove this when shipping. This is meant for debugging
       puts expression
 
       case expression
@@ -249,7 +249,7 @@ module AsciiMath
 
               parens(expression[:lparen], expression[:rparen]) do
                 rows.each_with_index do |row, i|
-                    append(row, {}, " & ")
+                    append(row, " & ")
                     @latex << " \\\\ " if i != len
                 end
               end
@@ -297,6 +297,7 @@ module AsciiMath
       @latex << "\\#{macro}{ "
 
       if block_given? || text
+        append_escaped(text)
         yield self if block_given?
       end
 
@@ -315,8 +316,8 @@ module AsciiMath
   end
 
   class Expression
-    def to_latex(attrs = {})
-      LatexBuilder.new().append_expression(@parsed_expression, attrs).to_s
+    def to_latex
+      LatexBuilder.new().append_expression(@parsed_expression).to_s
     end
   end
 end
