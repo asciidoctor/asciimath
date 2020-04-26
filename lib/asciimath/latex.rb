@@ -245,16 +245,16 @@ module AsciiMath
               rows = expression[:rows]
               len = rows.length - 1
               
-              @latex << "\\begin{matrix} "
-
               parens(expression[:lparen], expression[:rparen]) do
+                @latex << "\\begin{matrix} "
+
                 rows.each_with_index do |row, i|
                     append(row, " & ")
                     @latex << " \\\\ " if i != len
                 end
-              end
 
-              @latex << "\\end{matrix}"
+                @latex << " \\end{matrix}"
+              end
           end
       end
     end
