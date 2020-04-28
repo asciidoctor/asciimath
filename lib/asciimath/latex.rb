@@ -292,17 +292,25 @@ module AsciiMath
     def binary(operator, s1, s2)
       case operator
       when :sub
-        @latex << "{ "
+        @latex << "{ " if s1.is_a?(Array)
         append(s1)
-        @latex << " }_{ "
+        @latex << " }" if s1.is_a?(Array)
+        
+        @latex << "_"
+        
+        @latex << "{ " if s2.is_a?(Array)
         append(s2)
-        @latex << " }"
+        @latex << " }" if s2.is_a?(Array)
       when :sup
-        @latex << "{ "
+        @latex << "{ " if s1.is_a?(Array)
         append(s1)
-        @latex << " }^{ "
+        @latex << " }" if s1.is_a?(Array)
+        
+        @latex << "^"
+        
+        @latex << "{ " if s2.is_a?(Array)
         append(s2)
-        @latex << " }"
+        @latex << " }" if s2.is_a?(Array)
       when :frac
         operation("frac", s1, s2)
       when :root
@@ -367,13 +375,21 @@ module AsciiMath
     def ternary(operator, s1, s2, s3)
       case operator
       when :subsup
-        @latex << "{ "
+        @latex << "{ " if s1.is_a?(Array)
         append(s1)
-        @latex << " }_{ "
+        @latex << " }" if s1.is_a?(Array)
+        
+        @latex << "_"
+        
+        @latex << "{ " if s2.is_a?(Array)
         append(s2)
-        @latex << " }^{ "
+        @latex << " }" if s2.is_a?(Array)
+        
+        @latex << "^"
+        
+        @latex << "{ " if s3.is_a?(Array)
         append(s3)
-        @latex << " }"
+        @latex << " }" if s3.is_a?(Array)
       else
         operation(operator, s1, s2, s3)
       end
@@ -382,7 +398,7 @@ module AsciiMath
     def macro(macro, *args)
       @latex << "\\#{macro}"
 
-      if args.length
+      if args.length != 0
         @latex << "["
         append(args, ", ")
         @latex << "]"
