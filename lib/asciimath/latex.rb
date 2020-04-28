@@ -180,8 +180,7 @@ module AsciiMath
         :script        => "mathscr",
         :monospace     => "mathtt",
         :fraktur       => "mathfrak",
-        # TODO Implement this
-        :sans_serif    => "TODO"
+        :sans_serif    => "mathsf"
     }
 
     def initialize
