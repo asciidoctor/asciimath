@@ -18,183 +18,183 @@ module AsciiMath
     SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]]
 
     CONSTANTS = {
-        ?α => "alpha",
-        ?β => "beta",
-        ?γ => "gamma",
-        ?δ => "delta",
-        ?ε => "epsilon",
-        ?ɛ => "varepsilon",
-        ?ζ => "zeta",
-        ?η => "eta",
-        ?θ => "theta",
-        ?ϑ => "vartheta",
-        ?ι => "iota",
-        ?κ => "kappa",
-        ?λ => "lambda",
-        ?μ => "mu",
-        ?ν => "nu",
-        ?ξ => "xi",
-        ?π => "pi",
-        ?ρ => "rho",
-        ?σ => "sigma",
-        ?Σ => "Sigma",
-        ?τ => "tau",
-        ?υ => "upsilon",
-        ?ϕ => "phi",
-        ?Φ => "Phi",
-        ?φ => "varphi",
-        ?χ => "chi",
-        ?ψ => "psi",
-        ?Ψ => "Psi",
-        ?ω => "omega",
-        ?∅ => "emptyset",
+      ?α => "alpha",
+      ?β => "beta",
+      ?γ => "gamma",
+      ?δ => "delta",
+      ?ε => "epsilon",
+      ?ɛ => "varepsilon",
+      ?ζ => "zeta",
+      ?η => "eta",
+      ?θ => "theta",
+      ?ϑ => "vartheta",
+      ?ι => "iota",
+      ?κ => "kappa",
+      ?λ => "lambda",
+      ?μ => "mu",
+      ?ν => "nu",
+      ?ξ => "xi",
+      ?π => "pi",
+      ?ρ => "rho",
+      ?σ => "sigma",
+      ?Σ => "Sigma",
+      ?τ => "tau",
+      ?υ => "upsilon",
+      ?ϕ => "phi",
+      ?Φ => "Phi",
+      ?φ => "varphi",
+      ?χ => "chi",
+      ?ψ => "psi",
+      ?Ψ => "Psi",
+      ?ω => "omega",
+      ?∅ => "emptyset",
     }
 
     OPERATORS = {
-        ?⋅       => "\\cdot",
-        ?∗       => "\\ast",
-        ?⋆       => "\\star",
-        ?\\      => "\\backslash",
-        ?×       => "\\times",
-        ?÷       => "\\div",
-        ?⋉       => "\\ltimes",
-        ?⋊       => "\\rtimes",
-        ?⋈       => "\\bowtie",
-        ?∘       => "\\circ",
-        ?⊕       => "\\oplus",
-        ?⊗       => "\\otimes",
-        ?⊙       => "\\odot",
-        ?∑       => "\\sum",
-        ?Σ       => "\\Sigma",
-        ?∏       => "\\prod",
-        ?∧       => "\\wedge",
-        ?⋀       => "\\bigwedge",
-        ?∨       => "\\vee",
-        ?⋁       => "\\bigvee",
-        ?∩       => "\\cap",
-        ?⋂       => "\\bigcap",
-        ?∪       => "\\cup",
-        ?⋃       => "\\bigcup",
-        ?ℵ       => "\\aleph",
-        ?∞       => "\\infty",
-        ?≠       => "\\neq",
-        ?≤       => "\\leq",
-        ?≥       => "\\geq",
-        ?≺       => "\\prec",
-        ?⪯       => "\\preceq",
-        ?≻       => "\\succ",
-        ?⪰       => "\\succeq",
-        ?∈       => "\\in",
-        ?∉       => "\\notin",
-        ?⊂       => "\\subset",
-        ?⊃       => "\\supset",
-        ?⊆       => "\\subseteq",
-        ?⊇       => "\\supseteq",
-        ?≡       => "\\equiv",
-        ?≅       => "\\cong",
-        ?≈       => "\\approx",
-        ?∝       => "\\propto",
-        ?∫       => "\\int", 
-        ?∮       => "\\oint",
-        ?∂       => "\\partial",
-        ?∇       => "\\nabla",
-        ?±       => "\\pm",
-        ?∴       => "\\therefore",
-        ?∵       => "\\because",
-        "..."    => "\\ldots",
-        ?⋯       => "\\cdots",
-        ?⋮       => "\\vdots",
-        ?⋱       => "\\ddots",
-        ?∠       => "\\angle",
-        ?⌢       => "\\frown",
-        ?△       => "\\triangle",
-        ?⋄       => "\\diamond",
-        ?□       => "\\square",
-        ?⌊       => "\\lfloor",
-        ?⌋       => "\\rfloor",
-        ?⌈       => "\\lceil",
-        ?⌉       => "\\rceil",
-        ?ℂ       => "\\mathbb{C}",
-        ?ℕ       => "\\mathbb{N}",
-        ?ℚ       => "\\mathbb{Q}",
-        ?ℝ       => "\\mathbb{R}",
-        ?ℤ       => "\\mathbb{Z}",
-        ?¬       => "\\neg",
-        ?⇒       => "\\Rightarrow",
-        ?⇔       => "\\Leftrightarrow",
-        ?∀       => "\\forall",
-        ?∃       => "\\exists",
-        ?⊥       => "\\bot",
-        ?⊤       => "\\top",
-        ?⊢       => "\\vdash",
-        ?⊨       => "\\models",
-        ?↑       => "\\uparrow",
-        ?↓       => "\\downarrow",
-        ?→       => "\\rightarrow",
-        ?↣       => "\\rightarrowtail",
-        ?↠       => "\\twoheadrightarrow",
-        ?⤖       => "\\twoheadrightarrowtail",
-        ?↦       => "\\mapsto",
-        ?←       => "\\leftarrow",
-        ?↔       => "\\leftrightarrow",
-        ?⇐       => "\\Leftarrow",
-        ?′       => "'",
-        ?−       => "-",
-        ?Γ       => "Gamma",
-        ?Δ       => "Delta",
-        ?Θ       => "Theta",
-        ?Λ       => "Lambda",
-        ?Ξ       => "Xi",
-        ?Π       => "Pi",
-        ?Ω       => "Omega",
-        "lim"    => "\\lim",
-        "sin"    => "\\sin",
-        "cos"    => "\\cos",
-        "tan"    => "\\tan",
-        "sec"    => "\\sec",
-        "csc"    => "\\csc",
-        "cot"    => "\\cot",
-        "arcsin" => "\\arcsin",
-        "arccos" => "\\arccos",
-        "arctan" => "\\arctan",
-        "sinh"   => "\\sinh",
-        "cosh"   => "\\cosh",
-        "tanh"   => "\\tanh",
-        "log"    => "\\log",
-        "ln"     => "\\ln",
-        "det"    => "\\det",
-        "dim"    => "\\dim",
-        "mod"    => "\\mod",
-        "gcd"    => "\\gcd",
-        "min"    => "\\min",
-        "max"    => "\\max",
+      ?⋅       => "\\cdot",
+      ?∗       => "\\ast",
+      ?⋆       => "\\star",
+      ?\\      => "\\backslash",
+      ?×       => "\\times",
+      ?÷       => "\\div",
+      ?⋉       => "\\ltimes",
+      ?⋊       => "\\rtimes",
+      ?⋈       => "\\bowtie",
+      ?∘       => "\\circ",
+      ?⊕       => "\\oplus",
+      ?⊗       => "\\otimes",
+      ?⊙       => "\\odot",
+      ?∑       => "\\sum",
+      ?Σ       => "\\Sigma",
+      ?∏       => "\\prod",
+      ?∧       => "\\wedge",
+      ?⋀       => "\\bigwedge",
+      ?∨       => "\\vee",
+      ?⋁       => "\\bigvee",
+      ?∩       => "\\cap",
+      ?⋂       => "\\bigcap",
+      ?∪       => "\\cup",
+      ?⋃       => "\\bigcup",
+      ?ℵ       => "\\aleph",
+      ?∞       => "\\infty",
+      ?≠       => "\\neq",
+      ?≤       => "\\leq",
+      ?≥       => "\\geq",
+      ?≺       => "\\prec",
+      ?⪯       => "\\preceq",
+      ?≻       => "\\succ",
+      ?⪰       => "\\succeq",
+      ?∈       => "\\in",
+      ?∉       => "\\notin",
+      ?⊂       => "\\subset",
+      ?⊃       => "\\supset",
+      ?⊆       => "\\subseteq",
+      ?⊇       => "\\supseteq",
+      ?≡       => "\\equiv",
+      ?≅       => "\\cong",
+      ?≈       => "\\approx",
+      ?∝       => "\\propto",
+      ?∫       => "\\int", 
+      ?∮       => "\\oint",
+      ?∂       => "\\partial",
+      ?∇       => "\\nabla",
+      ?±       => "\\pm",
+      ?∴       => "\\therefore",
+      ?∵       => "\\because",
+      "..."    => "\\ldots",
+      ?⋯       => "\\cdots",
+      ?⋮       => "\\vdots",
+      ?⋱       => "\\ddots",
+      ?∠       => "\\angle",
+      ?⌢       => "\\frown",
+      ?△       => "\\triangle",
+      ?⋄       => "\\diamond",
+      ?□       => "\\square",
+      ?⌊       => "\\lfloor",
+      ?⌋       => "\\rfloor",
+      ?⌈       => "\\lceil",
+      ?⌉       => "\\rceil",
+      ?ℂ       => "\\mathbb{C}",
+      ?ℕ       => "\\mathbb{N}",
+      ?ℚ       => "\\mathbb{Q}",
+      ?ℝ       => "\\mathbb{R}",
+      ?ℤ       => "\\mathbb{Z}",
+      ?¬       => "\\neg",
+      ?⇒       => "\\Rightarrow",
+      ?⇔       => "\\Leftrightarrow",
+      ?∀       => "\\forall",
+      ?∃       => "\\exists",
+      ?⊥       => "\\bot",
+      ?⊤       => "\\top",
+      ?⊢       => "\\vdash",
+      ?⊨       => "\\models",
+      ?↑       => "\\uparrow",
+      ?↓       => "\\downarrow",
+      ?→       => "\\rightarrow",
+      ?↣       => "\\rightarrowtail",
+      ?↠       => "\\twoheadrightarrow",
+      ?⤖       => "\\twoheadrightarrowtail",
+      ?↦       => "\\mapsto",
+      ?←       => "\\leftarrow",
+      ?↔       => "\\leftrightarrow",
+      ?⇐       => "\\Leftarrow",
+      ?′       => "'",
+      ?−       => "-",
+      ?Γ       => "Gamma",
+      ?Δ       => "Delta",
+      ?Θ       => "Theta",
+      ?Λ       => "Lambda",
+      ?Ξ       => "Xi",
+      ?Π       => "Pi",
+      ?Ω       => "Omega",
+      "lim"    => "\\lim",
+      "sin"    => "\\sin",
+      "cos"    => "\\cos",
+      "tan"    => "\\tan",
+      "sec"    => "\\sec",
+      "csc"    => "\\csc",
+      "cot"    => "\\cot",
+      "arcsin" => "\\arcsin",
+      "arccos" => "\\arccos",
+      "arctan" => "\\arctan",
+      "sinh"   => "\\sinh",
+      "cosh"   => "\\cosh",
+      "tanh"   => "\\tanh",
+      "log"    => "\\log",
+      "ln"     => "\\ln",
+      "det"    => "\\det",
+      "dim"    => "\\dim",
+      "mod"    => "\\mod",
+      "gcd"    => "\\gcd",
+      "min"    => "\\min",
+      "max"    => "\\max",
     }
 
     PARENS = {
-        ?(  => ?(,
-        ?)  => ?),
-        ?[  => ?[,
-        ?]  => ?],
-        ?{  => "\\{",
-        ?}  => "\\}",
-        ?⟨  => "\\langle",
-        ?⟩  => "\\rangle",
-        ?⌊  => "\\lfloor",
-        ?⌋  => "\\rfloor",
-        ?⌈  => "\\lceil",
-        ?⌉  => "\\rceil",
-        ?|  => ?|,
-        ?∥  => "\\parallel",
-        nil => ?.,
+      ?(  => ?(,
+      ?)  => ?),
+      ?[  => ?[,
+      ?]  => ?],
+      ?{  => "\\{",
+      ?}  => "\\}",
+      ?⟨  => "\\langle",
+      ?⟩  => "\\rangle",
+      ?⌊  => "\\lfloor",
+      ?⌋  => "\\rfloor",
+      ?⌈  => "\\lceil",
+      ?⌉  => "\\rceil",
+      ?|  => ?|,
+      ?∥  => "\\parallel",
+      nil => ?.,
     }
 
     FONTS = {
-        :bold          => "mathbf",
-        :double_struck => "mathbb",
-        :script        => "mathscr",
-        :monospace     => "mathtt",
-        :fraktur       => "mathfrak",
-        :sans_serif    => "mathsf"
+      :bold          => "mathbf",
+      :double_struck => "mathbb",
+      :script        => "mathscr",
+      :monospace     => "mathtt",
+      :fraktur       => "mathfrak",
+      :sans_serif    => "mathsf"
     }
 
     def append(expression, separator = " ")
@@ -202,20 +202,20 @@ module AsciiMath
         when Array
           len = expression.length - 1
           expression.each_with_index do |e, i|
-             append(e)
-             @latex << separator if i != len
+            append(e)
+            @latex << separator if i != len
           end
         when Hash
           case expression[:type]
             when :operator
-                operation(expression[:c])
+              operation(expression[:c])
             when :identifier
               c = expression[:c]
 
               if CONSTANTS.has_key? c
-                  @latex << ?\\ << CONSTANTS[c]
+                @latex << ?\\ << CONSTANTS[c]
               else
-                  append_escaped(c)
+                append_escaped(c)
               end
             when :number
               @latex << "#{expression[:c]}"
@@ -235,15 +235,15 @@ module AsciiMath
               identifier = expression[:identifier]
               if identifier
                 if OPERATORS.has_key? identifier
-                    @latex << OPERATORS[identifier] << separator
-                    append(expression[:s])
+                  @latex << OPERATORS[identifier] << separator
+                  append(expression[:s])
                 else
-                    text do 
-                      @latex << identifier
-                    end
-                    
-                    @latex << separator
-                    append(expression[:s])
+                  text do 
+                    @latex << identifier
+                  end
+                  
+                  @latex << separator
+                  append(expression[:s])
                 end
               else
                 unary(expression[:operator], expression[:s])
@@ -263,8 +263,8 @@ module AsciiMath
                 @latex << "\\begin{matrix} "
 
                 rows.each_with_index do |row, i|
-                    append(row, " & ")
-                    @latex << " \\\\ " if i != len
+                  append(row, " & ")
+                  @latex << " \\\\ " if i != len
                 end
 
                 @latex << " \\end{matrix}"
@@ -279,30 +279,30 @@ module AsciiMath
 
     def parens(lparen, rparen, &block)
       if lparen || rparen
-          @latex << "\\left " << PARENS[lparen] << " "
-          yield self
-          @latex << " \\right " << PARENS[rparen] 
+        @latex << "\\left " << PARENS[lparen] << " "
+        yield self
+        @latex << " \\right " << PARENS[rparen] 
       else
-          yield self
+        yield self
       end
     end
 
     def font(font, &block)
-        macro(FONTS[font], &block)
+      macro(FONTS[font], &block)
     end
 
     def operation(operator, *args)
-        if OPERATORS.has_key? operator
-            @latex << OPERATORS[operator]
-        else
-            @latex << operator
-        end
+      if OPERATORS.has_key? operator
+        @latex << OPERATORS[operator]
+      else
+        @latex << operator
+      end
 
-        for arg in args do
-            @latex << "{ "
-            append(arg)
-            @latex << " }"
-        end
+      for arg in args do
+        @latex << "{ "
+        append(arg)
+        @latex << " }"
+      end
     end
 
     def unary(operator, s1)
@@ -337,6 +337,7 @@ module AsciiMath
           else
             operation("\\overset", s1, s2)
           end
+
           return
         end
 
@@ -375,6 +376,7 @@ module AsciiMath
           else
             operation("\\underset", s1, s2)
           end
+
           return
         end
 
@@ -462,10 +464,7 @@ module AsciiMath
 
     def append_escaped(text)
       text.each_codepoint do |cp|
-          if SPECIAL_CHARACTERS.include? cp.chr
-          @latex << "\\"
-        end
-        
+        @latex << "\\" if SPECIAL_CHARACTERS.include? cp.chr
         @latex << cp
       end
     end
