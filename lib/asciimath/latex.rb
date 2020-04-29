@@ -1,5 +1,20 @@
 module AsciiMath
   class LatexBuilder
+    def initialize
+      @latex = ''
+    end
+
+    def to_s
+      @latex
+    end
+
+    def append_expression(expression)
+      append(expression)
+      self
+    end
+
+    private
+
     SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]]
 
     CONSTANTS = {
@@ -182,21 +197,6 @@ module AsciiMath
         :fraktur       => "mathfrak",
         :sans_serif    => "mathsf"
     }
-
-    def initialize
-      @latex = ''
-    end
-
-    def to_s
-      @latex
-    end
-
-    def append_expression(expression)
-      append(expression)
-      self
-    end
-
-    private
 
     def append(expression, separator = " ")
       # TODO: Remove this when shipping. This is meant for debugging
