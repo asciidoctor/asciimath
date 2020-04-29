@@ -48,8 +48,9 @@ parsed_expression = AsciiMath.parse(asciimath)
 
 The parsed expression is a set of nested Array and Hash objects.
 
-This expression can then be converted to MathML or HTML (experimental) or LaTeX 
-(requires the use of the `amsmath`, `amssymb` and `stix` packages).
+This expression can then be converted to MathML, HTML (experimental) or LaTeX 
+(requires the use of the https://ctan.org/pkg/amsmath[`amsmath`], `amssymb` and 
+https://ctan.org/pkg/stix[`stix`] packages).
 
 [source,ruby]
 ----
