@@ -133,7 +133,6 @@ module AsciiMath
         ?→       => "\\rightarrow",
         ?↣       => "\\rightarrowtail",
         ?↠       => "\\twoheadrightarrow",
-        # TODO: Find an existing command for this
         ?⤖       => "\\twoheadrightarrowtail",
         ?↦       => "\\mapsto",
         ?←       => "\\leftarrow",
@@ -199,9 +198,6 @@ module AsciiMath
     }
 
     def append(expression, separator = " ")
-      # TODO: Remove this when shipping. This is meant for debugging
-      puts expression
-
       case expression
         when Array
           len = expression.length - 1
