@@ -37,17 +37,15 @@ module AsciiMath
       ?π => "pi",
       ?ρ => "rho",
       ?σ => "sigma",
-      ?Σ => "Sigma",
       ?τ => "tau",
       ?υ => "upsilon",
-      ?ϕ => "phi",
+      ?ϕ => "varphi",
       ?Φ => "Phi",
-      ?φ => "varphi",
+      ?φ => "phi",
       ?χ => "chi",
       ?ψ => "psi",
       ?Ψ => "Psi",
       ?ω => "omega",
-      ?∅ => "emptyset",
     }
 
     OPERATORS = {
@@ -75,6 +73,7 @@ module AsciiMath
       ?⋂       => "\\bigcap",
       ?∪       => "\\cup",
       ?⋃       => "\\bigcup",
+      ?∅       => "\\emptyset",
       ?ℵ       => "\\aleph",
       ?∞       => "\\infty",
       ?≠       => "\\neq",
