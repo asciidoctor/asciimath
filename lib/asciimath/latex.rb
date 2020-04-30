@@ -139,13 +139,13 @@ module AsciiMath
       ?⇐       => "\\Leftarrow",
       ?′       => "'",
       ?−       => "-",
-      ?Γ       => "Gamma",
-      ?Δ       => "Delta",
-      ?Θ       => "Theta",
-      ?Λ       => "Lambda",
-      ?Ξ       => "Xi",
-      ?Π       => "Pi",
-      ?Ω       => "Omega",
+      ?Γ       => "\\Gamma",
+      ?Δ       => "\\Delta",
+      ?Θ       => "\\Theta",
+      ?Λ       => "\\Lambda",
+      ?Ξ       => "\\Xi",
+      ?Π       => "\\Pi",
+      ?Ω       => "\\Omega",
       "lim"    => "\\lim",
       "sin"    => "\\sin",
       "cos"    => "\\cos",
@@ -374,7 +374,7 @@ module AsciiMath
           if s1.is_a?(Hash) and s1[:underover]
             sub(s1, s2)
           else
-            operation("\\underset", s1, s2)
+            operation("\\underset", s2, s1)
           end
 
           return
@@ -390,7 +390,7 @@ module AsciiMath
             append(s1)
           end
         else
-          operation("\\underset", s1, s2)
+          operation("\\underset", s2, s1)
         end
       else
         operation(operator, s1, s2)
@@ -464,8 +464,13 @@ module AsciiMath
 
     def append_escaped(text)
       text.each_codepoint do |cp|
-        @latex << "\\" if SPECIAL_CHARACTERS.include? cp.chr
-        @latex << cp
+        begin
+          @latex << "\\" if SPECIAL_CHARACTERS.include? cp.chr
+        rescue
+          # Not a unicode character
+        ensure
+          @latex << cp
+        end
       end
     end
   end
