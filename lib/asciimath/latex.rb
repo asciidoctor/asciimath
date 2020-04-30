@@ -167,6 +167,7 @@ module AsciiMath
       "gcd"    => "\\gcd",
       "min"    => "\\min",
       "max"    => "\\max",
+      "if"     => "\\text{if}"
     }
 
     PARENS = {
@@ -298,9 +299,9 @@ module AsciiMath
       end
 
       for arg in args do
-        @latex << "{ "
+        @latex << "{"
         append(arg)
-        @latex << " }"
+        @latex << "}"
       end
     end
 
@@ -399,48 +400,48 @@ module AsciiMath
     def ternary(operator, s1, s2, s3)
       case operator
       when :subsup, :underover
-        @latex << "{ " if s1.is_a?(Array)
+        @latex << "{" if s1.is_a?(Array)
         append(s1)
-        @latex << " }" if s1.is_a?(Array)
+        @latex << "}" if s1.is_a?(Array)
         
         @latex << "_"
         
-        @latex << "{ " if s2.is_a?(Array)
+        @latex << "{" if s2.is_a?(Array)
         append(s2)
-        @latex << " }" if s2.is_a?(Array)
+        @latex << "}" if s2.is_a?(Array)
         
         @latex << "^"
         
-        @latex << "{ " if s3.is_a?(Array)
+        @latex << "{" if s3.is_a?(Array)
         append(s3)
-        @latex << " }" if s3.is_a?(Array)
+        @latex << "}" if s3.is_a?(Array)
       else
         operation(operator, s1, s2, s3)
       end
     end
 
     def sub(s1, s2)
-      @latex << "{ " if s1.is_a?(Array)
+      @latex << "{" if s1.is_a?(Array)
       append(s1)
-      @latex << " }" if s1.is_a?(Array)
+      @latex << "}" if s1.is_a?(Array)
       
       @latex << "_"
       
-      @latex << "{ " if s2.is_a?(Array)
+      @latex << "{" if s2.is_a?(Array)
       append(s2)
-      @latex << " }" if s2.is_a?(Array)
+      @latex << "}" if s2.is_a?(Array)
     end
 
     def sup(s1, s2)
-      @latex << "{ " if s1.is_a?(Array)
+      @latex << "{" if s1.is_a?(Array)
       append(s1)
-      @latex << " }" if s1.is_a?(Array)
+      @latex << "}" if s1.is_a?(Array)
       
       @latex << "^"
       
-      @latex << "{ " if s2.is_a?(Array)
+      @latex << "{" if s2.is_a?(Array)
       append(s2)
-      @latex << " }" if s2.is_a?(Array)
+      @latex << "}" if s2.is_a?(Array)
     end
 
     def macro(macro, *args)
@@ -452,13 +453,13 @@ module AsciiMath
         @latex << "]"
       end
 
-      @latex << "{ "
+      @latex << "{"
 
       if block_given?
         yield self if block_given?
       end
 
-      @latex << " }"
+      @latex << "}"
     end
 
     def append_escaped(text)
