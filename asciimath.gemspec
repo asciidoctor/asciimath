@@ -6,8 +6,8 @@ require 'asciimath/version'
 Gem::Specification.new do |spec|
   spec.name          = "asciimath"
   spec.version       = AsciiMath::VERSION
-  spec.authors       = ["Pepijn Van Eeckhoudt"]
-  spec.email         = ["pepijn@vaneeckhoudt.net"]
+  spec.authors       = ["Pepijn Van Eeckhoudt", "Gark Garcia"]
+  spec.email         = ["pepijn@vaneeckhoudt.net", "pablo-ecobar@riseup.net"]
   spec.summary       = %q{AsciiMath parser and converter}
   spec.description   = %q{A pure Ruby AsciiMath parsing and conversion library.}
   spec.homepage      = ""

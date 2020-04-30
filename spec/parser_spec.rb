@@ -154,11 +154,11 @@ TEST_CASES = {
     },
     "s'_i = {(- 1, if s_i > s_(i + 1)),( + 1, if s_i <= s_(i + 1)):}" => {
         :mathml => '<math><mi>s</mi><msub><mo>&#x2032;</mo><mi>i</mi></msub><mo>=</mo><mfenced open="{" close=""><mtable><mtr><mtd><mrow><mo>&#x2212;</mo><mn>1</mn></mrow></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&gt;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr><mtr><mtd><mrow><mo>+</mo><mn>1</mn></mrow></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&#x2264;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr></mtable></mfenced></math>',
-        :latex => 's \'_1 = \\left { \\begin{matrix} - 1 & \\text{if} s_1 > s_i{i + 1} \\\\ + 1 & \\text{if} s_1 \\leq s_{i + 1} \\end{matrix} \\right .',
+        :latex => 's \'_1 = \\left \\{ \\begin{matrix} - 1 & \\text{if} s_1 > s_i{i + 1} \\\\ + 1 & \\text{if} s_1 \\leq s_{i + 1} \\end{matrix} \\right .',
     },
     "s'_i = {(, if s_i > s_(i + 1)),( + 1,):}" => {
         :mathml => '<math><mi>s</mi><msub><mo>&#x2032;</mo><mi>i</mi></msub><mo>=</mo><mfenced open="{" close=""><mtable><mtr><mtd></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&gt;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr><mtr><mtd><mrow><mo>+</mo><mn>1</mn></mrow></mtd><mtd></mtd></mtr></mtable></mfenced></math>',
-        :latex => 's \'_i = \\left { \\begin{matrix} & \\text{if} s_1 > s_{i + 1} \\\\ + 1 & \\end{matrix} \\right .',
+        :latex => 's \'_i = \\left \\{ \\begin{matrix} & \\text{if} s_1 > s_{i + 1} \\\\ + 1 & \\end{matrix} \\right .',
     },
     '{:(a,b),(c,d):}' => {
         :mathml => '<math><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable></math>',
