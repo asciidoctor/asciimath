@@ -102,7 +102,7 @@ Known issues are as follows:
 Rendering the HTML output correctly requires the inclusion of `style/math.css` in the html document.
 There is currently no specific required font for this output, it simply selects a `serif` font family - change the `@font-family` attribute in the `.math-inline` class to select something specific.
 
-### Notes on the LaTeX Output
+## Notes on the LaTeX Output
 
 All LaTeX commands and environments used in the output are coverved by 
 https://ctan.org/pkg/amsmath[`amsmath`] and `amssymb`, with a couple of 
