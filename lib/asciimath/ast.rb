@@ -12,7 +12,9 @@ module AsciiMath
     end
 
     def paren(lparen, e, rparen, opts = {})
-      {:type => :paren, :e => e, :lparen => lparen, :rparen => rparen, :no_unwrap => opts[:no_unwrap]}
+      e = {:type => :paren, :e => e, :lparen => lparen, :rparen => rparen}
+      e[:no_unwrap] = opts[:no_unwrap] if opts[:no_unwrap]
+      e
     end
 
     def subsup(e, sub, sup)

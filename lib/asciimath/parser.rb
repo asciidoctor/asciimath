@@ -55,7 +55,7 @@ module AsciiMath
   #
   class Tokenizer
     WHITESPACE = /\s+/
-    NUMBER = /-?[0-9]+(?:\.[0-9]+)?/
+    NUMBER = /[0-9]+(?:\.[0-9]+)?/
     QUOTED_TEXT = /"[^"]*"/
     TEX_TEXT = /text\([^)]*\)/
 
@@ -576,7 +576,7 @@ module AsciiMath
               t2 = tok.next_token
               case t2[:type]
                 when :rparen, :lrparen
-                  convert_to_matrix({:type => :paren, :e => e, :lparen => t1[:value], :rparen => t2[:value]})
+                  convert_to_matrix(paren(t1[:value], e, t2[:value]))
                 else
                   tok.push_back(t2)
                   paren(t1[:value], e, nil)

@@ -24,11 +24,7 @@ TEST_CASES = {
         :ast => expression(
             "x",
             :plus,
-            binary(
-                :frac,
-                "b",
-                expression("2", "a")
-            ),
+            binary(:frac, "b", expression("2", "a")),
             :lt,
             :pm,
             unary(
@@ -40,11 +36,7 @@ TEST_CASES = {
                         expression("4", sup("a", "2"))
                     ),
                     :minus,
-                    binary(
-                        :frac,
-                        "c",
-                        "a"
-                    )
+                    binary(:frac, "c", "a")
                 )
             )
         ),
@@ -54,6 +46,13 @@ TEST_CASES = {
     },
     'a^2 + b^2 = c^2' =>
     {
+        :ast => expression(
+            sup("a", "2"),
+            :plus,
+            sup("b", "2"),
+            :eq,
+            sup("c", "2")
+        ),
         :mathml => '<math><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>=</mo><msup><mi>c</mi><mn>2</mn></msup></math>',
         :html => '<span class="math-inline"><span class="math-row"><span class="math-identifier">a</span><span class="math-subsup"><span class="math-smaller"><span class="math-number">2</span></span><span class="math-smaller">&#x200D;</span></span><span class="math-operator">+</span><span class="math-identifier">b</span><span class="math-subsup"><span class="math-smaller"><span class="math-number">2</span></span><span class="math-smaller">&#x200D;</span></span><span class="math-operator">=</span><span class="math-identifier">c</span><span class="math-subsup"><span class="math-smaller"><span class="math-number">2</span></span><span class="math-smaller">&#x200D;</span></span></span></span>',
         :latex => 'a^2 + b^2 = c^2',
@@ -61,18 +60,53 @@ TEST_CASES = {
     },
     'x = (-b+-sqrt(b^2-4ac))/(2a)' =>
     {
+        :ast => expression(
+            "x",
+            :eq,
+            binary(
+                :frac,
+                expression(
+                    :minus, "b",
+                    :pm,
+                    unary(:sqrt, expression(sup("b", "2"), :minus, "4", "a", "c"))
+                ),
+                expression("2", "a"),
+            )
+        ),
         :mathml => '<math><mi>x</mi><mo>=</mo><mfrac><mrow><mo>&#x2212;</mo><mi>b</mi><mo>&#xB1;</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mn>-4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>',
         :html => nil,
         :latex => 'x = \\frac{- b \\pm \\sqrt{b^2 -4 a c}}{2 a}',
     },
     'm = (y_2 - y_1)/(x_2 - x_1) = (Deltay)/(Deltax)' =>
     {
+        :ast => expression(
+            "m",
+            :eq,
+            binary(:frac, expression(sub("y", "2"), :minus, sub("y", "1")), expression(sub("x", "2"), :minus, sub("x", "1"))),
+            :eq,
+            binary(:frac, expression(:Delta, "y"), expression(:Delta, "x")),
+        ),
         :mathml => '<math><mi>m</mi><mo>=</mo><mfrac><mrow><msub><mi>y</mi><mn>2</mn></msub><mo>&#x2212;</mo><msub><mi>y</mi><mn>1</mn></msub></mrow><mrow><msub><mi>x</mi><mn>2</mn></msub><mo>&#x2212;</mo><msub><mi>x</mi><mn>1</mn></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mo>&#x394;</mo><mi>y</mi></mrow><mrow><mo>&#x394;</mo><mi>x</mi></mrow></mfrac></math>',
         :html => '<span class="math-inline"><span class="math-row"><span class="math-identifier">m</span><span class="math-operator">=</span><span class="math-blank">&#x200D;</span><span class="math-fraction"><span class="math-fraction_row"><span class="math-fraction_cell"><span class="math-smaller"><span class="math-row"><span class="math-row"><span class="math-identifier">y</span><span class="math-subsup"><span class="math-smaller">&#x200D;</span><span class="math-smaller"><span class="math-number">2</span></span></span><span class="math-operator">&#x2212;</span><span class="math-identifier">y</span><span class="math-subsup"><span class="math-smaller">&#x200D;</span><span class="math-smaller"><span class="math-number">1</span></span></span></span></span></span></span></span><span class="math-fraction_row"><span class="math-fraction_cell"><span class="math-smaller"><span class="math-row"><span class="math-row"><span class="math-identifier">x</span><span class="math-subsup"><span class="math-smaller">&#x200D;</span><span class="math-smaller"><span class="math-number">2</span></span></span><span class="math-operator">&#x2212;</span><span class="math-identifier">x</span><span class="math-subsup"><span class="math-smaller">&#x200D;</span><span class="math-smaller"><span class="math-number">1</span></span></span></span></span></span></span></span></span><span class="math-operator">=</span><span class="math-blank">&#x200D;</span><span class="math-fraction"><span class="math-fraction_row"><span class="math-fraction_cell"><span class="math-smaller"><span class="math-row"><span class="math-row"><span class="math-operator">&#x394;</span><span class="math-identifier">y</span></span></span></span></span></span><span class="math-fraction_row"><span class="math-fraction_cell"><span class="math-smaller"><span class="math-row"><span class="math-row"><span class="math-operator">&#x394;</span><span class="math-identifier">x</span></span></span></span></span></span></span></span></span>',
         :latex => 'm = \\frac{y_2 - y_1}{x_2 - x_1} = \\frac{\\Delta y}{\\Delta x}',
     },
     'f\'(x) = lim_(Deltax->0)(f(x+Deltax)-f(x))/(Deltax)' =>
     {
+        :ast => expression(
+            :f,
+            :prime,
+            paren(:lparen, "x", :rparen),
+            :eq,
+            sub(
+                :lim,
+                expression(:Delta, "x", :to, "0")
+            ),
+            binary(
+                :frac,
+                expression(:f, paren(:lparen, expression("x", :plus, :Delta, "x"), :rparen), :minus, :f, paren(:lparen, "x", :rparen)),
+                expression(:Delta, "x")
+            )
+        ),
         :mathml => '<math><mi>f</mi><mo>&#x2032;</mo><mfenced open="(" close=")"><mi>x</mi></mfenced><mo>=</mo><munder><mo>lim</mo><mrow><mo>&#x394;</mo><mi>x</mi><mo>&#x2192;</mo><mn>0</mn></mrow></munder><mfrac><mrow><mi>f</mi><mfenced open="(" close=")"><mrow><mi>x</mi><mo>+</mo><mo>&#x394;</mo><mi>x</mi></mrow></mfenced><mo>&#x2212;</mo><mi>f</mi><mfenced open="(" close=")"><mi>x</mi></mfenced></mrow><mrow><mo>&#x394;</mo><mi>x</mi></mrow></mfrac></math>',
         :html => '<span class="math-inline"><span class="math-row"><span class="math-identifier">f</span><span class="math-operator">&#x2032;</span><span class="math-row"><span class="math-brace">(</span><span class="math-row"><span class="math-identifier">x</span></span><span class="math-brace">)</span></span><span class="math-operator">=</span><span class="math-blank">&#x200D;</span><span class="math-underover"><span class="math-smaller"><span class="math-blank">&#x200D;</span></span><span class="math-operator">lim</span><span class="math-smaller"><span class="math-row"><span class="math-operator">&#x394;</span><span class="math-identifier">x</span><span class="math-operator">&#x2192;</span><span class="math-number">0</span></span></span></span><span class="math-blank">&#x200D;</span><span class="math-fraction"><span class="math-fraction_row"><span class="math-fraction_cell"><span class="math-smaller"><span class="math-row"><span class="math-row"><span class="math-identifier">f</span><span class="math-row"><span class="math-brace">(</span><span class="math-row"><span class="math-identifier">x</span><span class="math-operator">+</span><span class="math-operator">&#x394;</span><span class="math-identifier">x</span></span><span class="math-brace">)</span></span><span class="math-operator">&#x2212;</span><span class="math-identifier">f</span><span class="math-row"><span class="math-brace">(</span><span class="math-row"><span class="math-identifier">x</span></span><span class="math-brace">)</span></span></span></span></span></span></span><span class="math-fraction_row"><span class="math-fraction_cell"><span class="math-smaller"><span class="math-row"><span class="math-row"><span class="math-operator">&#x394;</span><span class="math-identifier">x</span></span></span></span></span></span></span></span></span>',
         :latex => 'f \' \\left ( x \\right ) = \\lim_{\\Delta x \\rightarrow 0} \\frac{f \\left ( x + \\Delta x \\right ) - f \\left ( x \\right )}{\\Delta x}',
@@ -276,7 +310,7 @@ module AsciiMathHelper
   def expect_mathml(asciimath, mathml)
     expect(AsciiMath.parse(asciimath).to_mathml).to eq(mathml)
   end
-  
+
   def expect_html(asciimath, html)
     expect(AsciiMath.parse(asciimath).to_html).to eq(html)
   end
