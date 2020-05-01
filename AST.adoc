@@ -208,17 +208,17 @@ Matrices::
 |tilde |:tilde |https://codepoints.net/U+007E[U+007E] |~
 |\  |:nbsp |https://codepoints.net/U+00A0[U+00A0] | 
 |frown |:frown |https://codepoints.net/U+2322[U+2322] |⌢
-|quad |:quad | |  
-|qquad |:qquad | |    
+|quad |:quad |https://codepoints.net/U+00A0[U+00A0] https://codepoints.net/U+00A0[U+00A0] |  
+|qquad |:qquad |https://codepoints.net/U+00A0[U+00A0] https://codepoints.net/U+00A0[U+00A0] https://codepoints.net/U+00A0[U+00A0] https://codepoints.net/U+00A0[U+00A0] |    
 |cdots |:cdots |https://codepoints.net/U+22EF[U+22EF] |⋯
 |vdots |:vdots |https://codepoints.net/U+22EE[U+22EE] |⋮
 |ddots |:ddots |https://codepoints.net/U+22F1[U+22F1] |⋱
 |diamond |:diamond |https://codepoints.net/U+22C4[U+22C4] |⋄
 |square |:square |https://codepoints.net/U+25A1[U+25A1] |□
-||__ |:lfloor |https://codepoints.net/U+230A[U+230A] |⌊
-|__| |:rfloor |https://codepoints.net/U+230B[U+230B] |⌋
-||~ |:lceiling |https://codepoints.net/U+2308[U+2308] |⌈
-|~| |:rceiling |https://codepoints.net/U+2309[U+2309] |⌉
+|\|__ |:lfloor |https://codepoints.net/U+230A[U+230A] |⌊
+|__\| |:rfloor |https://codepoints.net/U+230B[U+230B] |⌋
+|\|~ |:lceiling |https://codepoints.net/U+2308[U+2308] |⌈
+|~\| |:rceiling |https://codepoints.net/U+2309[U+2309] |⌉
 |CC |:dstruck_captial_c |https://codepoints.net/U+2102[U+2102] |ℂ
 |NN |:dstruck_captial_n |https://codepoints.net/U+2115[U+2115] |ℕ
 |QQ |:dstruck_captial_q |https://codepoints.net/U+211A[U+211A] |ℚ
