@@ -1,8 +1,22 @@
-= Asciimath Grammar and AST
+= AsciiMath Grammar and AST
 
 == Grammar
 
-The syntax for ASCIIMath in EBNF style notation is
+The AsciiMath grammar is defined as
+
+[source]
+----
+v ::= [A-Za-z] | greek letters | numbers | other constant symbols
+u ::= sqrt | text | bb | other unary symbols for font commands
+b ::= frac | root | stackrel | other binary symbols
+l ::= ( | [ | { | (: | {: | other left brackets
+r ::= ) | ] | } | :) | :} | other right brackets
+S ::= v | lEr | uS | bSS             Simple expression
+I ::= S_S | S^S | S_S^S | S          Intermediate expression
+E ::= IE | I/I                       Expression
+----
+
+syntax  in EBNF style notation is
 
 [source]
 ----
@@ -13,7 +27,7 @@ intermediate = simp sub? super?
 super = '^' simp
 sub =  '_' simp
 simp = constant | paren_expr | unary_expr | binary_expr | text
-paren_expr = lparen expr rparen
+paren_expr = lparen asciimath rparen
 lparen = '(' | '[' | '{' | '(:' | '{:'
 rparen = ')' | ']' | '}' | ':)' | ':}'
 unary_expr = unary_op simp
@@ -32,19 +46,15 @@ identifier = [A-z]
 The parser returns an abstract syntax tree consisting of symbols, strings, Hashes and Arrays.
 Each expression 'node' of the AST is one of the following forms:
 
-Sequence::
+AsciiMath::
+`asciimath` is converted to a an Array of expressions.
+An empty Array is converted to nil by the parser.
+A single element Array is unwrapped to just the element.
 +
 Sequences of expressions are returned as an Array of nodes.
 
-Symbols::
-+
-Mathematical operators, function names, arrows, accents, greek letters, etc. are all represented as Symbol objects.
-
-Literals::
-+
-Literal text strings are represented as String objects.
-
 Parentheses::
+`lparen asciimath rparen` is converted to a Hash of the following form
 +
 [source]
 ----
@@ -57,6 +67,7 @@ Parentheses::
 ----
 
 Super and Sub Script::
+`simp sub`, `simp super` and `simp sub super` are converted to a Hash of the following form.
 +
 [source]
 ----
@@ -69,6 +80,7 @@ Super and Sub Script::
 ----
 
 Unary Expressions::
+`unary_op simp` is converted to a Hash of the following form.
 +
 [source]
 ----
@@ -80,6 +92,10 @@ Unary Expressions::
 ----
 
 Binary Expressions::
+`binary_op simp simp` is converted to a Hash of the following form.
++
+`intermediate / intermediate` is converted to the equivalent `frac` based binary expression.
+For instance the AsciiMath string `a / b` would be returned as `{:type => :binary, :op => :frac, :e1 => "a", :e2 => "b"}`.
 +
 [source]
 ----
@@ -91,7 +107,26 @@ Binary Expressions::
 }
 ----
 
+Constants::
++
+`symbol` (mathematical operators, function names, arrows, accents, greek letters, etc.) are all converted to Symbols.
+The <<symbol_table>> below list all the symbols that are recognized by the parser.
++
+`text`, `number` and `identifier` are converted to Strings.
+
 Matrices::
+Matrices in AsciiMath are a special case of nested `paren_expr`.
+The matrix itself can be any `paren_expr`.
+Inside this outer matrix `paren_expr` each row should be represented as a `paren_expr` using either `()` or `[]`.
+Rows must be separated by commas (`,`).
+The elements of each row must also be separated by commas.
+Each row must contain the same number of elements.
++
+When the parser detects a well-formed matrix expression it will strip away the `paren_expr` representation of the matrix and each row.
+Instead it returns a Hash of the following form.
+The `rows` value contains an Array with one element per row.
+Each row Array contains one element per column.
+Each column element is represented using the appropriate AST type.
 +
 [source]
 ----
@@ -103,10 +138,11 @@ Matrices::
 }
 ----
 
+[[symbol_table]]
 == Symbol Table
 
 |===
-|Asciimath |Symbol |Codepoint |Value
+|AsciiMath |Symbol |Codepoint |Value
 
 |+ |:plus |https://codepoints.net/U+002B[U+002B] |+
 |- |:minus |https://codepoints.net/U+2212[U+2212] |−
