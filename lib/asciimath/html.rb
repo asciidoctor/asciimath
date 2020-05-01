@@ -236,7 +236,7 @@ module AsciiMath
 
   class Expression
     def to_html(prefix = "", inline = true, attrs = {})
-      HTMLBuilder.new(prefix).append_expression(@parsed_expression, inline, attrs).to_s
+      HTMLBuilder.new(prefix).append_expression(ast, inline, attrs).to_s
     end
   end
 end

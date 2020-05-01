@@ -146,7 +146,7 @@ module AsciiMath
 
   class Expression
     def to_mathml(prefix = "", attrs = {})
-      MathMLBuilder.new(prefix).append_expression(@parsed_expression, attrs).to_s
+      MathMLBuilder.new(prefix).append_expression(ast, attrs).to_s
     end
   end
 end

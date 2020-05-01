@@ -6,11 +6,13 @@ The syntax for ASCIIMath in EBNF style notation is
 
 [source]
 ----
-expr = ( simp ( fraction | sub | super ) )+
-simp = constant | paren_expr | unary_expr | binary_expr | text
-fraction = '/' simp
+asciimath = expr*
+expr = intermediate fraction?
+fraction = '/' intermediate
+intermediate = simp sub? super?
 super = '^' simp
-sub =  '_' simp super?
+sub =  '_' simp
+simp = constant | paren_expr | unary_expr | binary_expr | text
 paren_expr = lparen expr rparen
 lparen = '(' | '[' | '{' | '(:' | '{:'
 rparen = ')' | ']' | '}' | ':)' | ':}'
@@ -27,96 +29,76 @@ identifier = [A-z]
 
 == Abstract Syntax Tree
 
-The parser returns an Array of expressions.
-Each expression is a Hash of one of the following forms.
+The parser returns an abstract syntax tree consisting of symbols, strings, Hashes and Arrays.
+Each expression 'node' of the AST is one of the following forms:
 
+Sequence::
++
+Sequences of expressions are returned as an Array of nodes.
+
+Symbols::
++
+Mathematical operators, function names, arrows, accents, greek letters, etc. are all represented as Symbol objects.
+
+Literals::
++
+Literal text strings are represented as String objects.
+
+Parentheses::
++
 [source]
 ----
 {
-    :type => :paren
-    :e => // expression between parens
-    :lparen => // left paren value
-    :rparen => // right paren value
+  :type => :paren
+  :e => <sub expression>
+  :lparen => <left Symbol or String>
+  :rparen => <right Symbol or String>
 }
 ----
 
+Super and Sub Script::
++
+[source]
+----
+{
+  :type => :subsup
+  :e => <base expression>
+  :sub => <subscript expression>
+  :sup => <superscript expression>
+}
+----
+
+Unary Expressions::
++
+[source]
+----
+{
+  :type => :unary
+  :e => <operand expression>
+  :op => <operator Symbol or String>
+}
+----
+
+Binary Expressions::
++
+[source]
+----
+{
+  :type => :binary
+  :e1 => <first operand expression>
+  :e2 => <second operand expression>
+  :op => <operator Symbol or String>
+}
+----
+
+Matrices::
++
 [source]
 ----
 {
     :type => :matrix
-    :rows => array of arrays of expressions
-    :lparen => // left paren value
-    :rparen => // right paren value
-}
-----
-
-[source]
-----
-{
-    :type => :operator
-    :c => // operator value
-}
-----
-
-[source]
-----
-{
-    :type => :unary
-    :s => // expression of the unary expression
-    :operator => // operator value
-}
-----
-
-[source]
-----
-{
-    :type => :binary
-    :s1 => // first expression of the binary expression
-    :s2 => // second expression of the binary expression
-    :operator => // the operator to use
-}
-----
-
-[source]
-----
-{
-    :type => :ternary
-    :s1 => // first expression of the binary expression
-    :s2 => // second expression of the binary expression
-    :s3 => // third expression of the binary expression
-    :operator => // the operator to use
-}
-----
-
-[source]
-----
-{
-    :type => :font
-    :s => // expression of the unary expression
-    :operator => // the operator to use
-}
-----
-
-[source]
-----
-{
-    :type => :text
-    :value => // text literal value
-}
-----
-
-[source]
-----
-{
-    :type => :number
-    :value => // number value
-}
-----
-
-[source]
-----
-{
-    :type => :identifier
-    :value => // identifier value
+    :rows => <Array of Arrays of expressions>
+    :lparen => <left Symbol or String>
+    :rparen => <right Symbol or String>
 }
 ----

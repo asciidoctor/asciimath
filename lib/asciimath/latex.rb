@@ -477,7 +477,7 @@ module AsciiMath
 
   class Expression
     def to_latex
-      LatexBuilder.new().append_expression(@parsed_expression).to_s
+      LatexBuilder.new().append_expression(ast).to_s
     end
   end
 end

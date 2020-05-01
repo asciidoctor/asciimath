@@ -1,4 +1,5 @@
 require 'strscan'
+require_relative 'ast'
 
 # Parser for ASCIIMath expressions.
 #
@@ -33,7 +34,7 @@ module AsciiMath
   # The :type key indicates the semantics of the token. The value for :type will be one
   # of the following symbols:
   #
-  # - :identifier a symbolic name or a bit of text without any further semantics
+  # - :symbol a symbolic name or a bit of text without any further semantics
   # - :text a bit of arbitrary text
   # - :number a number
   # - :operator a mathematical operator symbol
@@ -86,19 +87,19 @@ module AsciiMath
       return {:value => nil, :type => :eof} if @string.eos?
 
       case @string.peek(1)
-      when '"'
-        read_quoted_text
-      when 't'
-        case @string.peek(5)
-        when 'text('
-          read_tex_text
+        when '"'
+          read_quoted_text
+        when 't'
+          case @string.peek(5)
+            when 'text('
+              read_tex_text
+            else
+              read_symbol
+          end
+        when '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+          read_number || read_symbol
         else
           read_symbol
-        end
-      when '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-        read_number || read_symbol
-      else
-        read_symbol
       end
     end
 
@@ -173,7 +174,7 @@ module AsciiMath
           s.chop!
         end
         @string.pos = position + bytesize(s)
-        @symbols[s] || {:value => s, :type => :identifier}
+        @symbols[s] || {:value => s, :type => nil}
       end
     end
 
@@ -200,222 +201,223 @@ module AsciiMath
   end
 
   class Parser
+    include AsciiMath::AST
+
     SYMBOLS = {
         # Operation symbols
-        '+' => {:value => '+', :type => :operator},
-        '-' => {:value => "\u2212", :type => :operator},
-        '*' => {:value => "\u22C5", :type => :operator},
-        '**' => {:value => "\u002A", :type => :operator},
-        '***' => {:value => "\u22C6", :type => :operator},
-        '//' => {:value => '/', :type => :operator},
-        '\\\\' => {:value => '\\', :type => :operator},
-        'setminus' => {:value => '\\', :type => :operator},
-        'xx' => {:value => "\u00D7", :type => :operator},
-        '|><' => {:value => "\u22C9", :type => :operator},
-        '><|' => {:value => "\u22CA", :type => :operator},
-        '|><|' => {:value => "\u22C8", :type => :operator},
-        '-:' => {:value => "\u00F7", :type => :operator},
-        'divide' => {:value => "\u00F7", :type => :operator},
-        '@' => {:value => "\u26AC", :type => :operator},
-        'o+' => {:value => "\u2295", :type => :operator},
-        'ox' => {:value => "\u2297", :type => :operator},
-        'o.' => {:value => "\u2299", :type => :operator},
-        'sum' => {:value => "\u2211", :type => :operator, :underover => true},
-        'prod' => {:value => "\u220F", :type => :operator, :underover => true},
-        '^^' => {:value => "\u2227", :type => :operator},
-        '^^^' => {:value => "\u22C0", :type => :operator, :underover => true},
-        'vv' => {:value => "\u2228", :type => :operator},
-        'vvv' => {:value => "\u22C1", :type => :operator, :underover => true},
-        'nn' => {:value => "\u2229", :type => :operator},
-        'nnn' => {:value => "\u22C2", :type => :operator, :underover => true},
-        'uu' => {:value => "\u222A", :type => :operator},
-        'uuu' => {:value => "\u22C3", :type => :operator, :underover => true},
+        '+' => {:value => :plus, :type => nil},
+        '-' => {:value => :minus, :type => nil},
+        '*' => {:value => :cdot, :type => nil},
+        '**' => {:value => :ast, :type => nil},
+        '***' => {:value => :star, :type => nil},
+        '//' => {:value => :slash, :type => nil},
+        '\\\\' => {:value => :backslash, :type => nil},
+        'setminus' => {:value => :setminus, :type => nil},
+        'xx' => {:value => :times, :type => nil},
+        '|><' => {:value => :ltimes, :type => nil},
+        '><|' => {:value => :rtimes, :type => nil},
+        '|><|' => {:value => :bowtie, :type => nil},
+        '-:' => {:value => :div, :type => nil},
+        'divide' => {:value => :div, :type => nil},
+        '@' => {:value => :circ, :type => nil},
+        'o+' => {:value => :oplus, :type => nil},
+        'ox' => {:value => :otimes, :type => nil},
+        'o.' => {:value => :odot, :type => nil},
+        'sum' => {:value => :sum, :type => nil},
+        'prod' => {:value => :prod, :type => nil},
+        '^^' => {:value => :wedge, :type => nil},
+        '^^^' => {:value => :bidwedge, :type => nil},
+        'vv' => {:value => :vee, :type => nil},
+        'vvv' => {:value => :bigvee, :type => nil},
+        'nn' => {:value => :cap, :type => nil},
+        'nnn' => {:value => :bigcap, :type => nil},
+        'uu' => {:value => :cup, :type => nil},
+        'uuu' => {:value => :bigcup, :type => nil},
 
         # Relation symbols
-        '=' => {:value => '=', :type => :operator},
-        '!=' => {:value => "\u2260", :type => :operator},
-        ':=' => {:value => ':=', :type => :operator},
-        '<' => {:value => "\u003C", :type => :operator},
-        'lt' => {:value => "\u003C", :type => :operator},
-        '>' => {:value => "\u003E", :type => :operator},
-        'gt' => {:value => "\u003E", :type => :operator},
-        '<=' => {:value => "\u2264", :type => :operator},
-        'le' => {:value => "\u2264", :type => :operator},
-        '>=' => {:value => "\u2265", :type => :operator},
-        'ge' => {:value => "\u2265", :type => :operator},
-        '-<' => {:value => "\u227A", :type => :operator},
-        '-lt' => {:value => "\u227A", :type => :operator},
-        '>-' => {:value => "\u227B", :type => :operator},
-        '-<=' => {:value => "\u2AAF", :type => :operator},
-        '>-=' => {:value => "\u2AB0", :type => :operator},
-        'in' => {:value => "\u2208", :type => :operator},
-        '!in' => {:value => "\u2209", :type => :operator},
-        'sub' => {:value => "\u2282", :type => :operator},
-        'sup' => {:value => "\u2283", :type => :operator},
-        'sube' => {:value => "\u2286", :type => :operator},
-        'supe' => {:value => "\u2287", :type => :operator},
-        '-=' => {:value => "\u2261", :type => :operator},
-        '~=' => {:value => "\u2245", :type => :operator},
-        '~~' => {:value => "\u2248", :type => :operator},
-        'prop' => {:value => "\u221D", :type => :operator},
+        '=' => {:value => :eq, :type => nil},
+        '!=' => {:value => :ne, :type => nil},
+        ':=' => {:value => :assign, :type => nil},
+        '<' => {:value => :lt, :type => nil},
+        'lt' => {:value => :lt, :type => nil},
+        '>' => {:value => :gt, :type => nil},
+        'gt' => {:value => :gt, :type => nil},
+        '<=' => {:value => :le, :type => nil},
+        'le' => {:value => :le, :type => nil},
+        '>=' => {:value => :ge, :type => nil},
+        'ge' => {:value => :ge, :type => nil},
+        '-<' => {:value => :prec, :type => nil},
+        '-lt' => {:value => :prec, :type => nil},
+        '>-' => {:value => :succ, :type => nil},
+        '-<=' => {:value => :preceq, :type => nil},
+        '>-=' => {:value => :succeq, :type => nil},
+        'in' => {:value => :in, :type => nil},
+        '!in' => {:value => :notin, :type => nil},
+        'sub' => {:value => :subset, :type => nil},
+        'sup' => {:value => :supset, :type => nil},
+        'sube' => {:value => :subseteq, :type => nil},
+        'supe' => {:value => :supseteq, :type => nil},
+        '-=' => {:value => :equiv, :type => nil},
+        '~=' => {:value => :cong, :type => nil},
+        '~~' => {:value => :approx, :type => nil},
+        'prop' => {:value => :propto, :type => nil},
 
         # Logical symbols
-        'and' => {:value => 'and', :type => :text},
-        'or' => {:value => 'or', :type => :text},
-        'not' => {:value => "\u00AC", :type => :operator},
-        '=>' => {:value => "\u21D2", :type => :operator},
-        'if' => {:value => 'if', :type => :operator},
-        '<=>' => {:value => "\u21D4", :type => :operator},
-        'AA' => {:value => "\u2200", :type => :operator},
-        'EE' => {:value => "\u2203", :type => :operator},
-        '_|_' => {:value => "\u22A5", :type => :operator},
-        'TT' => {:value => "\u22A4", :type => :operator},
-        '|--' => {:value => "\u22A2", :type => :operator},
-        '|==' => {:value => "\u22A8", :type => :operator},
+        'and' => {:value => :and, :type => :identifier},
+        'or' => {:value => :or, :type => :identifier},
+        'not' => {:value => :not, :type => nil},
+        '=>' => {:value => :implies, :type => nil},
+        'if' => {:value => :if, :type => nil},
+        '<=>' => {:value => :iff, :type => nil},
+        'AA' => {:value => :forall, :type => nil},
+        'EE' => {:value => :exists, :type => nil},
+        '_|_' => {:value => :bot, :type => nil},
+        'TT' => {:value => :top, :type => nil},
+        '|--' => {:value => :vdash, :type => nil},
+        '|==' => {:value => :models, :type => nil},
 
         # Grouping brackets
-        '(' => {:value => '(', :type => :lparen},
-        ')' => {:value => ')', :type => :rparen},
-        '[' => {:value => '[', :type => :lparen},
-        ']' => {:value => ']', :type => :rparen},
-        '{' => {:value => '{', :type => :lparen},
-        '}' => {:value => '}', :type => :rparen},
-        '|' => {:value => '|', :type => :lrparen},
-        ':|:' => {:value => '|', :type => :operator},
-        '|:' => {:value => '|', :type => :lparen},
-        ':|' => {:value => '|', :type => :rparen},
-        '||' => {:value => '||', :type => :lrparen},
-        '(:' => {:value => "\u2329", :type => :lparen},
-        ':)' => {:value => "\u232A", :type => :rparen},
-        '<<' => {:value => "\u2329", :type => :lparen},
-        '>>' => {:value => "\u232A", :type => :rparen},
+        '(' => {:value => :lparen, :type => :lparen},
+        ')' => {:value => :rparen, :type => :rparen},
+        '[' => {:value => :lbracket, :type => :lparen},
+        ']' => {:value => :rbracket, :type => :rparen},
+        '{' => {:value => :lbrace, :type => :lparen},
+        '}' => {:value => :rbrace, :type => :rparen},
+        '|' => {:value => :vbar, :type => :lrparen},
+        ':|:' => {:value => :vbar, :type => nil},
+        '|:' => {:value => :vbar, :type => :lparen},
+        ':|' => {:value => :vbar, :type => :rparen},
+        # '||' => {:value => '||', :type => :lrparen},
+        '(:' => {:value => :langle, :type => :lparen},
+        ':)' => {:value => :rangle, :type => :rparen},
+        '<<' => {:value => :langle, :type => :lparen},
+        '>>' => {:value => :rangle, :type => :rparen},
         '{:' => {:value => nil, :type => :lparen},
         ':}' => {:value => nil, :type => :rparen},
 
         # Miscellaneous symbols
-        'int' => {:value => "\u222B", :type => :operator},
-        'dx' => {:value => 'dx', :type => :identifier},
-        'dy' => {:value => 'dy', :type => :identifier},
-        'dz' => {:value => 'dz', :type => :identifier},
-        'dt' => {:value => 'dt', :type => :identifier},
-        'oint' => {:value => "\u222E", :type => :operator},
-        'del' => {:value => "\u2202", :type => :operator},
-        'grad' => {:value => "\u2207", :type => :operator},
-        '+-' => {:value => "\u00B1", :type => :operator},
-        'O/' => {:value => "\u2205", :type => :operator},
-        'oo' => {:value => "\u221E", :type => :operator},
-        'aleph' => {:value => "\u2135", :type => :operator},
-        '...' => {:value => '...', :type => :operator},
-        ':.' => {:value => "\u2234", :type => :operator},
-        ':\'' => {:value => "\u2235", :type => :operator},
-        '/_' => {:value => "\u2220", :type => :operator},
-        '/_\\' => {:value => "\u25B3", :type => :operator},
-        '\'' => {:value => "\u2032", :type => :operator},
-        'tilde' => {:value => "~", :type => :accent, :position => :over},
-        '\\ ' => {:value => "\u00A0", :type => :operator},
-        'frown' => {:value => "\u2322", :type => :operator},
-        'quad' => {:value => "\u00A0\u00A0", :type => :operator},
-        'qquad' => {:value => "\u00A0\u00A0\u00A0\u00A0", :type => :operator},
-        'cdots' => {:value => "\u22EF", :type => :operator},
-        'vdots' => {:value => "\u22EE", :type => :operator},
-        'ddots' => {:value => "\u22F1", :type => :operator},
-        'diamond' => {:value => "\u22C4", :type => :operator},
-        'square' => {:value => "\u25A1", :type => :operator},
-        '|__' => {:value => "\u230A", :type => :operator},
-        '__|' => {:value => "\u230B", :type => :operator},
-        '|~' => {:value => "\u2308", :type => :operator},
-        '~|' => {:value => "\u2309", :type => :operator},
-        'CC' => {:value => "\u2102", :type => :operator},
-        'NN' => {:value => "\u2115", :type => :operator},
-        'QQ' => {:value => "\u211A", :type => :operator},
-        'RR' => {:value => "\u211D", :type => :operator},
-        'ZZ' => {:value => "\u2124", :type => :operator},
-        'f' => {:value => 'f', :type => :identifier},
-        'g' => {:value => 'g', :type => :identifier},
+        'int' => {:value => :integral, :type => nil},
+        'dx' => {:value => :dx, :type => nil},
+        'dy' => {:value => :dy, :type => nil},
+        'dz' => {:value => :dz, :type => nil},
+        'dt' => {:value => :dt, :type => nil},
+        'oint' => {:value => :contourintegral, :type => nil},
+        'del' => {:value => :partial, :type => nil},
+        'grad' => {:value => :nabla, :type => nil},
+        '+-' => {:value => :pm, :type => nil},
+        'O/' => {:value => :emptyset, :type => nil},
+        'oo' => {:value => :infty, :type => nil},
+        'aleph' => {:value => :aleph, :type => nil},
+        '...' => {:value => '...', :type => nil},
+        ':.' => {:value => :therefore, :type => nil},
+        ':\'' => {:value => :because, :type => nil},
+        '/_' => {:value => :angle, :type => nil},
+        '/_\\' => {:value => :triangle, :type => nil},
+        '\'' => {:value => :prime, :type => nil},
+        'tilde' => {:value => :tilde, :type => :accent},
+        '\\ ' => {:value => :nbsp, :type => nil},
+        'frown' => {:value => :frown, :type => nil},
+        'quad' => {:value => :quad, :type => nil},
+        'qquad' => {:value => :qquad, :type => nil},
+        'cdots' => {:value => :cdots, :type => nil},
+        'vdots' => {:value => :vdots, :type => nil},
+        'ddots' => {:value => :ddots, :type => nil},
+        'diamond' => {:value => :diamond, :type => nil},
+        'square' => {:value => :square, :type => nil},
+        '|__' => {:value => :lfloor, :type => nil},
+        '__|' => {:value => :rfloor, :type => nil},
+        '|~' => {:value => :lceiling, :type => nil},
+        '~|' => {:value => :rceiling, :type => nil},
+        'CC' => {:value => :dstruck_captial_c, :type => nil},
+        'NN' => {:value => :dstruck_captial_n, :type => nil},
+        'QQ' => {:value => :dstruck_captial_q, :type => nil},
+        'RR' => {:value => :dstruck_captial_r, :type => nil},
+        'ZZ' => {:value => :dstruck_captial_z, :type => nil},
+        'f' => {:value => :f, :type => nil},
+        'g' => {:value => :g, :type => nil},
 
 
         # Standard functions
-        'lim' => {:value => 'lim', :type => :operator, :underover => true},
-        'Lim' => {:value => 'Lim', :type => :operator, :underover => true},
-        'min' => {:value => 'min', :type => :operator, :underover => true},
-        'max' => {:value => 'max', :type => :operator, :underover => true},
-        'sin' => {:value => 'sin', :type => :func},
-        'Sin' => {:value => 'Sin', :type => :func},
-        'cos' => {:value => 'cos', :type => :func},
-        'Cos' => {:value => 'Cos', :type => :func},
-        'tan' => {:value => 'tan', :type => :func},
-        'Tan' => {:value => 'Tan', :type => :func},
-        'sinh' => {:value => 'sinh', :type => :func},
-        'Sinh' => {:value => 'Sinh', :type => :func},
-        'cosh' => {:value => 'cosh', :type => :func},
-        'Cosh' => {:value => 'Cosh', :type => :func},
-        'tanh' => {:value => 'tanh', :type => :func},
-        'Tanh' => {:value => 'Tanh', :type => :func},
-        'cot' => {:value => 'cot', :type => :func},
-        'Cot' => {:value => 'Cot', :type => :func},
-        'sec' => {:value => 'sec', :type => :func},
-        'Sec' => {:value => 'Sec', :type => :func},
-        'csc' => {:value => 'csc', :type => :func},
-        'Csc' => {:value => 'Csc', :type => :func},
-        'arcsin' => {:value => 'arcsin', :type => :func},
-        'arccos' => {:value => 'arccos', :type => :func},
-        'arctan' => {:value => 'arctan', :type => :func},
-        'coth' => {:value => 'coth', :type => :func},
-        'sech' => {:value => 'sech', :type => :func},
-        'csch' => {:value => 'csch', :type => :func},
-        'exp' => {:value => 'exp', :type => :func},
-        'abs' => {:value => 'abs', :type => :func, :wrap_left => '|', :wrap_right => '|'},
-        'Abs' => {:value => 'Abs', :type => :func, :wrap_left => '|', :wrap_right => '|'},
-        'norm' => {:value => 'norm', :type => :func, :wrap_left => "\u2225", :wrap_right => "\u2225"},
-        'floor' => {:value => 'floor', :type => :func, :wrap_left => "\u230A", :wrap_right => "\u230B"},
-        'ceil' => {:value => 'ceil', :type => :func, :wrap_left => "\u2308", :wrap_right => "\u2309"},
-        'log' => {:value => 'log', :type => :func},
-        'Log' => {:value => 'Log', :type => :func},
-        'ln' => {:value => 'ln', :type => :func},
-        'Ln' => {:value => 'Ln', :type => :func},
-        'det' => {:value => 'det', :type => :func},
-        'dim' => {:value => 'dim', :type => :func},
-        'mod' => {:value => 'mod', :type => :func},
-        'gcd' => {:value => 'gcd', :type => :func},
-        'lcm' => {:value => 'lcm', :type => :func},
-        'lub' => {:value => 'lub', :type => :func},
-        'glb' => {:value => 'glb', :type => :func},
+        'lim' => {:value => :lim, :type => nil},
+        'Lim' => {:value => :Lim, :type => nil},
+        'min' => {:value => :min, :type => nil},
+        'max' => {:value => :max, :type => nil},
+        'sin' => {:value => :sin, :type => :func},
+        'Sin' => {:value => :Sin, :type => :func},
+        'cos' => {:value => :cos, :type => :func},
+        'Cos' => {:value => :Cos, :type => :func},
+        'tan' => {:value => :tan, :type => :func},
+        'Tan' => {:value => :Tan, :type => :func},
+        'sinh' => {:value => :sinh, :type => :func},
+        'Sinh' => {:value => :Sinh, :type => :func},
+        'cosh' => {:value => :cosh, :type => :func},
+        'Cosh' => {:value => :Cosh, :type => :func},
+        'tanh' => {:value => :tanh, :type => :func},
+        'Tanh' => {:value => :Tanh, :type => :func},
+        'cot' => {:value => :cot, :type => :func},
+        'Cot' => {:value => :Cot, :type => :func},
+        'sec' => {:value => :sec, :type => :func},
+        'Sec' => {:value => :Sec, :type => :func},
+        'csc' => {:value => :csc, :type => :func},
+        'Csc' => {:value => :Csc, :type => :func},
+        'arcsin' => {:value => :arcsin, :type => :func},
+        'arccos' => {:value => :arccos, :type => :func},
+        'arctan' => {:value => :arctan, :type => :func},
+        'coth' => {:value => :coth, :type => :func},
+        'sech' => {:value => :sech, :type => :func},
+        'csch' => {:value => :csch, :type => :func},
+        'exp' => {:value => :exp, :type => :func},
+        'abs' => {:value => :abs, :type => :func, :wrap_left => :vbar, :wrap_right => :vbar},
+        'Abs' => {:value => :Abs, :type => :func, :wrap_left => :vbar, :wrap_right => :vbar},
+        'norm' => {:value => :norm, :type => :func, :wrap_left => :parallel, :wrap_right => :parallel},
+        'floor' => {:value => :floor, :type => :func, :wrap_left => :lfloor, :wrap_right => :rfloor},
+        'ceil' => {:value => :ceil, :type => :func, :wrap_left => :lceiling, :wrap_right => :rceiling},
+        'log' => {:value => :log, :type => :func},
+        'Log' => {:value => :Log, :type => :func},
+        'ln' => {:value => :ln, :type => :func},
+        'Ln' => {:value => :Ln, :type => :func},
+        'det' => {:value => :det, :type => :func},
+        'dim' => {:value => :dim, :type => :func},
+        'mod' => {:value => :mod, :type => :func},
+        'gcd' => {:value => :gcd, :type => :func},
+        'lcm' => {:value => :lcm, :type => :func},
+        'lub' => {:value => :lub, :type => :func},
+        'glb' => {:value => :glb, :type => :func},
 
         # Arrows
-        'uarr' => {:value => "\u2191", :type => :operator},
-        'darr' => {:value => "\u2193", :type => :operator},
-        'rarr' => {:value => "\u2192", :type => :operator},
-        '->' => {:value => "\u2192", :type => :operator},
-        '>->' => {:value => "\u21A3", :type => :operator},
-        '->>' => {:value => "\u21A0", :type => :operator},
-        '>->>' => {:value => "\u2916", :type => :operator},
-        '|->' => {:value => "\u21A6", :type => :operator},
-        'larr' => {:value => "\u2190", :type => :operator},
-        'harr' => {:value => "\u2194", :type => :operator},
-        'rArr' => {:value => "\u21D2", :type => :operator},
-        'lArr' => {:value => "\u21D0", :type => :operator},
-        'hArr' => {:value => "\u21D4", :type => :operator},
+        'uarr' => {:value => :uparrow, :type => nil},
+        'darr' => {:value => :downarrow, :type => nil},
+        'rarr' => {:value => :rightarrow, :type => nil},
+        '->' => {:value => :to, :type => nil},
+        '>->' => {:value => :rightarrowtail, :type => nil},
+        '->>' => {:value => :twoheadrightarrow, :type => nil},
+        '>->>' => {:value => :twoheadrightarrowtail, :type => nil},
+        '|->' => {:value => :mapsto, :type => nil},
+        'larr' => {:value => :leftarrow, :type => nil},
+        'harr' => {:value => :leftrightarrow, :type => nil},
+        'rArr' => {:value => :Rightarrow, :type => nil},
+        'lArr' => {:value => :Leftarrow, :type => nil},
+        'hArr' => {:value => :Leftrightarrow, :type => nil},
 
         # Other
         'sqrt' => {:value => :sqrt, :type => :unary},
         'root' => {:value => :root, :type => :binary},
         'frac' => {:value => :frac, :type => :binary},
         '/' => {:value => :frac, :type => :infix},
-        'stackrel' => {:value => :over, :type => :binary, :switch_operands => true},
-        'overset' => {:value => :over, :type => :binary, :switch_operands => true},
-        'underset' => {:value => :under, :type => :binary, :switch_operands => true},
+        'stackrel' => {:value => :stackrel, :type => :binary, :switch_operands => true},
+        'overset' => {:value => :overset, :type => :binary, :switch_operands => true},
+        'underset' => {:value => :underset, :type => :binary, :switch_operands => true},
         '_' => {:value => :sub, :type => :infix},
         '^' => {:value => :sup, :type => :infix},
-        'hat' => {:value => "\u005E", :type => :accent, :position => :over},
-        'bar' => {:value => "\u00AF", :type => :accent, :position => :over},
-        'vec' => {:value => "\u2192", :type => :accent, :position => :over},
-        'dot' => {:value => '.', :type => :accent, :position => :over},
-        'ddot' => {:value => '..', :type => :accent, :position => :over},
-        'overarc' => {:value => "\u23DC", :type => :accent, :position => :over},
-        'ul' => {:value => '_', :type => :accent, :position => :under},
-        'ubrace' => {:value => "\u23DF", :type => :accent, :position => :under},
-        'obrace' => {:value => "\u23DE", :type => :accent, :position => :over},
-        'text' => {:value => :text, :type => :unary},
+        'hat' => {:value => :hat, :type => :accent, :position => :over},
+        'bar' => {:value => :overline, :type => :accent, :position => :over},
+        'vec' => {:value => :vec, :type => :accent, :position => :over},
+        'dot' => {:value => :dot, :type => :accent, :position => :over},
+        'ddot' => {:value => :ddot, :type => :accent, :position => :over},
+        'overarc' => {:value => :overarc, :type => :accent, :position => :over},
+        'ul' => {:value => :underline, :type => :accent, :position => :under},
+        'ubrace' => {:value => :underbrace, :type => :accent, :position => :under},
+        'obrace' => {:value => :overbrace, :type => :accent, :position => :over},
 
         'bb' => {:value => :bold, :type => :font},
         'bbb' => {:value => :double_struck, :type => :font},
@@ -432,57 +434,57 @@ module AsciiMath
         'sfbi' => {:value => :sans_serif_bold_italic, :type => :font},
 
         # Greek letters
-        'alpha' => {:value => "\u03b1", :type => :identifier},
-        'Alpha' => {:value => "\u0391", :type => :identifier},
-        'beta' => {:value => "\u03b2", :type => :identifier},
-        'Beta' => {:value => "\u0392", :type => :identifier},
-        'gamma' => {:value => "\u03b3", :type => :identifier},
-        'Gamma' => {:value => "\u0393", :type => :operator},
-        'delta' => {:value => "\u03b4", :type => :identifier},
-        'Delta' => {:value => "\u0394", :type => :operator},
-        'epsilon' => {:value => "\u03b5", :type => :identifier},
-        'Epsilon' => {:value => "\u0395", :type => :identifier},
-        'varepsilon' => {:value => "\u025b", :type => :identifier},
-        'zeta' => {:value => "\u03b6", :type => :identifier},
-        'Zeta' => {:value => "\u0396", :type => :identifier},
-        'eta' => {:value => "\u03b7", :type => :identifier},
-        'Eta' => {:value => "\u0397", :type => :identifier},
-        'theta' => {:value => "\u03b8", :type => :identifier},
-        'Theta' => {:value => "\u0398", :type => :operator},
-        'vartheta' => {:value => "\u03d1", :type => :identifier},
-        'iota' => {:value => "\u03b9", :type => :identifier},
-        'Iota' => {:value => "\u0399", :type => :identifier},
-        'kappa' => {:value => "\u03ba", :type => :identifier},
-        'Kappa' => {:value => "\u039a", :type => :identifier},
-        'lambda' => {:value => "\u03bb", :type => :identifier},
-        'Lambda' => {:value => "\u039b", :type => :operator},
-        'mu' => {:value => "\u03bc", :type => :identifier},
-        'Mu' => {:value => "\u039c", :type => :identifier},
-        'nu' => {:value => "\u03bd", :type => :identifier},
-        'Nu' => {:value => "\u039d", :type => :identifier},
-        'xi' => {:value => "\u03be", :type => :identifier},
-        'Xi' => {:value => "\u039e", :type => :operator},
-        'omicron' => {:value => "\u03bf", :type => :identifier},
-        'Omicron' => {:value => "\u039f", :type => :identifier},
-        'pi' => {:value => "\u03c0", :type => :identifier},
-        'Pi' => {:value => "\u03a0", :type => :operator},
-        'rho' => {:value => "\u03c1", :type => :identifier},
-        'Rho' => {:value => "\u03a1", :type => :identifier},
-        'sigma' => {:value => "\u03c3", :type => :identifier},
-        'Sigma' => {:value => "\u03a3", :type => :operator},
-        'tau' => {:value => "\u03c4", :type => :identifier},
-        'Tau' => {:value => "\u03a4", :type => :identifier},
-        'upsilon' => {:value => "\u03c5", :type => :identifier},
-        'Upsilon' => {:value => "\u03a5", :type => :identifier},
-        'phi' => {:value => "\u03c6", :type => :identifier},
-        'Phi' => {:value => "\u03a6", :type => :identifier},
-        'varphi' => {:value => "\u03d5", :type => :identifier},
-        'chi' => {:value => '\u03b3c7', :type => :identifier},
-        'Chi' => {:value => '\u0393a7', :type => :identifier},
-        'psi' => {:value => "\u03c8", :type => :identifier},
-        'Psi' => {:value => "\u03a8", :type => :identifier},
-        'omega' => {:value => "\u03c9", :type => :identifier},
-        'Omega' => {:value => "\u03a9", :type => :operator},
+        'alpha' => {:value => :alpha, :type => nil},
+        'Alpha' => {:value => :Alpha, :type => nil},
+        'beta' => {:value => :beta, :type => nil},
+        'Beta' => {:value => :Beta, :type => nil},
+        'gamma' => {:value => :gamma, :type => nil},
+        'Gamma' => {:value => :Gamma, :type => nil},
+        'delta' => {:value => :delta, :type => nil},
+        'Delta' => {:value => :Delta, :type => nil},
+        'epsilon' => {:value => :epsilon, :type => nil},
+        'Epsilon' => {:value => :Epsilon, :type => nil},
+        'varepsilon' => {:value => :varepsilon, :type => nil},
+        'zeta' => {:value => :zeta, :type => nil},
+        'Zeta' => {:value => :Zeta, :type => nil},
+        'eta' => {:value => :eta, :type => nil},
+        'Eta' => {:value => :Eta, :type => nil},
+        'theta' => {:value => :theta, :type => nil},
+        'Theta' => {:value => :Theta, :type => nil},
+        'vartheta' => {:value => :vartheta, :type => nil},
+        'iota' => {:value => :iota, :type => nil},
+        'Iota' => {:value => :Iota, :type => nil},
+        'kappa' => {:value => :kappa, :type => nil},
+        'Kappa' => {:value => :Kappa, :type => nil},
+        'lambda' => {:value => :lambda, :type => nil},
+        'Lambda' => {:value => :Lambda, :type => nil},
+        'mu' => {:value => :mu, :type => nil},
+        'Mu' => {:value => :Mu, :type => nil},
+        'nu' => {:value => :nu, :type => nil},
+        'Nu' => {:value => :Nu, :type => nil},
+        'xi' => {:value => :xi, :type => nil},
+        'Xi' => {:value => :Xi, :type => nil},
+        'omicron' => {:value => :omicron, :type => nil},
+        'Omicron' => {:value => :Omicron, :type => nil},
+        'pi' => {:value => :pi, :type => nil},
+        'Pi' => {:value => :Pi, :type => nil},
+        'rho' => {:value => :rho, :type => nil},
+        'Rho' => {:value => :Rho, :type => nil},
+        'sigma' => {:value => :sigma, :type => nil},
+        'Sigma' => {:value => :Sigma, :type => nil},
+        'tau' => {:value => :tau, :type => nil},
+        'Tau' => {:value => :Tau, :type => nil},
+        'upsilon' => {:value => :upsilon, :type => nil},
+        'Upsilon' => {:value => :Upsilon, :type => nil},
+        'phi' => {:value => :phi, :type => nil},
+        'Phi' => {:value => :Phi, :type => nil},
+        'varphi' => {:value => :varphi, :type => nil},
+        'chi' => {:value => :chi, :type => nil},
+        'Chi' => {:value => :Chi, :type => nil},
+        'psi' => {:value => :psi, :type => nil},
+        'Psi' => {:value => :Psi, :type => nil},
+        'omega' => {:value => :omega, :type => nil},
+        'Omega' => {:value => :Omega, :type => nil},
     }
 
     def parse(input)
@@ -493,26 +495,19 @@ module AsciiMath
     end
 
     private
+
     def parse_expression(tok, depth)
       e = []
 
-      while (s1 = parse_simple_expression(tok, depth))
+      while (s1 = parse_intermediate_expression(tok, depth))
         t1 = tok.next_token
 
-        if t1[:type] == :infix
-          s2 = parse_simple_expression(tok, depth)
-          t2 = tok.next_token
-          if t1[:value] == :sub && t2[:value] == :sup
-            s3 = parse_simple_expression(tok, depth)
-            operator = s1[:underover] ? :underover : :subsup
-            e << {:type => :ternary, :operator => operator, :s1 => s1, :s2 => unwrap_paren(s2), :s3 => unwrap_paren(s3)}
+        if t1[:type] == :infix && t1[:value] == :frac
+          s2 = parse_intermediate_expression(tok, depth)
+          if s2
+            e << binary(:frac, unwrap_paren(s1), unwrap_paren(s2))
           else
-            operator = s1[:underover] ? (t1[:value] == :sub ? :under : :over) : t1[:value]
-            e << {:type => :binary, :operator => operator, :s1 => unwrap_paren(s1), :s2 => unwrap_paren(s2)}
-            tok.push_back(t2)
-            if (t2[:type] == :lrparen || t2[:type] == :rparen) && depth > 0
-              break
-            end
+            e << s1
           end
         elsif t1[:type] == :eof
           e << s1
@@ -526,7 +521,42 @@ module AsciiMath
         end
       end
 
-      e
+      expression(*e)
+    end
+
+    def parse_intermediate_expression(tok, depth)
+      s = parse_simple_expression(tok, depth)
+      sub = nil
+      sup = nil
+
+      t1 = tok.next_token
+      case t1[:type]
+        when :infix
+          case t1[:value]
+            when :sub
+              sub = parse_simple_expression(tok, depth)
+              if sub
+                t2 = tok.next_token
+                if t2[:type] == :infix && t2[:value] == :sup
+                  sup = parse_simple_expression(tok, depth)
+                else
+                  tok.push_back(t2)
+                end
+              end
+            when :sup
+              sup = parse_simple_expression(tok, depth)
+            else
+              tok.push_back(t1)
+          end
+        else
+          tok.push_back(t1)
+      end
+
+      if sub || sup
+        subsup(s, unwrap_paren(sub), unwrap_paren(sup))
+      else
+        s
+      end
     end
 
     def parse_simple_expression(tok, depth)
@@ -537,7 +567,7 @@ module AsciiMath
           t2 = tok.next_token
           case t2[:type]
             when :rparen, :lrparen
-              {:type => :paren, :e => nil, :lparen => t1[:value], :rparen => t2[:value]}
+              paren(t1[:value], e, t2[:value])
             else
               tok.push_back(t2)
 
@@ -549,7 +579,7 @@ module AsciiMath
                   convert_to_matrix({:type => :paren, :e => e, :lparen => t1[:value], :rparen => t2[:value]})
                 else
                   tok.push_back(t2)
-                  {:type => :paren, :e => e, :lparen => t1[:value]}
+                  paren(t1[:value], e, nil)
               end
           end
         when :rparen
@@ -557,38 +587,37 @@ module AsciiMath
             tok.push_back(t1)
             nil
           else
-            {:type => :operator, :c => t1[:value]}
+            t1[:value]
           end
         when :accent
           s = unwrap_paren(parse_simple_expression(tok, depth))
-          {:type => :binary, :s1 => s, :s2 => {:type => :operator, :c => t1[:value]}, :operator => t1[:position]}
-        when :unary, :font
+          unary(t1[:value], s)
+        when :unary
           s = unwrap_paren(parse_simple_expression(tok, depth))
-          {:type => t1[:type], :s => s, :operator => t1[:value]}
+          unary(t1[:value], s)
+        when :font
+          s = unwrap_paren(parse_simple_expression(tok, depth))
+          unary(t1[:value], s)
         when :func
           s = parse_simple_expression(tok, depth)
           if t1[:wrap_left] || t1[:wrap_right]
-            {:type => :paren, :e => s, :lparen => t1[:wrap_left], :rparen => t1[:wrap_right], :no_unwrap => true}
+            paren(t1[:wrap_left], s, t1[:wrap_right], :no_unwrap => true)
           else
-            {:type => :unary, :s => s, :identifier => t1[:value]}
+            unary(t1[:value], s)
           end
         when :binary
           s1 = unwrap_paren(parse_simple_expression(tok, depth))
           s2 = unwrap_paren(parse_simple_expression(tok, depth))
-          if t1[:switch_operands]
-            {:type => :binary, :s1 => s2, :s2 => s1, :operator => t1[:value]}
-          else
-            {:type => :binary, :s1 => s1, :s2 => s2, :operator => t1[:value]}
-          end
+          binary(t1[:value], s1, s2)
         when :eof
           nil
         else
-          {:type => t1[:type], :c => t1[:value], :underover => t1[:underover]}
+          t1[:value]
       end
     end
 
     def unwrap_paren(expression)
-      if expression[:type] == :paren && !expression[:no_unwrap]
+      if expression.is_a?(Hash) && expression[:type] == :paren && !expression[:no_unwrap]
         expression[:e]
       else
         expression
@@ -602,8 +631,8 @@ module AsciiMath
       return expression unless rows.length > 1 &&
           rows.length > separators.length &&
           separators.all? { |item| is_matrix_separator(item) } &&
-          (rows.all? { |item| item[:type] == :paren && item[:lparen] == '(' && item[:rparen] == ')' } ||
-              rows.all? { |item| item[:type] == :paren && item[:lparen] == '[' && item[:rparen] == ']' })
+          (rows.all? { |item| item[:type] == :paren && item[:lparen] == :lparen && item[:rparen] == :rparen } ||
+              rows.all? { |item| item[:type] == :paren && item[:lparen] == :lbracket && item[:rparen] == :rbracket })
 
       rows = rows.map do |row|
         chunks = []
@@ -619,16 +648,16 @@ module AsciiMath
 
         chunks << current_chunk
 
-        chunks.map {|c| c.length == 1 ? c[0] : c }.to_a
+        chunks.map { |c| c.length == 1 ? c[0] : c }.to_a
       end
 
       return expression unless rows.all? { |row| row.length == rows[0].length }
 
-      {:type => :matrix, :rows => rows, :lparen => expression[:lparen], :rparen => expression[:rparen]}
+      matrix(expression[:lparen], rows, expression[:rparen])
     end
 
     def is_matrix_separator(item)
-      item[:type] == :identifier && item[:c] == ','
+      item == ','
     end
 
     def matrix?(expression)
@@ -650,15 +679,17 @@ module AsciiMath
 
       cols, separators = expression.partition.with_index { |obj, i| i.even? }
 
-      cols.all? { |item| item[:type] != :identifier || item[:c] != ',' } &&
+      cols.all? { |item| item[:type] != nil || item[:c] != ',' } &&
           separators.all?(&method(:is_col_separator))
     end
   end
 
   class Expression
-    def initialize(asciimath, parsed_expression)
+    attr_accessor :ast
+
+    def initialize(asciimath, ast)
       @asciimath = asciimath
-      @parsed_expression = parsed_expression
+      @ast = ast
     end
 
     def to_s

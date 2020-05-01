@@ -1,12 +1,41 @@
 #encoding: utf-8
 require 'rspec'
 require 'asciimath'
+require 'asciimath/ast'
+
+include AsciiMath::AST
 
 TEST_CASES = {
     'x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)' =>
     {
+        :ast => expression(
+            "x",
+            :plus,
+            binary(
+                :frac,
+                "b",
+                expression("2", "a")
+            ),
+            :lt,
+            :pm,
+            unary(
+                :sqrt,
+                expression(
+                    binary(
+                        :frac,
+                        sup("b", "2"),
+                        expression("4", sup("a", "2"))
+                    ),
+                    :minus,
+                    binary(
+                        :frac,
+                        "c",
+                        "a"
+                    )
+                )
+            )
+        ),
         :mathml => '<math><mi>x</mi><mo>+</mo><mfrac><mi>b</mi><mrow><mn>2</mn><mi>a</mi></mrow></mfrac><mo>&lt;</mo><mo>&#xB1;</mo><msqrt><mrow><mfrac><msup><mi>b</mi><mn>2</mn></msup><mrow><mn>4</mn><msup><mi>a</mi><mn>2</mn></msup></mrow></mfrac><mo>&#x2212;</mo><mfrac><mi>c</mi><mi>a</mi></mfrac></mrow></msqrt></math>',
-
         :html => nil,
         :latex => 'x + \\frac{b}{2 a} < \\pm \\sqrt{\\frac{b^2}{4 a^2} - \\frac{c}{a}}',
     },
@@ -157,6 +186,19 @@ TEST_CASES = {
         :latex => 's \'_i = \\left \\{ \\begin{matrix} - 1 & \\text{if} s_i > s_{i + 1} \\\\ + 1 & \\text{if} s_i \\leq s_{i + 1} \\end{matrix} \\right .',
     },
     "s'_i = {(, if s_i > s_(i + 1)),( + 1,):}" => {
+        :ast => expression(
+            "s",
+            sub(:prime, "i"),
+            :eq,
+            matrix(
+                :lbrace,
+                [
+                    [[], [:if, sub("s", "i"), :gt, sub("s", ["i", :plus, "1"])]],
+                    [[:plus, "1"], []]
+                ],
+                nil
+            )
+        ),
         :mathml => '<math><mi>s</mi><msub><mo>&#x2032;</mo><mi>i</mi></msub><mo>=</mo><mfenced open="{" close=""><mtable><mtr><mtd></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&gt;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr><mtr><mtd><mrow><mo>+</mo><mn>1</mn></mrow></mtd><mtd></mtd></mtr></mtable></mfenced></math>',
         :latex => 's \'_i = \\left \\{ \\begin{matrix}  & \\text{if} s_i > s_{i + 1} \\\\ + 1 &  \\end{matrix} \\right .',
     },
@@ -214,6 +256,10 @@ if version[0] > 1 || version[1] > 8
 end
 
 module AsciiMathHelper
+  def expect_ast(asciimath, ast)
+    expect(AsciiMath.parse(asciimath).ast).to eq(ast)
+  end
+
   def expect_mathml(asciimath, mathml)
     expect(AsciiMath.parse(asciimath).to_mathml).to eq(mathml)
   end
@@ -231,31 +277,43 @@ RSpec.configure do |c|
   c.include AsciiMathHelper
 end
 
-describe "AsciiMath::MathMLBuilder" do
+describe "AsciiMath::Parser" do
   TEST_CASES.each_pair do |asciimath, output|
-    it "'#{asciimath}' to MathML" do
-      expect_mathml(asciimath, output[:mathml])
-    end
-  end
-end
-
-describe "AsciiMath::HTMLBuilder" do
-  TEST_CASES.each_pair do |asciimath, output|
-    if output[:html]
-      it "'#{asciimath}' to HTML" do
-        expect_html(asciimath, output[:html])
+    if output[:ast]
+      it "'#{asciimath}' to AST" do
+        expect_ast(asciimath, output[:ast])
       end
     end
   end
 end
 
-describe "AsciiMath::LatexBuilder" do
-  TEST_CASES.each_pair do |asciimath, output|
-    if output[:latex]
-      it "'#{asciimath}' to LaTeX" do
-        expect_latex(asciimath, output[:latex])
-      end
-    end
-  end
-end
+# describe "AsciiMath::MathMLBuilder" do
+#   TEST_CASES.each_pair do |asciimath, output|
+#     if output[:mathml]
+#       it "'#{asciimath}' to MathML" do
+#         expect_mathml(asciimath, output[:mathml])
+#       end
+#     end
+#   end
+# end
+#
+# describe "AsciiMath::HTMLBuilder" do
+#   TEST_CASES.each_pair do |asciimath, output|
+#     if output[:html]
+#       it "'#{asciimath}' to HTML" do
+#         expect_html(asciimath, output[:html])
+#       end
+#     end
+#   end
+# end
+#
+# describe "AsciiMath::LatexBuilder" do
+#   TEST_CASES.each_pair do |asciimath, output|
+#     if output[:latex]
+#       it "'#{asciimath}' to LaTeX" do
+#         expect_latex(asciimath, output[:latex])
+#       end
+#     end
+#   end
+# end
 
