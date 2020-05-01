@@ -2,6 +2,10 @@
 
 == 1.0.10
 
+Enhancements::
+
+  * Issue #16: add initial LaTeX output support (@GarkGarcia)
+
 Bug fixes::
 
   * Issue #14: add support for additional symbols and functions that are supported by Asciimath JS
