@@ -174,7 +174,7 @@ Each column element is represented using the appropriate AST type.
 |uuu |:bigcup |https://codepoints.net/U+22C3[U+22C3] |⋃
 |= |:eq |https://codepoints.net/U+003D[U+003D] |=
 |!= |:ne |https://codepoints.net/U+2260[U+2260] |≠
-|:= |:assign | |:=
+|:= |:assign |https://codepoints.net/U+2260[U+2254] |≔
 |< |:lt |https://codepoints.net/U+003C[U+003C] |<
 |lt |:lt |https://codepoints.net/U+003C[U+003C] |<
 |> |:gt |https://codepoints.net/U+003E[U+003E] |>
