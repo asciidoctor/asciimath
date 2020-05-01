@@ -15,7 +15,8 @@ TEST_CASES = {
             ),
             :eq,
             unary(:hat, "A"),
-            unary(:exp, "j"),
+            :exp,
+            "j",
             sub(:vartheta, "0")
         )
     },
