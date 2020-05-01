@@ -6,6 +6,19 @@ require 'asciimath/ast'
 include AsciiMath::AST
 
 TEST_CASES = {
+    'underset(_)(hat A) = hat A exp j vartheta_0' => {
+        :ast => expression(
+            binary(
+                :underset,
+                :sub,
+                unary(:hat, "A")
+            ),
+            :eq,
+            unary(:hat, "A"),
+            unary(:exp, "j"),
+            sub(:vartheta, "0")
+        )
+    },
     'x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)' =>
     {
         :ast => expression(

@@ -625,7 +625,7 @@ module AsciiMath
     end
 
     def convert_to_matrix(expression)
-      return expression unless expression.is_a?(Hash) && expression[:type] == :paren
+      return expression unless expression.is_a?(Hash) && expression[:type] == :paren && expression[:e].is_a?(Array)
 
       rows, separators = expression[:e].partition.with_index { |obj, i| i.even? }
       return expression unless rows.length > 1 &&
