@@ -557,7 +557,7 @@ module AsciiMath
           t2 = tok.next_token
           case t2[:type]
             when :rparen, :lrparen
-              paren(t1[:value], e, t2[:value])
+              paren(t1[:value], nil, t2[:value])
             else
               tok.push_back(t2)
 
@@ -605,11 +605,15 @@ module AsciiMath
       return expression unless expression.is_a?(Hash) && expression[:type] == :paren && expression[:e].is_a?(Array)
 
       rows, separators = expression[:e].partition.with_index { |obj, i| i.even? }
-      return expression unless rows.length > 1 &&
-          rows.length > separators.length &&
-          separators.all? { |item| is_matrix_separator(item) } &&
-          (rows.all? { |item| item[:type] == :paren && item[:lparen] == :lparen && item[:rparen] == :rparen } ||
-              rows.all? { |item| item[:type] == :paren && item[:lparen] == :lbracket && item[:rparen] == :rbracket })
+      begin
+        return expression unless rows.length > 1 &&
+            rows.length > separators.length &&
+            separators.all? { |item| is_matrix_separator(item) } &&
+            (rows.all? { |item| item.is_a?(Hash) && item[:type] == :paren && item[:lparen] == :lparen && item[:rparen] == :rparen } ||
+                rows.all? { |item| item.is_a?(Hash) && item[:type] == :paren && item[:lparen] == :lbracket && item[:rparen] == :rbracket })
+      rescue
+        raise e
+      end
 
       rows = rows.map do |row|
         chunks = []
