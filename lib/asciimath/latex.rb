@@ -153,6 +153,14 @@ module AsciiMath
                 parens(:lvert, :rvert) do
                   append(expression[:e])
                 end
+              when :floor
+                parens(:lfloor, :rfloor) do
+                  append(expression[:e])
+                end
+              when :ceil
+                parens(:lceiling, :rceiling) do
+                  append(expression[:e])
+                end
               when Symbol
                 macro(op) do
                   append(expression[:e])
