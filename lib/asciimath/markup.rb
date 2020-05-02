@@ -278,8 +278,6 @@ module AsciiMath
                 b.build
               end
 
-    NUMBER = /[0-9]+(?:\.[0-9]+)?/
-
     def append(expression, opts = {})
       case expression
         when Array
