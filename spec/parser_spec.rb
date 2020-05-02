@@ -516,6 +516,14 @@ RSpec.shared_examples "AsciiMath Examples" do
       :mathml => '<math><menclose notation="updiagonalstrike"><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup></menclose><msubsup><menclose notation="updiagonalstrike"><mi>a</mi></menclose><mi>b</mi><mi>c</mi></msubsup></math>',
   ))
 
+  example('color(red)(x) colortext(blue)(a_b^c)', &should_generate(
+      :ast => seq(
+          binary(:color, "red", "x"),
+          binary(:color, "blue", subsup("a", "b", "c"))
+      ),
+      :mathml => '<math><mstyle mathcolor="red"><mi>x</mi></mstyle><mstyle mathcolor="blue"><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup></mstyle></math>',
+      ))
+
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
 
   if version[0] > 1 || version[1] > 8

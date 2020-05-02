@@ -401,6 +401,7 @@ module AsciiMath
       b.add('stackrel', :stackrel, :binary)
       b.add('overset', :overset, :binary)
       b.add('underset', :underset, :binary)
+      b.add('color', :color, :binary)
       b.add('_', :sub, :infix)
       b.add('^', :sup, :infix)
       b.add('hat', :hat, :unary)
@@ -582,6 +583,11 @@ module AsciiMath
         when :binary
           s1 = unwrap_paren(parse_simple_expression(tok, depth))
           s2 = unwrap_paren(parse_simple_expression(tok, depth))
+
+          if t1[:value] == :color
+            s1 = text(to_color_string(s1))
+          end
+
           binary(symbol(t1[:value]), s1, s2)
         when :eof
           nil
@@ -593,6 +599,24 @@ module AsciiMath
           identifier(t1[:value])
         else
           symbol(t1[:value])
+      end
+    end
+
+    def to_color_string(expression)
+      case expression
+        when Symbol
+          expression.to_s
+        when Array
+          expression.inject("") { |memo, e| memo << to_color_string(e) }
+        when Hash
+          case expression[:type]
+            when :unary, :binary, :subsup
+              ''
+            else
+              expression[:value].to_s
+          end
+        else
+          ''
       end
     end
 

@@ -74,6 +74,12 @@ module AsciiMath
       end
     end
 
+    def append_color(color, e)
+      tag("mstyle", :mathcolor => color[:value]) do
+        append(e)
+      end
+    end
+
     def append_matrix(lparen, rows, rparen)
       fenced(lparen, rparen) do
         mtable do

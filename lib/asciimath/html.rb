@@ -74,6 +74,11 @@ module AsciiMath
       append(e)
     end
 
+    def append_color(color, expression)
+      #TODO - currently ignored
+      append(expression)
+    end
+
     def append_matrix(lparen, rows, rparen)
       row do
         # Figures out a font size for the braces, based on the height of the matrix.

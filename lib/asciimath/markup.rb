@@ -197,6 +197,7 @@ module AsciiMath
                 b.add(:stackrel, :stackrel, :over)
                 b.add(:overset, :overset, :over)
                 b.add(:underset, :underset, :under)
+                b.add(:color, :color, :color)
 
                 b.add(:sub, "_", :operator)
                 b.add(:sup, "^", :operator)
@@ -348,6 +349,8 @@ module AsciiMath
                     append_fraction(expression[:e1], expression[:e2])
                   when :root
                     append_root(expression[:e2], expression[:e1])
+                  when :color
+                    append_color(expression[:e1], expression[:e2])
                 end
               end
             when :matrix
@@ -385,6 +388,10 @@ module AsciiMath
     end
 
     def append_root(base, index)
+      raise NotImplementedError.new __method__.to_s
+    end
+
+    def append_color(color, expression)
       raise NotImplementedError.new __method__.to_s
     end
 
