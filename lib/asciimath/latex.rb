@@ -227,7 +227,7 @@ module AsciiMath
               parens(expression[:lparen], expression[:rparen]) do
                 @latex << "\\begin{matrix} "
 
-                rows.each_with_index do |row, i|
+                rows.each do |row|
                   append(row, " & ")
                   @latex << " \\\\ "
                 end
