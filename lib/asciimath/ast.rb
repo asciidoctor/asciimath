@@ -11,21 +11,7 @@ module AsciiMath
       end
     end
 
-    alias_method :seq, :expression
-
-    def paren(*args)
-      case args.length
-        when 1
-          lparen = :lparen
-          e = args[0]
-          rparen = :rparen
-        when 3
-          lparen = args[0]
-          e = args[1]
-          rparen = args[2]
-        else
-          raise "Incorrect argument count #{args.length}"
-      end
+    def paren(lparen, e, rparen)
       {:type => :paren, :e => e, :lparen => lparen, :rparen => rparen}
     end
 
@@ -49,19 +35,23 @@ module AsciiMath
       {:type => :binary, :op => operator, :e1 => e1, :e2 => e2}
     end
 
-    def matrix(*args)
-      case args.length
-        when 1
-          lparen = :lparen
-          rows = args[0]
-          rparen = :rparen
-        when 3
-          lparen = args[0]
-          rows = args[1]
-          rparen = args[2]
-        else
-          raise "Incorrect argument count #{args.length}"
-      end
+    def text(value)
+      {:type => :text, :value => value}
+    end
+
+    def number(value)
+      {:type => :number, :value => value}
+    end
+
+    def symbol(value)
+      {:type => :symbol, :value => value}
+    end
+
+    def identifier(value)
+      {:type => :identifier, :value => value}
+    end
+
+    def matrix(lparen, rows, rparen)
       {:type => :matrix, :rows => rows, :lparen => lparen, :rparen => rparen}
     end
   end
