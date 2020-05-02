@@ -15,7 +15,7 @@ module AsciiMath
 
     private
 
-    SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]]
+    SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]].map(&:ord)
 
     SYMBOLS = {
       :plus => ?+,
@@ -273,13 +273,8 @@ module AsciiMath
 
     def append_escaped(text)
       text.each_codepoint do |cp|
-        begin
-          @latex << "\\" if SPECIAL_CHARACTERS.include? cp.chr
-        rescue
-          # Not a unicode character
-        ensure
-          @latex << cp
-        end
+        @latex << "\\" if SPECIAL_CHARACTERS.include? cp
+        @latex << cp
       end
     end
 

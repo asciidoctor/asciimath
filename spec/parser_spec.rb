@@ -479,7 +479,7 @@ RSpec.shared_examples "AsciiMath Examples" do
       :ast => subsup(unary(:norm, "a"), "c", "b"),
       :mathml => '<math><msubsup><mfenced open="&#x2225;" close="&#x2225;"><mi>a</mi></mfenced><mi>c</mi><mi>b</mi></msubsup></math>',
       :html => '<span class="math-inline"><span class="math-row"><span class="math-brace">&#x2225;</span><span class="math-identifier">a</span><span class="math-brace">&#x2225;</span></span><span class="math-subsup"><span class="math-smaller"><span class="math-identifier">b</span></span><span class="math-smaller"><span class="math-identifier">c</span></span></span></span>',
-      :latex => '{\\left \\parallel a \\right \\parallel}_c^b',
+      :latex => '{\\left \\lVert a \\right \\rVert}_c^b',
   ))
 
   example('overarc a_b^c', &should_generate(
