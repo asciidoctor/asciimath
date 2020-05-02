@@ -236,6 +236,7 @@ Each column element is represented using the appropriate AST type.
 |O/ |:emptyset |https://codepoints.net/U+2205[U+2205] |∅
 |oo |:infty |https://codepoints.net/U+221E[U+221E] |∞
 |aleph |:aleph |https://codepoints.net/U+2135[U+2135] |ℵ
+|... |:ellipsis |https://codepoints.net/U+2026[U+2026] |…
 |:. |:therefore |https://codepoints.net/U+2234[U+2234] |∴
 |:' |:because |https://codepoints.net/U+2235[U+2235] |∵
 |/_ |:angle |https://codepoints.net/U+2220[U+2220] |∠

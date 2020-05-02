@@ -298,7 +298,7 @@ module AsciiMath
         'O/' => {:value => :emptyset, :type => :symbol},
         'oo' => {:value => :infty, :type => :symbol},
         'aleph' => {:value => :aleph, :type => :symbol},
-        '...' => {:value => '...', :type => :symbol},
+        '...' => {:value => :ellipsis, :type => :symbol},
         ':.' => {:value => :therefore, :type => :symbol},
         ':\'' => {:value => :because, :type => :symbol},
         '/_' => {:value => :angle, :type => :symbol},
