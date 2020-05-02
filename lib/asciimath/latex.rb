@@ -223,14 +223,13 @@ module AsciiMath
               end
             when :matrix
               rows = expression[:rows]
-              len = rows.length - 1
               
               parens(expression[:lparen], expression[:rparen]) do
                 @latex << "\\begin{matrix} "
 
                 rows.each_with_index do |row, i|
                   append(row, " & ")
-                  @latex << " \\\\ " if i != len
+                  @latex << " \\\\ "
                 end
 
                 @latex << " \\end{matrix}"
