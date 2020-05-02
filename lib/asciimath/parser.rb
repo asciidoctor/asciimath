@@ -58,7 +58,7 @@ module AsciiMath
       @string = StringScanner.new(string)
       @symbols = symbols
       lookahead = @symbols.keys.map { |k| k.length }.max
-      @symbol_regexp = /([^\s0-9]{1,#{lookahead}})/
+      @symbol_regexp = /((?:\\[\s0-9]|[^\s0-9]){1,#{lookahead}})/
       @push_back = nil
     end
 
@@ -177,7 +177,7 @@ module AsciiMath
     # Returns the matched String or the value returned by the block if one was given
     def read_value(regexp)
       s = @string.scan(regexp)
-      if s
+      if s && block_given?
         yield s
       else
         s
