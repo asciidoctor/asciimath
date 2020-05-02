@@ -107,7 +107,13 @@ module AsciiMath
             @latex << separator if i != len
           end
         when String
-          append_escaped(expression)
+          if expression.length > 1 and not expression.match(/^[1-9](\.[1-9]+)?/)
+            text do
+              append_escaped(expression)
+            end
+          else
+            append_escaped(expression)
+          end
         when Symbol
             @latex << (SYMBOLS[expression] || "\\#{expression.to_s}")
         when Hash
