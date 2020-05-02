@@ -278,29 +278,8 @@ module AsciiMath
                 b.build
               end
 
-    NUMBER = /[0-9]+(?:\.[0-9]+)?/
-
     def append(expression, opts = {})
       case expression
-        when String
-          if expression =~ NUMBER
-            append_number(expression)
-          elsif expression.length > 1
-            append_text(expression)
-          else
-            append_identifier(expression)
-          end
-        when Symbol
-          if (symbol = SYMBOLS[expression])
-            case symbol[:type]
-              when :operator, :accent
-                append_operator(symbol[:value])
-              else
-                append_identifier(symbol[:value])
-            end
-          else
-            append_identifier(expression)
-          end
         when Array
           if expression.length <= 1 || opts[:avoid_row]
             expression.each { |e| append(e) }
@@ -309,23 +288,40 @@ module AsciiMath
           end
         when Hash
           case expression[:type]
+            when :text
+              append_text(expression[:value])
+            when :number
+              append_number(expression[:value])
+            when :identifier
+              append_identifier(expression[:value])
+            when :symbol
+              if (symbol = resolve_symbol(expression))
+                case symbol[:type]
+                  when :operator, :accent, :lparen, :rparen, :lrparen
+                    append_operator(symbol[:value])
+                  else
+                    append_identifier(symbol[:value])
+                end
+              else
+                append_identifier(expression[:value])
+              end
             when :paren
-              append_paren(resolve(expression[:lparen]), expression[:e], resolve(expression[:rparen]), opts)
+              append_paren(resolve_paren(expression[:lparen]), expression[:e], resolve_paren(expression[:rparen]), opts)
             when :subsup
-              if (SYMBOLS[expression[:e]] || {})[:underover]
+              if (resolve_symbol(expression[:e]) || {})[:underover]
                 append_underover(expression[:e], expression[:sub], expression[:sup])
               else
                 append_subsup(expression[:e], expression[:sub], expression[:sup])
               end
             when :unary
-              if (symbol = SYMBOLS[expression[:op]])
+              if (symbol = resolve_symbol(expression[:op]))
                 case symbol[:type]
                   when :identifier
                     append_identifier_unary(symbol[:value], expression[:e])
                   when :operator
                     append_operator_unary(symbol[:value], expression[:e])
                   when :wrap
-                    append_paren(resolve(symbol[:lparen]), expression[:e], resolve(symbol[:rparen]), opts)
+                    append_paren(resolve_paren(symbol[:lparen]), expression[:e], resolve_paren(symbol[:rparen]), opts)
                   when :accent
                     if symbol[:position] == :over
                       append_underover(expression[:e], nil, expression[:op])
@@ -342,7 +338,7 @@ module AsciiMath
                 end
               end
             when :binary
-              if (symbol = SYMBOLS[expression[:op]])
+              if (symbol = resolve_symbol(expression[:op]))
                 case symbol[:type]
                   when :tag
                     case symbol[:value]
@@ -358,7 +354,7 @@ module AsciiMath
                 end
               end
             when :matrix
-              append_matrix(resolve(expression[:lparen]), expression[:rows], resolve(expression[:rparen]))
+              append_matrix(resolve_paren(expression[:lparen]), expression[:rows], resolve_paren(expression[:rparen]))
           end
       end
     end
@@ -423,13 +419,21 @@ module AsciiMath
       raise NotImplementedError.new __method__.to_s
     end
 
-    def resolve(symbol)
-      if symbol.nil?
+    def resolve_paren(paren_symbol)
+      if paren_symbol.nil?
         nil
-      elsif (resolved = SYMBOLS[symbol])
+      elsif (resolved = SYMBOLS[paren_symbol])
         resolved[:value]
       else
-        symbol
+        paren_symbol
+      end
+    end
+
+    def resolve_symbol(node)
+      if node[:type] == :symbol
+        SYMBOLS[node[:value]]
+      else
+        nil
       end
     end
   end

@@ -43,7 +43,7 @@ identifier = [A-z]
 
 == Abstract Syntax Tree
 
-The parser returns an abstract syntax tree consisting of symbols, strings, Hashes and Arrays.
+The parser returns an abstract syntax tree consisting of Hashes and Arrays.
 Each expression 'node' of the AST is one of the following forms:
 
 AsciiMath::
@@ -60,9 +60,9 @@ Parentheses::
 ----
 {
   :type => :paren
-  :e => <sub expression>
-  :lparen => <left Symbol or String>
-  :rparen => <right Symbol or String>
+  :e => <sub node>
+  :lparen => <left Symbol>
+  :rparen => <right Symbol>
 }
 ----
 
@@ -73,9 +73,9 @@ Super and Sub Script::
 ----
 {
   :type => :subsup
-  :e => <base expression>
-  :sub => <subscript expression>
-  :sup => <superscript expression>
+  :e => <base node>
+  :sub => <subscript node>
+  :sup => <superscript node>
 }
 ----
 
@@ -86,8 +86,8 @@ Unary Expressions::
 ----
 {
   :type => :unary
-  :e => <operand expression>
-  :op => <operator Symbol or String>
+  :e => <operand node>
+  :op => <operator node>
 }
 ----
 
@@ -101,18 +101,60 @@ For instance the AsciiMath string `a / b` would be returned as `{:type => :binar
 ----
 {
   :type => :binary
-  :e1 => <first operand expression>
-  :e2 => <second operand expression>
-  :op => <operator Symbol or String>
+  :e1 => <first operand node>
+  :e2 => <second operand node>
+  :op => <operator node>
 }
 ----
 
-Constants::
+Symbols::
 +
-`symbol` (mathematical operators, function names, arrows, accents, greek letters, etc.) are all converted to Symbols.
+`symbol` (mathematical operators, function names, arrows, accents, greek letters, etc.) is converted to a Hash of the following form.
 The <<symbol_table>> below list all the symbols that are recognized by the parser.
 +
-`text`, `number` and `identifier` are converted to Strings.
+[source]
+----
+{
+  :type => :symbol
+  :value => <value Symbol>
+}
+----
+
+Identifiers::
++
+`identifier` is converted to a Hash of the following form.
++
+[source]
+----
+{
+  :type => :identifier
+  :value => <value String>
+}
+----
+
+Text::
++
+`text` is converted to a Hash of the following form.
++
+[source]
+----
+{
+  :type => :text
+  :value => <value String>
+}
+----
+
+Numbers::
++
+`number` is converted to a Hash of the following form.
++
+[source]
+----
+{
+  :type => :number
+  :value => <value String>
+}
+----
 
 Matrices::
 Matrices in AsciiMath are a special case of nested `paren_expr`.
@@ -132,9 +174,9 @@ Each column element is represented using the appropriate AST type.
 ----
 {
     :type => :matrix
-    :rows => <Array of Arrays of expressions>
-    :lparen => <left Symbol or String>
-    :rparen => <right Symbol or String>
+    :rows => <Array of Arrays of nodes>
+    :lparen => <left Symbol>
+    :rparen => <right Symbol>
 }
 ----
 

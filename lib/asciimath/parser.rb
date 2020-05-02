@@ -165,7 +165,7 @@ module AsciiMath
           s.chop!
         end
         @string.pos = position + bytesize(s)
-        @symbols[s] || {:value => s, :type => :symbol}
+        @symbols[s] || {:value => s, :type => :identifier}
       end
     end
 
@@ -491,7 +491,7 @@ module AsciiMath
         if t1[:type] == :infix && t1[:value] == :frac
           s2 = parse_intermediate_expression(tok, depth)
           if s2
-            e << binary(:frac, unwrap_paren(s1), unwrap_paren(s2))
+            e << binary(symbol(:frac), unwrap_paren(s1), unwrap_paren(s2))
           else
             e << s1
           end
@@ -573,19 +573,25 @@ module AsciiMath
             tok.push_back(t1)
             nil
           else
-            t1[:value]
+            symbol(t1[:value])
           end
         when :unary
           s = unwrap_paren(parse_simple_expression(tok, depth))
-          unary(t1[:value], s)
+          unary(symbol(t1[:value]), s)
         when :binary
           s1 = unwrap_paren(parse_simple_expression(tok, depth))
           s2 = unwrap_paren(parse_simple_expression(tok, depth))
-          binary(t1[:value], s1, s2)
+          binary(symbol(t1[:value]), s1, s2)
         when :eof
           nil
+        when :number
+          number(t1[:value])
+        when :text
+          text(t1[:value])
+        when :identifier
+          identifier(t1[:value])
         else
-          t1[:value]
+          symbol(t1[:value])
       end
     end
 
@@ -601,15 +607,11 @@ module AsciiMath
       return expression unless expression.is_a?(Hash) && expression[:type] == :paren && expression[:e].is_a?(Array)
 
       rows, separators = expression[:e].partition.with_index { |obj, i| i.even? }
-      begin
-        return expression unless rows.length > 1 &&
-            rows.length > separators.length &&
-            separators.all? { |item| is_matrix_separator(item) } &&
-            (rows.all? { |item| item.is_a?(Hash) && item[:type] == :paren && item[:lparen] == :lparen && item[:rparen] == :rparen } ||
-                rows.all? { |item| item.is_a?(Hash) && item[:type] == :paren && item[:lparen] == :lbracket && item[:rparen] == :rbracket })
-      rescue
-        raise e
-      end
+      return expression unless rows.length > 1 &&
+          rows.length > separators.length &&
+          separators.all? { |item| is_matrix_separator(item) } &&
+          (rows.all? { |item| item.is_a?(Hash) && item[:type] == :paren && item[:lparen] == :lparen && item[:rparen] == :rparen } ||
+              rows.all? { |item| item.is_a?(Hash) && item[:type] == :paren && item[:lparen] == :lbracket && item[:rparen] == :rbracket })
 
       rows = rows.map do |row|
         chunks = []
@@ -634,7 +636,7 @@ module AsciiMath
     end
 
     def is_matrix_separator(item)
-      item == ','
+      item.is_a?(Hash) && item[:type] == :identifier && item[:value] == ','
     end
 
     def matrix?(expression)

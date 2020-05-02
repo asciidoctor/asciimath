@@ -1,7 +1,7 @@
 #encoding: utf-8
 require 'rspec'
 require 'asciimath'
-require 'asciimath/ast'
+require 'ast'
 
 def should_generate(expected_output)
   Proc.new { |example|
@@ -33,7 +33,7 @@ end
 
 RSpec.shared_examples "AsciiMath Examples" do
   class << self
-    include AsciiMath::AST
+    include ::AsciiMath::ASTHelper
   end
 
   example('underset(_)(hat A) = hat A exp j vartheta_0', &should_generate(
@@ -373,7 +373,7 @@ RSpec.shared_examples "AsciiMath Examples" do
   ))
 
   example('text("foo")', &should_generate(
-      :ast => '"foo"',
+      :ast => text('"foo"'),
       :mathml => '<math><mtext>"foo"</mtext></math>',
       :html => '<span class="math-inline"><span class="math-text">"foo"</span></span>',
       :latex => '\\text{"foo"}',
@@ -499,6 +499,13 @@ RSpec.shared_examples "AsciiMath Examples" do
       :ast => seq(:sin, paren(subsup("a", "c", "b"))),
       :mathml => '<math><mi>sin</mi><mfenced open="(" close=")"><msubsup><mi>a</mi><mi>c</mi><mi>b</mi></msubsup></mfenced></math>',
       :latex => '\\sin \\left ( a_c^b \\right )',
+  ))
+
+  example('text(a)a2)', &should_generate(
+      :ast => seq(text('a'), identifier('a'), number('2'), symbol(:rparen)),
+      :mathml => '<math><mtext>a</mtext><mi>a</mi><mn>2</mn><mo>)</mo></math>',
+      :html => '<span class="math-inline"><span class="math-text">a</span><span class="math-identifier">a</span><span class="math-number">2</span><span class="math-operator">)</span></span>',
+      :latex => '',
   ))
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
