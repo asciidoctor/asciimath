@@ -1,7 +1,7 @@
 # AsciiMath
 ifndef::env-site[:status:]
 
-An http://asciimath.org[AsciiMath] parser and MathML generator written in pure Ruby.
+An http://asciimath.org[AsciiMath] parser and MathML/LaTeX generator written in pure Ruby.
 
 ifdef::status[]
 [discrete]
@@ -48,9 +48,7 @@ parsed_expression = AsciiMath.parse(asciimath)
 
 The parsed expression is a set of nested Array and Hash objects.
 
-This expression can then be converted to MathML, HTML (experimental) or LaTeX 
-(requires the use of the https://ctan.org/pkg/amsmath[`amsmath`], `amssymb` and 
-https://ctan.org/pkg/stix[`stix`] packages).
+This expression can then be converted to MathML, HTML (experimental) or LaTeX.
 
 [source,ruby]
 ----
@@ -59,7 +57,7 @@ html = parsed_expression.to_html
 latex = parsed_expression.to_latex
 ----
 
-The MathML or HTML code is returned as a String.
+The MathML, HTML or LaTeX code is returned as a String.
 
 ### Command line
 
@@ -103,6 +101,18 @@ Known issues are as follows:
 
 Rendering the HTML output correctly requires the inclusion of `style/math.css` in the html document.
 There is currently no specific required font for this output, it simply selects a `serif` font family - change the `@font-family` attribute in the `.math-inline` class to select something specific.
+
+## Notes on the LaTeX Output
+
+All LaTeX commands and environments used in the output are coverved by 
+https://ctan.org/pkg/amsmath[`amsmath`] and `amssymb`, with a couple of 
+exceptions:
+
+ * `\mathscr`
+ * `\twoheadrightarrowtail`
+
+Both this commands are supported by the https://ctan.org/pkg/stix[`stix`] 
+package.
 
 ## Contributing
 
