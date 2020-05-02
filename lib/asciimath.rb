@@ -1,5 +1,5 @@
-require File.join(File.dirname(__FILE__), 'asciimath/version')
-require File.join(File.dirname(__FILE__), 'asciimath/parser')
-require File.join(File.dirname(__FILE__), 'asciimath/mathml')
-require File.join(File.dirname(__FILE__), 'asciimath/html')
-require File.join(File.dirname(__FILE__), 'asciimath/latex')
+require_relative 'asciimath/version'
+require_relative 'asciimath/parser'
+require_relative 'asciimath/mathml'
+require_relative 'asciimath/html'
+require_relative 'asciimath/latex'
