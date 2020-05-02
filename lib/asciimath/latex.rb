@@ -170,7 +170,7 @@ module AsciiMath
                   append(expression[:e])
                 end
               else
-                raise nil
+                raise "Unsupported unary operation"
               end
 
             when :binary
@@ -202,7 +202,7 @@ module AsciiMath
                   append(expression[:e2])
                 end
               else
-                raise nil
+                raise "Unsupported binary operation"
               end
             when :matrix
               rows = expression[:rows]
