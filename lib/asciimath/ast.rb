@@ -11,10 +11,22 @@ module AsciiMath
       end
     end
 
-    def paren(lparen, e, rparen, opts = {})
-      e = {:type => :paren, :e => e, :lparen => lparen, :rparen => rparen}
-      e[:no_unwrap] = opts[:no_unwrap] if opts[:no_unwrap]
-      e
+    alias_method :seq, :expression
+
+    def paren(*args)
+      case args.length
+        when 1
+          lparen = :lparen
+          e = args[0]
+          rparen = :rparen
+        when 3
+          lparen = args[0]
+          e = args[1]
+          rparen = args[2]
+        else
+          raise "Incorrect argument count #{args.length}"
+      end
+      {:type => :paren, :e => e, :lparen => lparen, :rparen => rparen}
     end
 
     def subsup(e, sub, sup)
@@ -37,7 +49,19 @@ module AsciiMath
       {:type => :binary, :e1 => e1, :e2 => e2, :op => operator}
     end
 
-    def matrix(lparen, rows, rparen)
+    def matrix(*args)
+      case args.length
+        when 1
+          lparen = :lparen
+          rows = args[0]
+          rparen = :rparen
+        when 3
+          lparen = args[0]
+          rows = args[1]
+          rparen = args[2]
+        else
+          raise "Incorrect argument count #{args.length}"
+      end
       {:type => :matrix, :rows => rows, :lparen => lparen, :rparen => rparen}
     end
   end

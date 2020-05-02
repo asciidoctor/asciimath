@@ -594,7 +594,7 @@ module AsciiMath
     end
 
     def unwrap_paren(expression)
-      if expression.is_a?(Hash) && expression[:type] == :paren && !expression[:no_unwrap]
+      if expression.is_a?(Hash) && expression[:type] == :paren
         expression[:e]
       else
         expression
