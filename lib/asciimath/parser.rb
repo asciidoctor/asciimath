@@ -190,292 +190,299 @@ module AsciiMath
     end
   end
 
+  module SymbolTable
+    def self.create
+      s = {}
+
+      class << s
+        def add(*names, value, type)
+          entry = {:value => value, :type => type}.freeze
+          names.each { |name| self[name.freeze] = entry }
+        end
+      end
+
+      # Operation symbols
+      s.add('+', :plus, :symbol)
+      s.add('-', :minus, :symbol)
+      s.add('*', 'cdot', :cdot, :symbol)
+      s.add('**', 'ast', :ast, :symbol)
+      s.add('***', 'star', :star, :symbol)
+      s.add('//', :slash, :symbol)
+      s.add('\\\\', 'backslash', :backslash, :symbol)
+      s.add('setminus', :setminus, :symbol)
+      s.add('xx', 'times', :times, :symbol)
+      s.add('|><', 'ltimes', :ltimes, :symbol)
+      s.add('><|', 'rtimes', :rtimes, :symbol)
+      s.add('|><|', 'bowtie', :bowtie, :symbol)
+      s.add('-:', 'div', 'divide', :div, :symbol)
+      s.add('@', 'circ', :circ, :symbol)
+      s.add('o+', 'oplus', :oplus, :symbol)
+      s.add('ox', 'otimes', :otimes, :symbol)
+      s.add('o.', 'odot', :odot, :symbol)
+      s.add('sum', :sum, :symbol)
+      s.add('prod', :prod, :symbol)
+      s.add('^^', 'wedge', :wedge, :symbol)
+      s.add('^^^', 'bigwedge', :bigwedge, :symbol)
+      s.add('vv', 'vee', :vee, :symbol)
+      s.add('vvv', 'bigvee', :bigvee, :symbol)
+      s.add('nn', 'cap', :cap, :symbol)
+      s.add('nnn', 'bigcap', :bigcap, :symbol)
+      s.add('uu', 'cup', :cup, :symbol)
+      s.add('uuu', 'bigcup', :bigcup, :symbol)
+
+      # Relation symbols
+      s.add('=', :eq, :symbol)
+      s.add('!=', 'ne', :ne, :symbol)
+      s.add(':=', :assign, :symbol)
+      s.add('<', 'lt', :lt, :symbol)
+      s.add('>', 'gt', :gt, :symbol)
+      s.add('<=', 'le', :le, :symbol)
+      s.add('>=', 'ge', :ge, :symbol)
+      s.add('-<', '-lt', 'prec', :prec, :symbol)
+      s.add('>-', 'succ', :succ, :symbol)
+      s.add('-<=', 'preceq', :preceq, :symbol)
+      s.add('>-=', 'succeq', :succeq, :symbol)
+      s.add('in', :in, :symbol)
+      s.add('!in', 'notin', :notin, :symbol)
+      s.add('sub', 'subset', :subset, :symbol)
+      s.add('sup', 'supset', :supset, :symbol)
+      s.add('sube', 'subseteq', :subseteq, :symbol)
+      s.add('supe', 'supseteq', :supseteq, :symbol)
+      s.add('-=', 'equiv', :equiv, :symbol)
+      s.add('~=', 'cong', :cong, :symbol)
+      s.add('~~', 'approx', :approx, :symbol)
+      s.add('prop', 'propto', :propto, :symbol)
+
+      # Logical symbols
+      s.add('and', :and, :symbol)
+      s.add('or', :or, :symbol)
+      s.add('not', 'neg', :not, :symbol)
+      s.add('=>', 'implies', :implies, :symbol)
+      s.add('if', :if, :symbol)
+      s.add('<=>', 'iff', :iff, :symbol)
+      s.add('AA', 'forall', :forall, :symbol)
+      s.add('EE', 'exists', :exists, :symbol)
+      s.add('_|_', 'bot', :bot, :symbol)
+      s.add('TT', 'top', :top, :symbol)
+      s.add('|--', 'vdash', :vdash, :symbol)
+      s.add('|==', 'models', :models, :symbol)
+
+      # Grouping brackets
+      s.add('(', 'left(', :lparen, :lparen)
+      s.add(')', 'right)', :rparen, :rparen)
+      s.add('[', 'left[', :lbracket, :lparen)
+      s.add(']', 'right]', :rbracket, :rparen)
+      s.add('{', :lbrace, :lparen)
+      s.add('}', :rbrace, :rparen)
+      s.add('|', :vbar, :lrparen)
+      s.add(':|:', :vbar, :symbol)
+      s.add('|:', :vbar, :lparen)
+      s.add(':|', :vbar, :rparen)
+      # s.add('||', '||', :lrparen)
+      s.add('(:', '<<', 'langle', :langle, :lparen)
+      s.add(':)', '>>', 'rangle', :rangle, :rparen)
+      s.add('{:', nil, :lparen)
+      s.add(':}', nil, :rparen)
+
+      # Miscellaneous symbols
+      s.add('int', :integral, :symbol)
+      s.add('dx', :dx, :symbol)
+      s.add('dy', :dy, :symbol)
+      s.add('dz', :dz, :symbol)
+      s.add('dt', :dt, :symbol)
+      s.add('oint', :contourintegral, :symbol)
+      s.add('del', 'partial', :partial, :symbol)
+      s.add('grad', 'nabla', :nabla, :symbol)
+      s.add('+-', 'pm', :pm, :symbol)
+      s.add('O/', 'emptyset', :emptyset, :symbol)
+      s.add('oo', 'infty', :infty, :symbol)
+      s.add('aleph', :aleph, :symbol)
+      s.add('...', 'ldots', :ellipsis, :symbol)
+      s.add(':.', 'therefore', :therefore, :symbol)
+      s.add(':\'', 'because', :because, :symbol)
+      s.add('/_', 'angle', :angle, :symbol)
+      s.add('/_\\', 'triangle', :triangle, :symbol)
+      s.add('\'', 'prime', :prime, :symbol)
+      s.add('tilde', :tilde, :unary)
+      s.add('\\ ', :nbsp, :symbol)
+      s.add('frown', :frown, :symbol)
+      s.add('quad', :quad, :symbol)
+      s.add('qquad', :qquad, :symbol)
+      s.add('cdots', :cdots, :symbol)
+      s.add('vdots', :vdots, :symbol)
+      s.add('ddots', :ddots, :symbol)
+      s.add('diamond', :diamond, :symbol)
+      s.add('square', :square, :symbol)
+      s.add('|__', 'lfloor', :lfloor, :symbol)
+      s.add('__|', 'rfloor', :rfloor, :symbol)
+      s.add('|~', 'lceiling', :lceiling, :symbol)
+      s.add('~|', 'rceiling', :rceiling, :symbol)
+      s.add('CC', :dstruck_captial_c, :symbol)
+      s.add('NN', :dstruck_captial_n, :symbol)
+      s.add('QQ', :dstruck_captial_q, :symbol)
+      s.add('RR', :dstruck_captial_r, :symbol)
+      s.add('ZZ', :dstruck_captial_z, :symbol)
+      s.add('f', :f, :symbol)
+      s.add('g', :g, :symbol)
+
+
+      # Standard functions
+      s.add('lim', :lim, :symbol)
+      s.add('Lim', :Lim, :symbol)
+      s.add('min', :min, :symbol)
+      s.add('max', :max, :symbol)
+      s.add('sin', :sin, :symbol)
+      s.add('Sin', :Sin, :symbol)
+      s.add('cos', :cos, :symbol)
+      s.add('Cos', :Cos, :symbol)
+      s.add('tan', :tan, :symbol)
+      s.add('Tan', :Tan, :symbol)
+      s.add('sinh', :sinh, :symbol)
+      s.add('Sinh', :Sinh, :symbol)
+      s.add('cosh', :cosh, :symbol)
+      s.add('Cosh', :Cosh, :symbol)
+      s.add('tanh', :tanh, :symbol)
+      s.add('Tanh', :Tanh, :symbol)
+      s.add('cot', :cot, :symbol)
+      s.add('Cot', :Cot, :symbol)
+      s.add('sec', :sec, :symbol)
+      s.add('Sec', :Sec, :symbol)
+      s.add('csc', :csc, :symbol)
+      s.add('Csc', :Csc, :symbol)
+      s.add('arcsin', :arcsin, :symbol)
+      s.add('arccos', :arccos, :symbol)
+      s.add('arctan', :arctan, :symbol)
+      s.add('coth', :coth, :symbol)
+      s.add('sech', :sech, :symbol)
+      s.add('csch', :csch, :symbol)
+      s.add('exp', :exp, :symbol)
+      s.add('abs', :abs, :unary)
+      s.add('Abs', :abs, :unary)
+      s.add('norm', :norm, :unary)
+      s.add('floor', :floor, :unary)
+      s.add('ceil', :ceil, :unary)
+      s.add('log', :log, :symbol)
+      s.add('Log', :Log, :symbol)
+      s.add('ln', :ln, :symbol)
+      s.add('Ln', :Ln, :symbol)
+      s.add('det', :det, :symbol)
+      s.add('dim', :dim, :symbol)
+      s.add('mod', :mod, :symbol)
+      s.add('gcd', :gcd, :symbol)
+      s.add('lcm', :lcm, :symbol)
+      s.add('lub', :lub, :symbol)
+      s.add('glb', :glb, :symbol)
+
+      # Arrows
+      s.add('uarr', 'uparrow', :uparrow, :symbol)
+      s.add('darr', 'downarrow', :downarrow, :symbol)
+      s.add('rarr', 'rightarrow', :rightarrow, :symbol)
+      s.add('->', 'to', :to, :symbol)
+      s.add('>->', 'rightarrowtail', :rightarrowtail, :symbol)
+      s.add('->>', 'twoheadrightarrow', :twoheadrightarrow, :symbol)
+      s.add('>->>', 'twoheadrightarrowtail', :twoheadrightarrowtail, :symbol)
+      s.add('|->', 'mapsto', :mapsto, :symbol)
+      s.add('larr', 'leftarrow', :leftarrow, :symbol)
+      s.add('harr', 'leftrightarrow', :leftrightarrow, :symbol)
+      s.add('rArr', 'Rightarrow', :Rightarrow, :symbol)
+      s.add('lArr', 'Leftarrow', :Leftarrow, :symbol)
+      s.add('hArr', 'Leftrightarrow', :Leftrightarrow, :symbol)
+
+      # Other
+      s.add('sqrt', :sqrt, :unary)
+      s.add('root', :root, :binary)
+      s.add('frac', :frac, :binary)
+      s.add('/', :frac, :infix)
+      s.add('stackrel', :stackrel, :binary)
+      s.add('overset', :overset, :binary)
+      s.add('underset', :underset, :binary)
+      s.add('_', :sub, :infix)
+      s.add('^', :sup, :infix)
+      s.add('hat', :hat, :unary)
+      s.add('bar', :overline, :unary)
+      s.add('vec', :vec, :unary)
+      s.add('dot', :dot, :unary)
+      s.add('ddot', :ddot, :unary)
+      s.add('overarc', 'overparen', :overarc, :unary)
+      s.add('ul', 'underline', :underline, :unary)
+      s.add('ubrace', 'underbrace', :underbrace, :unary)
+      s.add('obrace', 'overbrace', :overbrace, :unary)
+
+      s.add('bb', :bold, :unary)
+      s.add('bbb', :double_struck, :unary)
+      s.add('ii', :italic, :unary)
+      s.add('bii', :bold_italic, :unary)
+      s.add('cc', :script, :unary)
+      s.add('bcc', :bold_script, :unary)
+      s.add('tt', :monospace, :unary)
+      s.add('fr', :fraktur, :unary)
+      s.add('bfr', :bold_fraktur, :unary)
+      s.add('sf', :sans_serif, :unary)
+      s.add('bsf', :bold_sans_serif, :unary)
+      s.add('sfi', :sans_serif_italic, :unary)
+      s.add('sfbi', :sans_serif_bold_italic, :unary)
+
+      # Greek letters
+      s.add('alpha', :alpha, :symbol)
+      s.add('Alpha', :Alpha, :symbol)
+      s.add('beta', :beta, :symbol)
+      s.add('Beta', :Beta, :symbol)
+      s.add('gamma', :gamma, :symbol)
+      s.add('Gamma', :Gamma, :symbol)
+      s.add('delta', :delta, :symbol)
+      s.add('Delta', :Delta, :symbol)
+      s.add('epsi', 'epsilon', :epsilon, :symbol)
+      s.add('Epsilon', :Epsilon, :symbol)
+      s.add('varepsilon', :varepsilon, :symbol)
+      s.add('zeta', :zeta, :symbol)
+      s.add('Zeta', :Zeta, :symbol)
+      s.add('eta', :eta, :symbol)
+      s.add('Eta', :Eta, :symbol)
+      s.add('theta', :theta, :symbol)
+      s.add('Theta', :Theta, :symbol)
+      s.add('vartheta', :vartheta, :symbol)
+      s.add('iota', :iota, :symbol)
+      s.add('Iota', :Iota, :symbol)
+      s.add('kappa', :kappa, :symbol)
+      s.add('Kappa', :Kappa, :symbol)
+      s.add('lambda', :lambda, :symbol)
+      s.add('Lambda', :Lambda, :symbol)
+      s.add('mu', :mu, :symbol)
+      s.add('Mu', :Mu, :symbol)
+      s.add('nu', :nu, :symbol)
+      s.add('Nu', :Nu, :symbol)
+      s.add('xi', :xi, :symbol)
+      s.add('Xi', :Xi, :symbol)
+      s.add('omicron', :omicron, :symbol)
+      s.add('Omicron', :Omicron, :symbol)
+      s.add('pi', :pi, :symbol)
+      s.add('Pi', :Pi, :symbol)
+      s.add('rho', :rho, :symbol)
+      s.add('Rho', :Rho, :symbol)
+      s.add('sigma', :sigma, :symbol)
+      s.add('Sigma', :Sigma, :symbol)
+      s.add('tau', :tau, :symbol)
+      s.add('Tau', :Tau, :symbol)
+      s.add('upsilon', :upsilon, :symbol)
+      s.add('Upsilon', :Upsilon, :symbol)
+      s.add('phi', :phi, :symbol)
+      s.add('Phi', :Phi, :symbol)
+      s.add('varphi', :varphi, :symbol)
+      s.add('chi', :chi, :symbol)
+      s.add('Chi', :Chi, :symbol)
+      s.add('psi', :psi, :symbol)
+      s.add('Psi', :Psi, :symbol)
+      s.add('omega', :omega, :symbol)
+      s.add('Omega', :Omega, :symbol)
+
+      s.freeze
+    end
+  end
+
   class Parser
     include AsciiMath::AST
 
-    SYMBOLS = {
-        # Operation symbols
-        '+' => {:value => :plus, :type => :symbol},
-        '-' => {:value => :minus, :type => :symbol},
-        '*' => {:value => :cdot, :type => :symbol},
-        '**' => {:value => :ast, :type => :symbol},
-        '***' => {:value => :star, :type => :symbol},
-        '//' => {:value => :slash, :type => :symbol},
-        '\\\\' => {:value => :backslash, :type => :symbol},
-        'setminus' => {:value => :setminus, :type => :symbol},
-        'xx' => {:value => :times, :type => :symbol},
-        '|><' => {:value => :ltimes, :type => :symbol},
-        '><|' => {:value => :rtimes, :type => :symbol},
-        '|><|' => {:value => :bowtie, :type => :symbol},
-        '-:' => {:value => :div, :type => :symbol},
-        'divide' => {:value => :div, :type => :symbol},
-        '@' => {:value => :circ, :type => :symbol},
-        'o+' => {:value => :oplus, :type => :symbol},
-        'ox' => {:value => :otimes, :type => :symbol},
-        'o.' => {:value => :odot, :type => :symbol},
-        'sum' => {:value => :sum, :type => :symbol},
-        'prod' => {:value => :prod, :type => :symbol},
-        '^^' => {:value => :wedge, :type => :symbol},
-        '^^^' => {:value => :bigwedge, :type => :symbol},
-        'vv' => {:value => :vee, :type => :symbol},
-        'vvv' => {:value => :bigvee, :type => :symbol},
-        'nn' => {:value => :cap, :type => :symbol},
-        'nnn' => {:value => :bigcap, :type => :symbol},
-        'uu' => {:value => :cup, :type => :symbol},
-        'uuu' => {:value => :bigcup, :type => :symbol},
-
-        # Relation symbols
-        '=' => {:value => :eq, :type => :symbol},
-        '!=' => {:value => :ne, :type => :symbol},
-        ':=' => {:value => :assign, :type => :symbol},
-        '<' => {:value => :lt, :type => :symbol},
-        'lt' => {:value => :lt, :type => :symbol},
-        '>' => {:value => :gt, :type => :symbol},
-        'gt' => {:value => :gt, :type => :symbol},
-        '<=' => {:value => :le, :type => :symbol},
-        'le' => {:value => :le, :type => :symbol},
-        '>=' => {:value => :ge, :type => :symbol},
-        'ge' => {:value => :ge, :type => :symbol},
-        '-<' => {:value => :prec, :type => :symbol},
-        '-lt' => {:value => :prec, :type => :symbol},
-        '>-' => {:value => :succ, :type => :symbol},
-        '-<=' => {:value => :preceq, :type => :symbol},
-        '>-=' => {:value => :succeq, :type => :symbol},
-        'in' => {:value => :in, :type => :symbol},
-        '!in' => {:value => :notin, :type => :symbol},
-        'sub' => {:value => :subset, :type => :symbol},
-        'sup' => {:value => :supset, :type => :symbol},
-        'sube' => {:value => :subseteq, :type => :symbol},
-        'supe' => {:value => :supseteq, :type => :symbol},
-        '-=' => {:value => :equiv, :type => :symbol},
-        '~=' => {:value => :cong, :type => :symbol},
-        '~~' => {:value => :approx, :type => :symbol},
-        'prop' => {:value => :propto, :type => :symbol},
-
-        # Logical symbols
-        'and' => {:value => :and, :type => :symbol},
-        'or' => {:value => :or, :type => :symbol},
-        'not' => {:value => :not, :type => :symbol},
-        '=>' => {:value => :implies, :type => :symbol},
-        'if' => {:value => :if, :type => :symbol},
-        '<=>' => {:value => :iff, :type => :symbol},
-        'AA' => {:value => :forall, :type => :symbol},
-        'EE' => {:value => :exists, :type => :symbol},
-        '_|_' => {:value => :bot, :type => :symbol},
-        'TT' => {:value => :top, :type => :symbol},
-        '|--' => {:value => :vdash, :type => :symbol},
-        '|==' => {:value => :models, :type => :symbol},
-
-        # Grouping brackets
-        '(' => {:value => :lparen, :type => :lparen},
-        ')' => {:value => :rparen, :type => :rparen},
-        '[' => {:value => :lbracket, :type => :lparen},
-        ']' => {:value => :rbracket, :type => :rparen},
-        '{' => {:value => :lbrace, :type => :lparen},
-        '}' => {:value => :rbrace, :type => :rparen},
-        '|' => {:value => :vbar, :type => :lrparen},
-        ':|:' => {:value => :vbar, :type => :symbol},
-        '|:' => {:value => :vbar, :type => :lparen},
-        ':|' => {:value => :vbar, :type => :rparen},
-        # '||' => {:value => '||', :type => :lrparen},
-        '(:' => {:value => :langle, :type => :lparen},
-        ':)' => {:value => :rangle, :type => :rparen},
-        '<<' => {:value => :langle, :type => :lparen},
-        '>>' => {:value => :rangle, :type => :rparen},
-        '{:' => {:value => nil, :type => :lparen},
-        ':}' => {:value => nil, :type => :rparen},
-
-        # Miscellaneous symbols
-        'int' => {:value => :integral, :type => :symbol},
-        'dx' => {:value => :dx, :type => :symbol},
-        'dy' => {:value => :dy, :type => :symbol},
-        'dz' => {:value => :dz, :type => :symbol},
-        'dt' => {:value => :dt, :type => :symbol},
-        'oint' => {:value => :contourintegral, :type => :symbol},
-        'del' => {:value => :partial, :type => :symbol},
-        'grad' => {:value => :nabla, :type => :symbol},
-        '+-' => {:value => :pm, :type => :symbol},
-        'O/' => {:value => :emptyset, :type => :symbol},
-        'oo' => {:value => :infty, :type => :symbol},
-        'aleph' => {:value => :aleph, :type => :symbol},
-        '...' => {:value => :ellipsis, :type => :symbol},
-        ':.' => {:value => :therefore, :type => :symbol},
-        ':\'' => {:value => :because, :type => :symbol},
-        '/_' => {:value => :angle, :type => :symbol},
-        '/_\\' => {:value => :triangle, :type => :symbol},
-        '\'' => {:value => :prime, :type => :symbol},
-        'tilde' => {:value => :tilde, :type => :unary},
-        '\\ ' => {:value => :nbsp, :type => :symbol},
-        'frown' => {:value => :frown, :type => :symbol},
-        'quad' => {:value => :quad, :type => :symbol},
-        'qquad' => {:value => :qquad, :type => :symbol},
-        'cdots' => {:value => :cdots, :type => :symbol},
-        'vdots' => {:value => :vdots, :type => :symbol},
-        'ddots' => {:value => :ddots, :type => :symbol},
-        'diamond' => {:value => :diamond, :type => :symbol},
-        'square' => {:value => :square, :type => :symbol},
-        '|__' => {:value => :lfloor, :type => :symbol},
-        '__|' => {:value => :rfloor, :type => :symbol},
-        '|~' => {:value => :lceiling, :type => :symbol},
-        '~|' => {:value => :rceiling, :type => :symbol},
-        'CC' => {:value => :dstruck_captial_c, :type => :symbol},
-        'NN' => {:value => :dstruck_captial_n, :type => :symbol},
-        'QQ' => {:value => :dstruck_captial_q, :type => :symbol},
-        'RR' => {:value => :dstruck_captial_r, :type => :symbol},
-        'ZZ' => {:value => :dstruck_captial_z, :type => :symbol},
-        'f' => {:value => :f, :type => :symbol},
-        'g' => {:value => :g, :type => :symbol},
-
-
-        # Standard functions
-        'lim' => {:value => :lim, :type => :symbol},
-        'Lim' => {:value => :Lim, :type => :symbol},
-        'min' => {:value => :min, :type => :symbol},
-        'max' => {:value => :max, :type => :symbol},
-        'sin' => {:value => :sin, :type => :symbol},
-        'Sin' => {:value => :Sin, :type => :symbol},
-        'cos' => {:value => :cos, :type => :symbol},
-        'Cos' => {:value => :Cos, :type => :symbol},
-        'tan' => {:value => :tan, :type => :symbol},
-        'Tan' => {:value => :Tan, :type => :symbol},
-        'sinh' => {:value => :sinh, :type => :symbol},
-        'Sinh' => {:value => :Sinh, :type => :symbol},
-        'cosh' => {:value => :cosh, :type => :symbol},
-        'Cosh' => {:value => :Cosh, :type => :symbol},
-        'tanh' => {:value => :tanh, :type => :symbol},
-        'Tanh' => {:value => :Tanh, :type => :symbol},
-        'cot' => {:value => :cot, :type => :symbol},
-        'Cot' => {:value => :Cot, :type => :symbol},
-        'sec' => {:value => :sec, :type => :symbol},
-        'Sec' => {:value => :Sec, :type => :symbol},
-        'csc' => {:value => :csc, :type => :symbol},
-        'Csc' => {:value => :Csc, :type => :symbol},
-        'arcsin' => {:value => :arcsin, :type => :symbol},
-        'arccos' => {:value => :arccos, :type => :symbol},
-        'arctan' => {:value => :arctan, :type => :symbol},
-        'coth' => {:value => :coth, :type => :symbol},
-        'sech' => {:value => :sech, :type => :symbol},
-        'csch' => {:value => :csch, :type => :symbol},
-        'exp' => {:value => :exp, :type => :symbol},
-        'abs' => {:value => :abs, :type => :unary},
-        'Abs' => {:value => :abs, :type => :unary},
-        'norm' => {:value => :norm, :type => :unary},
-        'floor' => {:value => :floor, :type => :unary},
-        'ceil' => {:value => :ceil, :type => :unary},
-        'log' => {:value => :log, :type => :symbol},
-        'Log' => {:value => :Log, :type => :symbol},
-        'ln' => {:value => :ln, :type => :symbol},
-        'Ln' => {:value => :Ln, :type => :symbol},
-        'det' => {:value => :det, :type => :symbol},
-        'dim' => {:value => :dim, :type => :symbol},
-        'mod' => {:value => :mod, :type => :symbol},
-        'gcd' => {:value => :gcd, :type => :symbol},
-        'lcm' => {:value => :lcm, :type => :symbol},
-        'lub' => {:value => :lub, :type => :symbol},
-        'glb' => {:value => :glb, :type => :symbol},
-
-        # Arrows
-        'uarr' => {:value => :uparrow, :type => :symbol},
-        'darr' => {:value => :downarrow, :type => :symbol},
-        'rarr' => {:value => :rightarrow, :type => :symbol},
-        '->' => {:value => :to, :type => :symbol},
-        '>->' => {:value => :rightarrowtail, :type => :symbol},
-        '->>' => {:value => :twoheadrightarrow, :type => :symbol},
-        '>->>' => {:value => :twoheadrightarrowtail, :type => :symbol},
-        '|->' => {:value => :mapsto, :type => :symbol},
-        'larr' => {:value => :leftarrow, :type => :symbol},
-        'harr' => {:value => :leftrightarrow, :type => :symbol},
-        'rArr' => {:value => :Rightarrow, :type => :symbol},
-        'lArr' => {:value => :Leftarrow, :type => :symbol},
-        'hArr' => {:value => :Leftrightarrow, :type => :symbol},
-
-        # Other
-        'sqrt' => {:value => :sqrt, :type => :unary},
-        'root' => {:value => :root, :type => :binary},
-        'frac' => {:value => :frac, :type => :binary},
-        '/' => {:value => :frac, :type => :infix},
-        'stackrel' => {:value => :stackrel, :type => :binary},
-        'overset' => {:value => :overset, :type => :binary},
-        'underset' => {:value => :underset, :type => :binary},
-        '_' => {:value => :sub, :type => :infix},
-        '^' => {:value => :sup, :type => :infix},
-        'hat' => {:value => :hat, :type => :unary},
-        'bar' => {:value => :overline, :type => :unary},
-        'vec' => {:value => :vec, :type => :unary},
-        'dot' => {:value => :dot, :type => :unary},
-        'ddot' => {:value => :ddot, :type => :unary},
-        'overarc' => {:value => :overarc, :type => :unary},
-        'ul' => {:value => :underline, :type => :unary},
-        'ubrace' => {:value => :underbrace, :type => :unary},
-        'obrace' => {:value => :overbrace, :type => :unary},
-
-        'bb' => {:value => :bold, :type => :unary},
-        'bbb' => {:value => :double_struck, :type => :unary},
-        'ii' => {:value => :italic, :type => :unary},
-        'bii' => {:value => :bold_italic, :type => :unary},
-        'cc' => {:value => :script, :type => :unary},
-        'bcc' => {:value => :bold_script, :type => :unary},
-        'tt' => {:value => :monospace, :type => :unary},
-        'fr' => {:value => :fraktur, :type => :unary},
-        'bfr' => {:value => :bold_fraktur, :type => :unary},
-        'sf' => {:value => :sans_serif, :type => :unary},
-        'bsf' => {:value => :bold_sans_serif, :type => :unary},
-        'sfi' => {:value => :sans_serif_italic, :type => :unary},
-        'sfbi' => {:value => :sans_serif_bold_italic, :type => :unary},
-
-        # Greek letters
-        'alpha' => {:value => :alpha, :type => :symbol},
-        'Alpha' => {:value => :Alpha, :type => :symbol},
-        'beta' => {:value => :beta, :type => :symbol},
-        'Beta' => {:value => :Beta, :type => :symbol},
-        'gamma' => {:value => :gamma, :type => :symbol},
-        'Gamma' => {:value => :Gamma, :type => :symbol},
-        'delta' => {:value => :delta, :type => :symbol},
-        'Delta' => {:value => :Delta, :type => :symbol},
-        'epsilon' => {:value => :epsilon, :type => :symbol},
-        'Epsilon' => {:value => :Epsilon, :type => :symbol},
-        'varepsilon' => {:value => :varepsilon, :type => :symbol},
-        'zeta' => {:value => :zeta, :type => :symbol},
-        'Zeta' => {:value => :Zeta, :type => :symbol},
-        'eta' => {:value => :eta, :type => :symbol},
-        'Eta' => {:value => :Eta, :type => :symbol},
-        'theta' => {:value => :theta, :type => :symbol},
-        'Theta' => {:value => :Theta, :type => :symbol},
-        'vartheta' => {:value => :vartheta, :type => :symbol},
-        'iota' => {:value => :iota, :type => :symbol},
-        'Iota' => {:value => :Iota, :type => :symbol},
-        'kappa' => {:value => :kappa, :type => :symbol},
-        'Kappa' => {:value => :Kappa, :type => :symbol},
-        'lambda' => {:value => :lambda, :type => :symbol},
-        'Lambda' => {:value => :Lambda, :type => :symbol},
-        'mu' => {:value => :mu, :type => :symbol},
-        'Mu' => {:value => :Mu, :type => :symbol},
-        'nu' => {:value => :nu, :type => :symbol},
-        'Nu' => {:value => :Nu, :type => :symbol},
-        'xi' => {:value => :xi, :type => :symbol},
-        'Xi' => {:value => :Xi, :type => :symbol},
-        'omicron' => {:value => :omicron, :type => :symbol},
-        'Omicron' => {:value => :Omicron, :type => :symbol},
-        'pi' => {:value => :pi, :type => :symbol},
-        'Pi' => {:value => :Pi, :type => :symbol},
-        'rho' => {:value => :rho, :type => :symbol},
-        'Rho' => {:value => :Rho, :type => :symbol},
-        'sigma' => {:value => :sigma, :type => :symbol},
-        'Sigma' => {:value => :Sigma, :type => :symbol},
-        'tau' => {:value => :tau, :type => :symbol},
-        'Tau' => {:value => :Tau, :type => :symbol},
-        'upsilon' => {:value => :upsilon, :type => :symbol},
-        'Upsilon' => {:value => :Upsilon, :type => :symbol},
-        'phi' => {:value => :phi, :type => :symbol},
-        'Phi' => {:value => :Phi, :type => :symbol},
-        'varphi' => {:value => :varphi, :type => :symbol},
-        'chi' => {:value => :chi, :type => :symbol},
-        'Chi' => {:value => :Chi, :type => :symbol},
-        'psi' => {:value => :psi, :type => :symbol},
-        'Psi' => {:value => :Psi, :type => :symbol},
-        'omega' => {:value => :omega, :type => :symbol},
-        'Omega' => {:value => :Omega, :type => :symbol},
-    }
+    SYMBOLS = AsciiMath::SymbolTable.create
 
     def parse(input)
       Expression.new(
