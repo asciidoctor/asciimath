@@ -73,186 +73,6 @@ module AsciiMath
       :sans_serif => "\\mathsf"
     }
 
-    CONSTANTS = {
-      ?α => "alpha",
-      ?β => "beta",
-      ?γ => "gamma",
-      ?δ => "delta",
-      ?ε => "epsilon",
-      ?ɛ => "varepsilon",
-      ?ζ => "zeta",
-      ?η => "eta",
-      ?θ => "theta",
-      ?ϑ => "vartheta",
-      ?ι => "iota",
-      ?κ => "kappa",
-      ?λ => "lambda",
-      ?μ => "mu",
-      ?ν => "nu",
-      ?ξ => "xi",
-      ?π => "pi",
-      ?ρ => "rho",
-      ?σ => "sigma",
-      ?τ => "tau",
-      ?υ => "upsilon",
-      ?ϕ => "varphi",
-      ?Φ => "Phi",
-      ?φ => "phi",
-      ?χ => "chi",
-      ?ψ => "psi",
-      ?Ψ => "Psi",
-      ?ω => "omega",
-    }
-
-    OPERATORS = {
-      ?⋅       => "\\cdot",
-      ?∗       => "\\ast",
-      ?⋆       => "\\star",
-      ?\\      => "\\backslash",
-      ?×       => "\\times",
-      ?÷       => "\\div",
-      ?⋉       => "\\ltimes",
-      ?⋊       => "\\rtimes",
-      ?⋈       => "\\bowtie",
-      ?∘       => "\\circ",
-      ?⊕       => "\\oplus",
-      ?⊗       => "\\otimes",
-      ?⊙       => "\\odot",
-      ?∑       => "\\sum",
-      ?Σ       => "\\Sigma",
-      ?∏       => "\\prod",
-      ?∧       => "\\wedge",
-      ?⋀       => "\\bigwedge",
-      ?∨       => "\\vee",
-      ?⋁       => "\\bigvee",
-      ?∩       => "\\cap",
-      ?⋂       => "\\bigcap",
-      ?∪       => "\\cup",
-      ?⋃       => "\\bigcup",
-      ?∅       => "\\emptyset",
-      ?ℵ       => "\\aleph",
-      ?∞       => "\\infty",
-      ?≠       => "\\neq",
-      ?≤       => "\\leq",
-      ?≥       => "\\geq",
-      ?≺       => "\\prec",
-      ?⪯       => "\\preceq",
-      ?≻       => "\\succ",
-      ?⪰       => "\\succeq",
-      ?∈       => "\\in",
-      ?∉       => "\\notin",
-      ?⊂       => "\\subset",
-      ?⊃       => "\\supset",
-      ?⊆       => "\\subseteq",
-      ?⊇       => "\\supseteq",
-      ?≡       => "\\equiv",
-      ?≅       => "\\cong",
-      ?≈       => "\\approx",
-      ?∝       => "\\propto",
-      ?∫       => "\\int", 
-      ?∮       => "\\oint",
-      ?∂       => "\\partial",
-      ?∇       => "\\nabla",
-      ?±       => "\\pm",
-      ?∴       => "\\therefore",
-      ?∵       => "\\because",
-      "..."    => "\\ldots",
-      ?⋯       => "\\cdots",
-      ?⋮       => "\\vdots",
-      ?⋱       => "\\ddots",
-      ?∠       => "\\angle",
-      ?⌢       => "\\frown",
-      ?△       => "\\triangle",
-      ?⋄       => "\\diamond",
-      ?□       => "\\square",
-      ?⌊       => "\\lfloor",
-      ?⌋       => "\\rfloor",
-      ?⌈       => "\\lceil",
-      ?⌉       => "\\rceil",
-      ?ℂ       => "\\mathbb{C}",
-      ?ℕ       => "\\mathbb{N}",
-      ?ℚ       => "\\mathbb{Q}",
-      ?ℝ       => "\\mathbb{R}",
-      ?ℤ       => "\\mathbb{Z}",
-      ?¬       => "\\neg",
-      ?⇒       => "\\Rightarrow",
-      ?⇔       => "\\Leftrightarrow",
-      ?∀       => "\\forall",
-      ?∃       => "\\exists",
-      ?⊥       => "\\bot",
-      ?⊤       => "\\top",
-      ?⊢       => "\\vdash",
-      ?⊨       => "\\models",
-      ?↑       => "\\uparrow",
-      ?↓       => "\\downarrow",
-      ?→       => "\\rightarrow",
-      ?↣       => "\\rightarrowtail",
-      ?↠       => "\\twoheadrightarrow",
-      ?⤖       => "\\twoheadrightarrowtail",
-      ?↦       => "\\mapsto",
-      ?←       => "\\leftarrow",
-      ?↔       => "\\leftrightarrow",
-      ?⇐       => "\\Leftarrow",
-      ?′       => "'",
-      ?−       => "-",
-      ?Γ       => "\\Gamma",
-      ?Δ       => "\\Delta",
-      ?Θ       => "\\Theta",
-      ?Λ       => "\\Lambda",
-      ?Ξ       => "\\Xi",
-      ?Π       => "\\Pi",
-      ?Ω       => "\\Omega",
-      "lim"    => "\\lim",
-      "sin"    => "\\sin",
-      "cos"    => "\\cos",
-      "tan"    => "\\tan",
-      "sec"    => "\\sec",
-      "csc"    => "\\csc",
-      "cot"    => "\\cot",
-      "arcsin" => "\\arcsin",
-      "arccos" => "\\arccos",
-      "arctan" => "\\arctan",
-      "sinh"   => "\\sinh",
-      "cosh"   => "\\cosh",
-      "tanh"   => "\\tanh",
-      "log"    => "\\log",
-      "ln"     => "\\ln",
-      "det"    => "\\det",
-      "dim"    => "\\dim",
-      "mod"    => "\\mod",
-      "gcd"    => "\\gcd",
-      "min"    => "\\min",
-      "max"    => "\\max",
-      "if"     => "\\text{if}"
-    }
-
-    PARENS = {
-      ?(  => ?(,
-      ?)  => ?),
-      ?[  => ?[,
-      ?]  => ?],
-      ?{  => "\\{",
-      ?}  => "\\}",
-      ?⟨  => "\\langle",
-      ?⟩  => "\\rangle",
-      ?⌊  => "\\lfloor",
-      ?⌋  => "\\rfloor",
-      ?⌈  => "\\lceil",
-      ?⌉  => "\\rceil",
-      ?|  => ?|,
-      ?∥  => "\\parallel",
-      nil => ?.,
-    }
-
-    FONTS = {
-      :bold          => "mathbf",
-      :double_struck => "mathbb",
-      :script        => "mathscr",
-      :monospace     => "mathtt",
-      :fraktur       => "mathfrak",
-      :sans_serif    => "mathsf"
-    }
-
     def append(expression, separator = " ")
       case expression
         when Array
@@ -329,7 +149,7 @@ module AsciiMath
                   append(expression[:e2])
                 end
               when Symbol
-                @latex << (SYMBOLS[op] || "\\#{op.to_s}")
+                @latex << symbol(op)
 
                 curly do
                   append(expression[:e1])
@@ -370,7 +190,7 @@ module AsciiMath
     end
 
     def macro(macro, *args)
-      @latex << (SYMBOLS[macro] || "\\#{macro.to_s}")
+      @latex << symbol(macro)
 
       if args.length != 0
         @latex << "["
@@ -391,9 +211,9 @@ module AsciiMath
 
     def parens(lparen, rparen, &block)
       if lparen || rparen
-        @latex << "\\left " << (SYMBOLS[lparen] || "\\#{lparen.to_s}") << " "
+        @latex << "\\left " << symbol(lparen) << " "
         yield self
-        @latex << " \\right " << (SYMBOLS[rparen] || "\\#{rparen.to_s}")
+        @latex << " \\right " << symbol(rparen)
       else
         yield self
       end
@@ -420,6 +240,10 @@ module AsciiMath
           @latex << cp
         end
       end
+    end
+
+    def symbol(s)
+        SYMBOLS[s] || "\\#{s.to_s}"
     end
   end
 
