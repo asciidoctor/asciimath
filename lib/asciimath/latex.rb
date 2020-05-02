@@ -27,6 +27,8 @@ module AsciiMath
       :assign => ":=",
       :lt => ?<,
       :gt => ?>,
+      :sub => "\\text{–}",
+      :sup => "\\text{^}",
       :implies => "\\Rightarrow",
       :iff => "\\Leftrightarrow",
       :if => "\\text{if}",
