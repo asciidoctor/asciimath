@@ -104,26 +104,27 @@ module AsciiMath
       case expression
         when Array
           len = expression.length - 1
+
           expression.each_with_index do |e, i|
             append(e)
             @latex << separator if i != len
           end
-        when String
-          if expression.length > 1 and not expression.match(/^[0-9](\.[0-9]+)?/)
-            text do
-              append_escaped(expression)
-            end
-          else
-            append_escaped(expression)
-          end
-        when Symbol
-            @latex << (SYMBOLS[expression] || "\\#{expression.to_s}")
+
         when Hash
           case expression[:type]
+            when :symbol
+              @latex << symbol(expression[:value])
+
+            when :identifier
+              append_escaped(expression[:value])
+
             when :text
               text do
-                append_escaped(expression[:c])
+                append_escaped(expression[:value])
               end
+
+            when :number
+              @latex << expression[:value]
 
             when :paren
               parens(expression[:lparen], expression[:rparen]) do
@@ -154,7 +155,7 @@ module AsciiMath
               end
 
             when :unary
-              op = expression[:op]
+              op = expression[:op][:value]
 
               case op
               when :norm
@@ -171,7 +172,7 @@ module AsciiMath
                 end
               when :overarc
                 overset do
-                  append(:frown)
+                  append({:type => :symbol, :value => :frown})
                 end
                 
                 curly do
@@ -190,7 +191,7 @@ module AsciiMath
               end
 
             when :binary
-              op = expression[:op]
+              op = expression[:op][:value]
 
               case op
               when :root
@@ -270,10 +271,21 @@ module AsciiMath
 
     def curly(x = true, &block)
       case x
-      when Array, Hash, true
+      when Array, true
         @latex << "{"
         yield self
         @latex << "}"
+
+      when Hash
+        case x[:type]
+        when :symbol, :identifier, :text, :number
+          yield self
+        else
+          @latex << ?{
+          yield self
+          @latex << ?}
+        end
+
       else
         yield self
       end

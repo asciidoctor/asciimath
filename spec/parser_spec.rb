@@ -505,7 +505,7 @@ RSpec.shared_examples "AsciiMath Examples" do
       :ast => seq(text('a'), identifier('a'), number('2'), symbol(:rparen)),
       :mathml => '<math><mtext>a</mtext><mi>a</mi><mn>2</mn><mo>)</mo></math>',
       :html => '<span class="math-inline"><span class="math-text">a</span><span class="math-identifier">a</span><span class="math-number">2</span><span class="math-operator">)</span></span>',
-      :latex => '',
+      :latex => '\\text{a} a 2 )',
   ))
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
