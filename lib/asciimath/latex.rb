@@ -169,6 +169,14 @@ module AsciiMath
                 parens(:lceiling, :rceiling) do
                   append(expression[:e])
                 end
+              when :overarc
+                overset do
+                  append(:frown)
+                end
+                
+                curly do
+                  append(expression[:e])
+                end
               when Symbol
                 macro(op) do
                   append(expression[:e])
