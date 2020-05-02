@@ -48,6 +48,12 @@ module AsciiMath
       append_tag("sqrt", expression)
     end
 
+    def append_cancel(expression)
+      tag("menclose", :notation => "updiagonalstrike") do
+        append(expression, :avoid_row => true)
+      end
+    end
+
     def append_root(base, index)
       append_tag("root", base, index)
     end

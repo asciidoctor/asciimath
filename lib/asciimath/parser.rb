@@ -412,6 +412,7 @@ module AsciiMath
       b.add('ul', 'underline', :underline, :unary)
       b.add('ubrace', 'underbrace', :underbrace, :unary)
       b.add('obrace', 'overbrace', :overbrace, :unary)
+      b.add('cancel', :cancel, :unary)
       b.add('bb', :bold, :unary)
       b.add('bbb', :double_struck, :unary)
       b.add('ii', :italic, :unary)

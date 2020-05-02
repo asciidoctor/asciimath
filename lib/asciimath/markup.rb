@@ -188,14 +188,15 @@ module AsciiMath
                 b.add(:Leftrightarrow, "\u21D4", :operator)
 
                 # Unary tags
-                b.add(:sqrt, :sqrt, :tag)
+                b.add(:sqrt, :sqrt, :sqrt)
+                b.add(:cancel, :cancel, :cancel)
 
                 # Binary tags
-                b.add(:root, :root, :tag)
-                b.add(:frac, :frac, :tag)
-                b.add(:stackrel, :stackrel, :tag)
-                b.add(:overset, :overset, :tag)
-                b.add(:underset, :underset, :tag)
+                b.add(:root, :root, :root)
+                b.add(:frac, :frac, :frac)
+                b.add(:stackrel, :stackrel, :over)
+                b.add(:overset, :overset, :over)
+                b.add(:underset, :underset, :under)
 
                 b.add(:sub, "_", :operator)
                 b.add(:sup, "^", :operator)
@@ -330,27 +331,23 @@ module AsciiMath
                     end
                   when :font
                     append_font(symbol[:value], expression[:e])
-                  when :tag
-                    case symbol[:value]
-                      when :sqrt
-                        append_sqrt(expression[:e])
-                    end
+                  when :cancel
+                    append_cancel(expression[:e])
+                  when :sqrt
+                    append_sqrt(expression[:e])
                 end
               end
             when :binary
               if (symbol = resolve_symbol(expression[:op]))
                 case symbol[:type]
-                  when :tag
-                    case symbol[:value]
-                      when :stackrel, :overset
-                        append_underover(expression[:e2], nil, expression[:e1])
-                      when :underset
-                        append_underover(expression[:e2], expression[:e1], nil)
-                      when :frac
-                        append_fraction(expression[:e1], expression[:e2])
-                      when :root
-                        append_root(expression[:e2], expression[:e1])
-                    end
+                  when :over
+                    append_underover(expression[:e2], nil, expression[:e1])
+                  when :under
+                    append_underover(expression[:e2], expression[:e1], nil)
+                  when :frac
+                    append_fraction(expression[:e1], expression[:e2])
+                  when :root
+                    append_root(expression[:e2], expression[:e1])
                 end
               end
             when :matrix
@@ -380,6 +377,10 @@ module AsciiMath
     end
 
     def append_sqrt(expression)
+      raise NotImplementedError.new __method__.to_s
+    end
+
+    def append_cancel(expression)
       raise NotImplementedError.new __method__.to_s
     end
 

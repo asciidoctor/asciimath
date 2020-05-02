@@ -57,6 +57,11 @@ module AsciiMath
       end
     end
 
+    def append_cancel(expression)
+      #TODO - currently ignored
+      append(expression)
+    end
+
     def append_root(base, index)
       tag("sqrt") do
         append(base)

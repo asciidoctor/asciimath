@@ -508,6 +508,14 @@ RSpec.shared_examples "AsciiMath Examples" do
       :latex => '\\text{a} a 2 )',
   ))
 
+  example('cancel(a_b^c) cancel a_b^c', &should_generate(
+      :ast => seq(
+          unary(:cancel, subsup("a", "b", "c")),
+          subsup(unary(:cancel, "a"), "b", "c")
+      ),
+      :mathml => '<math><menclose notation="updiagonalstrike"><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup></menclose><msubsup><menclose notation="updiagonalstrike"><mi>a</mi></menclose><mi>b</mi><mi>c</mi></msubsup></math>',
+  ))
+
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
 
   if version[0] > 1 || version[1] > 8
