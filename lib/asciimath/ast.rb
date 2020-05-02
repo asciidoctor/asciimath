@@ -42,11 +42,11 @@ module AsciiMath
     end
 
     def unary(operator, e)
-      {:type => :unary, :e => e, :op => operator}
+      {:type => :unary, :op => operator, :e => e}
     end
 
     def binary(operator, e1, e2)
-      {:type => :binary, :e1 => e1, :e2 => e2, :op => operator}
+      {:type => :binary, :op => operator, :e1 => e1, :e2 => e2}
     end
 
     def matrix(*args)
