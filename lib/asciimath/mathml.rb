@@ -1,5 +1,10 @@
+require_relative 'markup'
+require_relative 'symbol_table'
+
 module AsciiMath
   class MathMLBuilder
+    include ::AsciiMath::MarkupBuilder
+
     def initialize(prefix)
       @prefix = prefix
       @mathml = ''
@@ -17,76 +22,129 @@ module AsciiMath
 
     private
 
-    def append(expression, opts = {})
-      case expression
-        when Array
-          if expression.length <= 1 || opts[:avoid_row]
-            expression.each { |e| append(e) }
-          else
-            mrow do
-              expression.each { |e| append(e) }
+    def append_row(expressions)
+      mrow do
+        expressions.each { |e| append(e) }
+      end
+    end
+
+    def append_operator(operator)
+      mo(operator)
+    end
+
+    def append_identifier(identifier)
+      mi(identifier)
+    end
+
+    def append_text(text)
+      mtext(text)
+    end
+
+    def append_number(number)
+      mn(number)
+    end
+
+    def append_sqrt(expression)
+      append_tag("sqrt", expression)
+    end
+
+    def append_root(base, index)
+      append_tag("root", base, index)
+    end
+
+    def append_fraction(numerator, denominator)
+      append_tag("frac", numerator, denominator)
+    end
+
+    def append_tag(tag, *children)
+      tag("m#{tag}") do
+        children.each { |child| append(child) }
+      end
+    end
+
+    def append_font(style, e)
+      tag("mstyle", :mathvariant => style.to_s.gsub('_', '-')) do
+        append(e)
+      end
+    end
+
+    def append_matrix(lparen, rows, rparen)
+      fenced(lparen, rparen) do
+        mtable do
+          rows.each do |row|
+            mtr do
+              row.each do |col|
+                mtd do
+                  append(col)
+                end
+              end
             end
           end
-        when Hash
-          case expression[:type]
-            when :operator
-              mo(expression[:c])
-            when :identifier
-              mi(expression[:c])
-            when :number
-              mn(expression[:c])
-            when :text
-              mtext(expression[:c])
-            when :paren
-              fenced(expression[:lparen], expression[:rparen]) do
-                append(expression[:e])
-              end
-            when :font
-              style = expression[:operator]
-              tag("mstyle", :mathvariant => style.to_s.gsub('_', '-')) do
-                append(expression[:s])
-              end
-            when :unary
-              identifier = expression[:identifier]
-              operator = expression[:operator]
-              if identifier
-                mrow do
-                  mi(identifier)
-                  append(expression[:s], :avoid_row => true)
-                end
-              else
-                tag("m#{operator}") do
-                  append(expression[:s])
-                end
-              end
-            when :binary
-              operator = expression[:operator]
-              tag("m#{operator}") do
-                append(expression[:s1])
-                append(expression[:s2])
-              end
-            when :ternary
-              operator = expression[:operator]
-              tag("m#{operator}") do
-                append(expression[:s1])
-                append(expression[:s2])
-                append(expression[:s3])
-              end
-            when :matrix
-              fenced(expression[:lparen], expression[:rparen]) do
-                mtable do
-                  expression[:rows].each do |row|
-                    mtr do
-                      row.each do |col|
-                        mtd do
-                          append(col)
-                        end
-                      end
-                    end
-                  end
-                end
-              end
-          end
+        end
+      end
+    end
+
+    def append_operator_unary(operator, expression)
+      mrow do
+        mo(operator)
+        append(expression, :avoid_row => true)
+      end
+    end
+
+    def append_identifier_unary(identifier, expression)
+      mrow do
+        mi(identifier)
+        append(expression, :avoid_row => true)
+      end
+    end
+
+    def append_paren(lparen, e, rparen, opts = {})
+      fenced(lparen, rparen) do
+        append(e)
+      end
+    end
+
+    def append_subsup(base, sub, sup)
+      if sub && sup
+        msubsup do
+          append(base)
+          append(sub)
+          append(sup)
+        end
+      elsif sub
+        msub do
+          append(base)
+          append(sub)
+        end
+      elsif sup
+        msup do
+          append(base)
+          append(sup)
+        end
+      else
+        append(base)
+      end
+    end
+
+    def append_underover(base, sub, sup)
+      if sub && sup
+        munderover do
+          append(base)
+          append(sub)
+          append(sup)
+        end
+      elsif sub
+        munder do
+          append(base)
+          append(sub)
+        end
+      elsif sup
+        mover do
+          append(base)
+          append(sup)
+        end
+      else
+        append(base)
       end
     end
 
@@ -94,7 +152,7 @@ module AsciiMath
       tag(meth, *args, &block)
     end
 
-    def fenced(lparen, rparen, &block)
+    def fenced(lparen, rparen)
       if lparen || rparen
         mfenced(:open => lparen || '', :close => rparen || '') do
           yield self
@@ -106,7 +164,7 @@ module AsciiMath
 
     def tag(tag, *args)
       attrs = args.last.is_a?(Hash) ? args.pop : {}
-      text = args.last.is_a?(String) ? args.pop : ''
+      text = args.last.is_a?(String) || args.last.is_a?(Symbol) ? args.pop.to_s : ''
 
       @mathml << '<' << @prefix << tag.to_s
 
@@ -146,7 +204,7 @@ module AsciiMath
 
   class Expression
     def to_mathml(prefix = "", attrs = {})
-      MathMLBuilder.new(prefix).append_expression(@parsed_expression, attrs).to_s
+      MathMLBuilder.new(prefix).append_expression(ast, attrs).to_s
     end
   end
 end
