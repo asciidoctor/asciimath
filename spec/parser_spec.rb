@@ -102,7 +102,7 @@ RSpec.shared_examples "AsciiMath Examples" do
           )
       ),
       :mathml => '<math><mi>x</mi><mo>=</mo><mfrac><mrow><mo>&#x2212;</mo><mi>b</mi><mo>&#xB1;</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mn>-4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>',
-      :latex => 'x = \\frac{- b \\pm \\sqrt{b^2 -4 a c}}{2 a}',
+      :latex => 'x = \\frac{- b \\pm \\sqrt{b^2 - 4 a c}}{2 a}',
   ))
 
   example('m = (y_2 - y_1)/(x_2 - x_1) = (Deltay)/(Deltax)', &should_generate(
@@ -167,7 +167,7 @@ RSpec.shared_examples "AsciiMath Examples" do
       ),
       :mathml => '<math><msubsup><mo>&#x222B;</mo><mi>a</mi><mi>b</mi></msubsup><mi>f</mi><mfenced open="(" close=")"><mi>x</mi></mfenced><mi>dx</mi><mo>=</mo><msubsup><mfenced open="[" close="]"><mrow><mi>F</mi><mfenced open="(" close=")"><mi>x</mi></mfenced></mrow></mfenced><mi>a</mi><mi>b</mi></msubsup><mo>=</mo><mi>F</mi><mfenced open="(" close=")"><mi>b</mi></mfenced><mo>&#x2212;</mo><mi>F</mi><mfenced open="(" close=")"><mi>a</mi></mfenced></math>',
       :html => '<span class="math-inline"><span class="math-row"><span class="math-operator">&#x222B;</span><span class="math-subsup"><span class="math-smaller"><span class="math-identifier">b</span></span><span class="math-smaller"><span class="math-identifier">a</span></span></span><span class="math-identifier">f</span><span class="math-row"><span class="math-brace">(</span><span class="math-row"><span class="math-identifier">x</span></span><span class="math-brace">)</span></span><span class="math-identifier">dx</span><span class="math-operator">=</span><span class="math-row"><span class="math-brace">[</span><span class="math-row"><span class="math-identifier">F</span><span class="math-row"><span class="math-brace">(</span><span class="math-row"><span class="math-identifier">x</span></span><span class="math-brace">)</span></span></span><span class="math-brace">]</span></span><span class="math-subsup"><span class="math-smaller"><span class="math-identifier">b</span></span><span class="math-smaller"><span class="math-identifier">a</span></span></span><span class="math-operator">=</span><span class="math-identifier">F</span><span class="math-row"><span class="math-brace">(</span><span class="math-row"><span class="math-identifier">b</span></span><span class="math-brace">)</span></span><span class="math-operator">&#x2212;</span><span class="math-identifier">F</span><span class="math-row"><span class="math-brace">(</span><span class="math-row"><span class="math-identifier">a</span></span><span class="math-brace">)</span></span></span></span>',
-      :latex => '\\int_a^b f \\left ( x \\right ) dx = \\left [ F \\left ( x \\right ) \\right ]_a^b = F \\left ( b \\right ) - F \\left ( a \\right )',
+      :latex => '\\int_a^b f \\left ( x \\right ) dx = {\\left [ F \\left ( x \\right ) \\right ]}_a^b = F \\left ( b \\right ) - F \\left ( a \\right )',
   ))
 
   example('int_a^b f(x) dx = f(c)(b - a)', &should_generate(
@@ -317,7 +317,7 @@ RSpec.shared_examples "AsciiMath Examples" do
                      ]),
       :mathml => '<math><mfenced open="(" close=")"><mtable><mtr><mtd><msub><mi>a</mi><mn>11</mn></msub></mtd><mtd><mo>&#x22EF;</mo></mtd><mtd><msub><mi>a</mi><mrow><mn>1</mn><mi>n</mi></mrow></msub></mtd></mtr><mtr><mtd><mo>&#x22EE;</mo></mtd><mtd><mo>&#x22F1;</mo></mtd><mtd><mo>&#x22EE;</mo></mtd></mtr><mtr><mtd><msub><mi>a</mi><mrow><mi>m</mi><mn>1</mn></mrow></msub></mtd><mtd><mo>&#x22EF;</mo></mtd><mtd><msub><mi>a</mi><mrow><mi>m</mi><mi>n</mi></mrow></msub></mtd></mtr></mtable></mfenced></math>',
       :html => '<span class="math-inline"><span class="math-row"><span class="math-row"><span class="math-brace" style="font-size: 300%;">(</span><span class="math-matrix" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);"><span class="math-row"><span class="math-identifier">a</span><span class="math-subsup"><span class="math-smaller">&#x200D;</span><span class="math-smaller"><span class="math-row"><span class="math-number">11</span></span></span></span></span><span class="math-row"><span class="math-operator">&#x22EF;</span></span><span class="math-row"><span class="math-identifier">a</span><span class="math-subsup"><span class="math-smaller">&#x200D;</span><span class="math-smaller"><span class="math-row"><span class="math-number">1</span><span class="math-identifier">n</span></span></span></span></span><span class="math-row"><span class="math-operator">&#x22EE;</span></span><span class="math-row"><span class="math-operator">&#x22F1;</span></span><span class="math-row"><span class="math-operator">&#x22EE;</span></span><span class="math-row"><span class="math-identifier">a</span><span class="math-subsup"><span class="math-smaller">&#x200D;</span><span class="math-smaller"><span class="math-row"><span class="math-identifier">m</span><span class="math-number">1</span></span></span></span></span><span class="math-row"><span class="math-operator">&#x22EF;</span></span><span class="math-row"><span class="math-identifier">a</span><span class="math-subsup"><span class="math-smaller">&#x200D;</span><span class="math-smaller"><span class="math-row"><span class="math-identifier">m</span><span class="math-identifier">n</span></span></span></span></span></span><span class="math-brace" style="font-size: 300%;">)</span></span></span></span>',
-      :latex => '\\left ( \\begin{matrix} a_{11} & \\cdots & a_{1 n} \\\\ \\vdots & \\ddots & \\vdots \\\\ a_{m 1} & \\cdots & a_{m n} \\end{matrix} \\right )',
+      :latex => '\\left ( \\begin{matrix} a_11 & \\cdots & a_{1 n} \\\\ \\vdots & \\ddots & \\vdots \\\\ a_{m 1} & \\cdots & a_{m n} \\end{matrix} \\right )',
   ))
 
   example('sum_(k=1)^n k = 1+2+ cdots +n=(n(n+1))/2', &should_generate(
@@ -399,7 +399,7 @@ RSpec.shared_examples "AsciiMath Examples" do
           )
       ),
       :mathml => '<math><mi>s</mi><msub><mo>&#x2032;</mo><mi>i</mi></msub><mo>=</mo><mfenced open="{" close=""><mtable><mtr><mtd><mrow><mo>&#x2212;</mo><mn>1</mn></mrow></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&gt;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr><mtr><mtd><mrow><mo>+</mo><mn>1</mn></mrow></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&#x2264;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr></mtable></mfenced></math>',
-      :latex => 's \'_i = \\left \\{ \\begin{matrix} - 1 & \\text{if} s_i > s_{i + 1} \\\\ + 1 & \\text{if} s_i \\leq s_{i + 1} \\end{matrix} \\right .',
+      :latex => 's \'_i = \\left \\{ \\begin{matrix} - 1 & \\text{if} s_i > s_{i + 1} \\\\ + 1 & \\text{if} s_i \\le s_{i + 1} \\end{matrix} \\right .',
   ))
 
   example("s'_i = {(, if s_i > s_(i + 1)),( + 1,):}", &should_generate(
@@ -476,7 +476,7 @@ RSpec.shared_examples "AsciiMath Examples" do
       :ast => subsup(unary(:norm, "a"), "c", "b"),
       :mathml => '<math><msubsup><mfenced open="&#x2225;" close="&#x2225;"><mi>a</mi></mfenced><mi>c</mi><mi>b</mi></msubsup></math>',
       :html => '<span class="math-inline"><span class="math-row"><span class="math-row"><span class="math-brace">&#x2225;</span><span class="math-identifier">a</span><span class="math-brace">&#x2225;</span></span><span class="math-subsup"><span class="math-smaller"><span class="math-identifier">b</span></span><span class="math-smaller"><span class="math-identifier">c</span></span></span></span></span>',
-      :latex => '\\left \\parallel a \\right \\parallel_c^b',
+      :latex => '{\\left \\lVert a \\right \\rVert}_c^b',
   ))
 
   example('overarc a_b^c', &should_generate(
@@ -527,6 +527,6 @@ describe "AsciiMath::HTMLBuilder", :variant => :html, :skip => "Temporarily disa
   include_examples "AsciiMath Examples", :html
 end
 
-describe "AsciiMath::LatexBuilder", :variant => :latex, :skip => "Temporarily disabled" do
+describe "AsciiMath::LatexBuilder", :variant => :latex do
   include_examples "AsciiMath Examples"
 end

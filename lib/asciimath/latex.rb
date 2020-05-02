@@ -17,6 +17,62 @@ module AsciiMath
 
     SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]]
 
+    SYMBOLS = {
+      :plus => ?+,
+      :minus => ?-,
+      :ast => ?*,
+      :slash => ?/,
+      :eq => ?=,
+      :ne => "\\neq",
+      :assign => "TODO",
+      :lt => ?<,
+      :gt => ?>,
+      :implies => "\\Rightarrow",
+      :iff => "\\Leftrightarrow",
+      :if => "\\text{if}",
+      :and => "\\text{and}",
+      :or => "\\text{or}",
+      :lparen => ?(,
+      :rparen => ?),
+      :lbracket => ?[,
+      :rbracket => ?],
+      :lbrace => "\\{",
+      :rbrace => "\\}",
+      :lvert => "\\lVert",
+      :rvert => "\\rVert",
+      :vbar => ?|,
+      nil => ?.,
+      :integral => "\\int",
+      :dx => "dx",
+      :dy => "dy",
+      :dz => "dz",
+      :dt => "dt",
+      :contourintegral => "\\oint",
+      :partial => "\\del",
+      :prime => ?',
+      :tilde => "TODO",
+      :nbsp => "\\;",
+      :quad => "\\;\\;",
+      :qquad => "\\;\\;\\;\\;",
+      :lceiling => "\\lceil",
+      :rceiling => "\\rceil",
+      :dstruck_captial_c => "\\mathbb{C}",
+      :dstruck_captial_n => "\\mathbb{N}",
+      :dstruck_captial_q => "\\mathbb{Q}",
+      :dstruck_captial_r => "\\mathbb{R}",
+      :dstruck_captial_z => "\\mathbb{Z}",
+      :f => "f",
+      :g => "g",
+      :to => "\\rightarrow",
+      :bold => "\\mathbf",
+      :double_struck => "\\mathbb",
+      :script => "\\mathscr",
+      :italic => "\\mathit",
+      :monospace => "\\mathtt",
+      :fraktur => "\\mathfrak",
+      :sans_serif => "\\mathsf"
+    }
+
     CONSTANTS = {
       ?α => "alpha",
       ?β => "beta",
@@ -205,56 +261,96 @@ module AsciiMath
             append(e)
             @latex << separator if i != len
           end
+        when String
+          append_escaped(expression)
+        when Symbol
+            @latex << (SYMBOLS[expression] || "\\#{expression.to_s}")
         when Hash
           case expression[:type]
-            when :operator
-              operation(expression[:c])
-            when :identifier
-              c = expression[:c]
-
-              if CONSTANTS.has_key? c
-                @latex << ?\\ << CONSTANTS[c]
-              else
-                append_escaped(c)
-              end
-            when :number
-              @latex << "#{expression[:c]}"
             when :text
               text do
                 append_escaped(expression[:c])
               end
+
             when :paren
               parens(expression[:lparen], expression[:rparen]) do
                 append(expression[:e], separator)
               end
-            when :font
-              font(expression[:operator]) do
-                append(expression[:s], separator)
+
+            when :subsup
+              sub = expression[:sub]
+              sup = expression[:sup]
+              e = expression[:e]
+
+              curly(e) do
+                append(e)
               end
+
+              if sub
+                @latex << "_"
+                curly(sub) do
+                  append(sub)
+                end
+              end
+
+              if sup
+                @latex << "^"
+                curly(sup) do
+                  append(sup)
+                end
+              end
+
             when :unary
-              identifier = expression[:identifier]
-              if identifier
-                if OPERATORS.has_key? identifier
-                  @latex << OPERATORS[identifier] << separator
-                  append(expression[:s])
-                else
-                  text do 
-                    @latex << identifier
-                  end
-                  
-                  @latex << separator
-                  append(expression[:s])
+              op = expression[:op]
+
+              case op
+              when :norm
+                parens(:lvert, :rvert) do
+                  append(expression[:e])
+                end
+              when Symbol
+                macro(op) do
+                  append(expression[:e])
+                end
+              when String
+                macro(op) do
+                  append(expression[:e])
                 end
               else
-                unary(expression[:operator], expression[:s])
+                raise nil
               end
+
             when :binary
-              binary(expression[:operator], expression[:s1], expression[:s2])
-            when :ternary
-              s1 = expression[:s1]
-              s2 = expression[:s2]
-              s3 = expression[:s3]
-              ternary(expression[:operator], s1, s2, s3)
+              op = expression[:op]
+
+              case op
+              when :root
+                macro("sqrt", expression[:e1]) do
+                  append(expression[:e2])
+                end
+              when Symbol
+                @latex << (SYMBOLS[op] || "\\#{op.to_s}")
+
+                curly do
+                  append(expression[:e1])
+                end
+
+                curly do
+                  append(expression[:e2])
+                end
+              when String
+                @latex << op
+
+                curly do
+                  append(expression[:e1])
+                end
+
+                curly do
+                  append(expression[:e2])
+                end
+              else
+                raise nil
+              end
             when :matrix
               rows = expression[:rows]
               len = rows.length - 1
@@ -273,179 +369,8 @@ module AsciiMath
       end
     end
 
-    def method_missing(meth, *args, &block)
-      macro(meth, *args, &block)
-    end
-
-    def parens(lparen, rparen, &block)
-      if lparen || rparen
-        @latex << "\\left " << PARENS[lparen] << " "
-        yield self
-        @latex << " \\right " << PARENS[rparen] 
-      else
-        yield self
-      end
-    end
-
-    def font(font, &block)
-      macro(FONTS[font], &block)
-    end
-
-    def operation(operator, *args)
-      if OPERATORS.has_key? operator
-        @latex << OPERATORS[operator]
-      else
-        @latex << operator
-      end
-
-      for arg in args do
-        @latex << "{"
-        append(arg)
-        @latex << "}"
-      end
-    end
-
-    def unary(operator, s1)
-      case operator
-      when :sqrt
-        sqrt do
-          append(s1)
-        end
-      else
-        macro(operator) do
-          append(s1)
-        end
-      end
-    end
-
-    def binary(operator, s1, s2)
-      case operator
-      when :sub
-        sub(s1, s2)
-      when :sup
-        sup(s1, s2)
-      when :frac
-        operation("\\frac", s1, s2)
-      when :root
-        sqrt(s1) do
-          append(s2)
-        end
-      when :over
-        if not s2.is_a?(Hash)
-          if s1.is_a?(Hash) and s1[:underover]
-            sub(s1, s2)
-          else
-            operation("\\overset", s1, s2)
-          end
-
-          return
-        end
-
-        case s2[:c]
-        when "^"
-          hat do
-            append(s1)
-          end
-        when "¯"
-          overline do
-            append(s1)
-          end
-        when "→"
-          vec do
-            append(s1)
-          end
-        when "."
-          dot do
-            append(s1)
-          end
-        when ".."
-          ddot do
-            append(s1)
-          end
-        when "⏞"
-          overbrace do
-            append(s1)
-          end
-        else
-          operation("\\overset", s1, s2)
-        end
-      when :under
-        if not s2.is_a?(Hash)
-          if s1.is_a?(Hash) and s1[:underover]
-            sub(s1, s2)
-          else
-            operation("\\underset", s2, s1)
-          end
-
-          return
-        end
-
-        case s2[:c]
-        when "_"
-          underline do
-            append(s1)
-          end
-        when "⏟"
-          underbrace do
-            append(s1)
-          end
-        else
-          operation("\\underset", s2, s1)
-        end
-      else
-        operation(operator, s1, s2)
-      end
-    end
-
-    def ternary(operator, s1, s2, s3)
-      case operator
-      when :subsup, :underover
-        @latex << "{" if s1.is_a?(Array)
-        append(s1)
-        @latex << "}" if s1.is_a?(Array)
-        
-        @latex << "_"
-        
-        @latex << "{" if s2.is_a?(Array)
-        append(s2)
-        @latex << "}" if s2.is_a?(Array)
-        
-        @latex << "^"
-        
-        @latex << "{" if s3.is_a?(Array)
-        append(s3)
-        @latex << "}" if s3.is_a?(Array)
-      else
-        operation(operator, s1, s2, s3)
-      end
-    end
-
-    def sub(s1, s2)
-      @latex << "{" if s1.is_a?(Array)
-      append(s1)
-      @latex << "}" if s1.is_a?(Array)
-      
-      @latex << "_"
-      
-      @latex << "{" if s2.is_a?(Array)
-      append(s2)
-      @latex << "}" if s2.is_a?(Array)
-    end
-
-    def sup(s1, s2)
-      @latex << "{" if s1.is_a?(Array)
-      append(s1)
-      @latex << "}" if s1.is_a?(Array)
-      
-      @latex << "^"
-      
-      @latex << "{" if s2.is_a?(Array)
-      append(s2)
-      @latex << "}" if s2.is_a?(Array)
-    end
-
     def macro(macro, *args)
-      @latex << "\\#{macro}"
+      @latex << (SYMBOLS[macro] || "\\#{macro.to_s}")
 
       if args.length != 0
         @latex << "["
@@ -453,13 +378,36 @@ module AsciiMath
         @latex << "]"
       end
 
-      @latex << "{"
-
       if block_given?
-        yield self if block_given?
+        curly do
+          yield self
+        end
       end
+    end
 
-      @latex << "}"
+    def method_missing(meth, *args, &block)
+      macro(meth, *args, &block)
+    end
+
+    def parens(lparen, rparen, &block)
+      if lparen || rparen
+        @latex << "\\left " << (SYMBOLS[lparen] || "\\#{lparen.to_s}") << " "
+        yield self
+        @latex << " \\right " << (SYMBOLS[rparen] || "\\#{rparen.to_s}")
+      else
+        yield self
+      end
+    end
+
+    def curly(x = true, &block)
+      case x
+      when Array, Hash, true
+        @latex << "{"
+        yield self
+        @latex << "}"
+      else
+        yield self
+      end
     end
 
     def append_escaped(text)
