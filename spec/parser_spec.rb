@@ -46,7 +46,8 @@ RSpec.shared_examples "AsciiMath Examples" do
           :exp,
           "j",
           sub(:vartheta, "0")
-      )
+      ),
+      :mathml => '<math><munder><mover><mi>A</mi><mo>^</mo></mover><mo>_</mo></munder><mo>=</mo><mover><mi>A</mi><mo>^</mo></mover><mi>exp</mi><mi>j</mi><msub><mi>&#x3D1;</mi><mn>0</mn></msub></math>'
   ))
 
   example('x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)', &should_generate(
@@ -101,7 +102,7 @@ RSpec.shared_examples "AsciiMath Examples" do
               seq("2", "a"),
           )
       ),
-      :mathml => '<math><mi>x</mi><mo>=</mo><mfrac><mrow><mo>&#x2212;</mo><mi>b</mi><mo>&#xB1;</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mn>-4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>',
+      :mathml => '<math><mi>x</mi><mo>=</mo><mfrac><mrow><mo>&#x2212;</mo><mi>b</mi><mo>&#xB1;</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>&#x2212;</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>',
       :latex => 'x = \\frac{- b \\pm \\sqrt{b^2 -4 a c}}{2 a}',
   ))
 
@@ -457,7 +458,7 @@ RSpec.shared_examples "AsciiMath Examples" do
           :sin,
           subsup("a", "c", "b")
       ),
-      :mathml => '<math><msubsup><mrow><mi>sin</mi><mi>a</mi></mrow><mi>c</mi><mi>b</mi></msubsup></math>',
+      :mathml => '<math><mi>sin</mi><msubsup><mi>a</mi><mi>c</mi><mi>b</mi></msubsup></math>',
       :html => '<span class="math-inline"><span class="math-row"><span class="math-row"><span class="math-identifier">sin</span><span class="math-identifier">a</span></span><span class="math-subsup"><span class="math-smaller"><span class="math-identifier">b</span></span><span class="math-smaller"><span class="math-identifier">c</span></span></span></span></span>',
       :latex => '\\sin a_c^b',
   ))
@@ -492,7 +493,7 @@ RSpec.shared_examples "AsciiMath Examples" do
 
   example('sin(a_c^b)', &should_generate(
       :ast => seq(:sin, paren(subsup("a", "c", "b"))),
-      :mathml => '<math><mrow><mi>sin</mi><mfenced open="(" close=")"><msubsup><mi>a</mi><mi>c</mi><mi>b</mi></msubsup></mfenced></mrow></math>',
+      :mathml => '<math><mi>sin</mi><mfenced open="(" close=")"><msubsup><mi>a</mi><mi>c</mi><mi>b</mi></msubsup></mfenced></math>',
       :latex => '\\sin \\left ( a_c^b \\right )',
   ))
 
@@ -519,7 +520,7 @@ describe "AsciiMath::Parser", :variant => :ast do
   include_examples "AsciiMath Examples"
 end
 
-describe "AsciiMath::MathMLBuilder", :variant => :mathml, :skip => "Temporarily disabled" do
+describe "AsciiMath::MathMLBuilder", :variant => :mathml do
   include_examples "AsciiMath Examples"
 end
 
