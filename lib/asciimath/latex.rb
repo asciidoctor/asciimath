@@ -109,7 +109,7 @@ module AsciiMath
             @latex << separator if i != len
           end
         when String
-          if expression.length > 1 and not expression.match(/^[1-9](\.[1-9]+)?/)
+          if expression.length > 1 and not expression.match(/^[0-9](\.[0-9]+)?/)
             text do
               append_escaped(expression)
             end
