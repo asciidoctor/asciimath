@@ -522,6 +522,7 @@ RSpec.shared_examples "AsciiMath Examples" do
           binary(:color, "blue", subsup("a", "b", "c"))
       ),
       :mathml => '<math><mstyle mathcolor="red"><mi>x</mi></mstyle><mstyle mathcolor="blue"><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup></mstyle></math>',
+      :latex => '{\\color{red} x} {\\color{blue} a_b^c}',
   ))
 
   example('{ x\ : \ x in A ^^ x in B }', &should_generate(
@@ -531,6 +532,7 @@ RSpec.shared_examples "AsciiMath Examples" do
           :rbrace
       ),
       :mathml => '<math><mfenced open="{" close="}"><mrow><mi>x</mi><mo>&#xA0;</mo><mi>:</mi><mo>&#xA0;</mo><mi>x</mi><mo>&#x2208;</mo><mi>A</mi><mo>&#x2227;</mo><mi>x</mi><mo>&#x2208;</mo><mi>B</mi></mrow></mfenced></math>',
+      :latex => '\\left \\{ x \\: : \\: x \\in A \\wedge x \\in B \\right \\}',
   ))
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
