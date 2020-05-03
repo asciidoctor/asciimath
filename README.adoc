@@ -105,14 +105,16 @@ There is currently no specific required font for this output, it simply selects 
 ## Notes on the LaTeX Output
 
 All LaTeX commands and environments used in the output are coverved by 
-https://ctan.org/pkg/amsmath[`amsmath`] and `amssymb`, with a couple of 
-exceptions:
+https://ctan.org/pkg/amsmath[`amsmath`] and `amssymb`, with a few exceptions:
 
+ * `\color`
  * `\mathscr`
  * `\twoheadrightarrowtail`
 
-Both this commands are supported by the https://ctan.org/pkg/stix[`stix`] 
-package.
+The `\color` command is supported by the 
+https://www.ctan.org/pkg/xcolor[`xcolor`] color, included in most LaTeX 
+distributions. The other commands are supported by the 
+https://ctan.org/pkg/stix[`stix`] package.
 
 ## Contributing
 
