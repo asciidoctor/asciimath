@@ -112,8 +112,8 @@ https://ctan.org/pkg/amsmath[`amsmath`] and `amssymb`, with a few exceptions:
  * `\twoheadrightarrowtail`
 
 The `\color` command is supported by the 
-https://www.ctan.org/pkg/xcolor[`xcolor`] color, included in most LaTeX 
-distributions. The other commands are supported by the 
+https://www.ctan.org/pkg/xcolor[`xcolor`] package, which is included in most 
+LaTeX distributions. The other commands are supported by the 
 https://ctan.org/pkg/stix[`stix`] package.
 
 ## Contributing
