@@ -5,6 +5,7 @@
 Enhancements::
 
   * Issue #16: add initial LaTeX output support (@GarkGarcia)
+  * Issue #26: avoid generating `<mfenced>` tags in MathML output
 
 Bug fixes::
 

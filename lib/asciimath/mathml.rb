@@ -166,8 +166,10 @@ module AsciiMath
 
     def fenced(lparen, rparen)
       if lparen || rparen
-        mfenced(:open => lparen || '', :close => rparen || '') do
+        mrow do
+          mo(lparen) if lparen
           yield self
+          mo(rparen) if rparen
         end
       else
         yield self
