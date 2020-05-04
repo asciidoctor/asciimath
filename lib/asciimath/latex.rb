@@ -143,7 +143,7 @@ module AsciiMath
                 curly(sub) do
                   append(sub)
                 end
-              end
+              end       
 
               if sup
                 @latex << "^"
@@ -281,26 +281,24 @@ module AsciiMath
       end
     end
 
-    def curly(x = true, &block)
-      case x
-      when Array, true
-        @latex << "{"
-        yield self
-        @latex << "}"
-
+    def curly(expression = nil, &block)
+      case expression
       when Hash
-        case x[:type]
-        when :symbol, :identifier, :text, :number
+        case expression[:type]
+        when :symbol, :text
           yield self
-        else
-          @latex << ?{
-          yield self
-          @latex << ?}
+          return
+        when :identifier, :number
+          if expression[:value].length <= 1
+            yield self
+            return
+          end
         end
-
-      else
-        yield self
       end
+
+      @latex << ?{
+      yield self
+      @latex << ?}
     end
 
     def append_escaped(text)
