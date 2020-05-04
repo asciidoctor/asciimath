@@ -514,6 +514,7 @@ RSpec.shared_examples "AsciiMath Examples" do
           subsup(unary(:cancel, "a"), "b", "c")
       ),
       :mathml => '<math><menclose notation="updiagonalstrike"><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup></menclose><msubsup><menclose notation="updiagonalstrike"><mi>a</mi></menclose><mi>b</mi><mi>c</mi></msubsup></math>',
+      :latex => '\\cancel{a_b^c} {\\cancel{a}}_b^c',
   ))
 
   example('color(red)(x) colortext(blue)(a_b^c)', &should_generate(
