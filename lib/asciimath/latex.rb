@@ -72,9 +72,7 @@ module AsciiMath
       :partial => "\\del",
       :prime => ?',
       :tilde => "\\~",
-      :nbsp => "\\;",
-      :quad => "\\;\\;",
-      :qquad => "\\;\\;\\;\\;",
+      :nbsp => "\\:",
       :lceiling => "\\lceil",
       :rceiling => "\\rceil",
       :dstruck_captial_c => "\\mathbb{C}",
@@ -198,6 +196,17 @@ module AsciiMath
                 macro("sqrt", expression[:e1]) do
                   append(expression[:e2])
                 end
+            
+              when :color
+                curly do
+                  color do
+                    @latex << expression[:e1][:value]
+                  end
+
+                  @latex << " "
+                  append(expression[:e2])
+                end
+
               when Symbol
                 @latex << symbol(op)
 
@@ -208,6 +217,7 @@ module AsciiMath
                 curly do
                   append(expression[:e2])
                 end
+              
               when String
                 @latex << op
 
@@ -218,9 +228,11 @@ module AsciiMath
                 curly do
                   append(expression[:e2])
                 end
+              
               else
                 raise "Unsupported binary operation"
               end
+            
             when :matrix
               rows = expression[:rows]
               len = rows.length - 1
