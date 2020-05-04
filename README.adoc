@@ -108,12 +108,15 @@ All LaTeX commands and environments used in the output are coverved by
 https://ctan.org/pkg/amsmath[`amsmath`] and `amssymb`, with a few exceptions:
 
  * `\color`
+ * `\cancel`
  * `\mathscr`
  * `\twoheadrightarrowtail`
 
 The `\color` command is supported by the 
 https://www.ctan.org/pkg/xcolor[`xcolor`] package, which is included in most 
-LaTeX distributions. The other commands are supported by the 
+LaTeX distributions. The `\cancel` command is supported by the 
+https://www.ctan.org/pkg/cancel[cancel] package, also included in most LaTeX 
+distributions. The other commands are supported by the 
 https://ctan.org/pkg/stix[`stix`] package.
 
 ## Contributing
