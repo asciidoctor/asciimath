@@ -24,11 +24,11 @@ module AsciiMath
     end
 
     def sub(e, sub)
-      Sub.new(e, sub)
+      SubSup.new(e, sub, nil)
     end
 
     def sup(e, sup)
-      Sup.new(e, sup)
+      SubSup.new(e, nil, sup)
     end
 
     def unary(operator, e)
@@ -83,8 +83,12 @@ module AsciiMath
         @children = []
       end
 
-      def children
-        children.dup
+      def [](*args)
+        @children[*args]
+      end
+
+      def length
+        @children.length
       end
 
       def each(&block)
@@ -120,8 +124,7 @@ module AsciiMath
       end
 
       def ==(o)
-        eq = o.class == self.class && o.child_nodes == child_nodes
-        eq
+        o.class == self.class && o.child_nodes == child_nodes
       end
     end
 
@@ -145,8 +148,7 @@ module AsciiMath
       end
 
       def ==(o)
-        eq = o.class == self.class && o.lparen == lparen && o.expression == expression && o.rparen == rparen
-        eq
+        o.class == self.class && o.lparen == lparen && o.expression == expression && o.rparen == rparen
       end
     end
 
@@ -170,8 +172,7 @@ module AsciiMath
       end
 
       def ==(o)
-        eq = o.class == self.class && o.lparen == lparen && o.expression == expression && o.rparen == rparen
-        eq
+        o.class == self.class && o.lparen == lparen && o.expression == expression && o.rparen == rparen
       end
     end
 
@@ -179,8 +180,8 @@ module AsciiMath
       def initialize(e, sub, sup)
         super()
         add(e)
-        add(sub)
-        add(sup)
+        add(sub || Empty.new)
+        add(sup || Empty.new)
       end
 
       def base_expression
@@ -188,70 +189,30 @@ module AsciiMath
       end
 
       def sub_expression
-        child_nodes[1]
+        child = child_nodes[1]
+        child.is_a?(Empty) ? nil : child
       end
 
       def sup_expression
-        child_nodes[2]
+        child = child_nodes[2]
+        child.is_a?(Empty) ? nil : child
       end
 
       def to_s
-        "#{base_expression}_#{sub_expression}^#{sup_expression}"
+        s = base_expression.to_s
+        sub = sub_expression
+        if sub
+          s << "_" << sub.to_s
+        end
+        sup = sup_expression
+        if sup
+          s << "^" << sup.to_s
+        end
+        s
       end
 
       def ==(o)
-        eq = o.class == self.class && o.base_expression == base_expression && o.sub_expression == sub_expression && o.sup_expression == sup_expression
-        eq
-      end
-    end
-
-    class Sub < InnerNode
-      def initialize(e, sub)
-        super()
-        add(e)
-        add(sub)
-      end
-
-      def base_expression
-        child_nodes[0]
-      end
-
-      def sub_expression
-        child_nodes[1]
-      end
-
-      def to_s
-        "#{base_expression}_#{sub_expression}"
-      end
-
-      def ==(o)
-        eq = o.class == self.class && o.base_expression == base_expression && o.sub_expression == sub_expression
-        eq
-      end
-    end
-
-    class Sup < InnerNode
-      def initialize(e, sup)
-        super()
-        add(e)
-        add(sup)
-      end
-
-      def base_expression
-        child_nodes[0]
-      end
-
-      def sup_expression
-        child_nodes[1]
-      end
-
-      def to_s
-        "#{base_expression}^#{sup_expression}"
-      end
-
-      def ==(o)
-        eq = o.class == self.class && o.base_expression == base_expression && o.sup_expression == sup_expression
-        eq
+        o.class == self.class && o.base_expression == base_expression && o.sub_expression == sub_expression && o.sup_expression == sup_expression
       end
     end
 
@@ -275,8 +236,7 @@ module AsciiMath
       end
 
       def ==(o)
-        eq = o.class == self.class && o.operator == operator && o.operand == operand
-        eq
+        o.class == self.class && o.operator == operator && o.operand == operand
       end
     end
 
@@ -306,8 +266,7 @@ module AsciiMath
       end
 
       def ==(o)
-        eq = o.class == self.class && o.operator == operator && o.operand1 == operand1 && o.operand2 == operand2
-        eq
+        o.class == self.class && o.operator == operator && o.operand1 == operand1 && o.operand2 == operand2
       end
     end
 
@@ -337,8 +296,7 @@ module AsciiMath
       end
 
       def ==(o)
-        eq = o.class == self.class && o.operator == operator && o.operand1 == operand1 && o.operand2 == operand2
-        eq
+        o.class == self.class && o.operator == operator && o.operand1 == operand1 && o.operand2 == operand2
       end
     end
 
@@ -355,8 +313,7 @@ module AsciiMath
       end
 
       def ==(o)
-        eq = o.class == self.class && o.value == value
-        eq
+        o.class == self.class && o.value == value
       end
     end
 
@@ -385,8 +342,7 @@ module AsciiMath
       end
 
       def ==(o)
-        eq = super && o.text == text
-        eq
+        super && o.text == text
       end
 
       def to_s
@@ -414,8 +370,6 @@ module AsciiMath
         @rparen = rparen
         rows.map { |row| MatrixRow.new(row) }.each { |row_seq| add(row_seq) }
       end
-
-      alias_method :rows, :children
 
       def to_s
         begin

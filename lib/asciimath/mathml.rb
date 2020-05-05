@@ -75,7 +75,7 @@ module AsciiMath
     end
 
     def append_color(color, e)
-      tag("mstyle", :mathcolor => color[:value]) do
+      tag("mstyle", :mathcolor => color) do
         append(e)
       end
     end
