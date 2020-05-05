@@ -165,7 +165,12 @@ module AsciiMath
           s.chop!
         end
         @string.pos = position + bytesize(s)
-        @symbols[s] || {:value => s, :type => :identifier}
+        symbol = @symbols[s]
+        if symbol
+          symbol.merge({:text => s})
+        else
+          {:value => s, :type => :identifier}
+        end
       end
     end
 
@@ -192,6 +197,287 @@ module AsciiMath
   end
 
   class Parser
+    SYMBOLS = begin
+                b = AsciiMath::SymbolTableBuilder.new
+
+                # Operation symbols
+                b.add('+', :plus, :symbol)
+                b.add('-', :minus, :symbol)
+                b.add('*', 'cdot', :cdot, :symbol)
+                b.add('**', 'ast', :ast, :symbol)
+                b.add('***', 'star', :star, :symbol)
+                b.add('//', :slash, :symbol)
+                b.add('\\\\', 'backslash', :backslash, :symbol)
+                b.add('setminus', :setminus, :symbol)
+                b.add('xx', 'times', :times, :symbol)
+                b.add('|><', 'ltimes', :ltimes, :symbol)
+                b.add('><|', 'rtimes', :rtimes, :symbol)
+                b.add('|><|', 'bowtie', :bowtie, :symbol)
+                b.add('-:', 'div', 'divide', :div, :symbol)
+                b.add('@', 'circ', :circ, :symbol)
+                b.add('o+', 'oplus', :oplus, :symbol)
+                b.add('ox', 'otimes', :otimes, :symbol)
+                b.add('o.', 'odot', :odot, :symbol)
+                b.add('sum', :sum, :symbol)
+                b.add('prod', :prod, :symbol)
+                b.add('^^', 'wedge', :wedge, :symbol)
+                b.add('^^^', 'bigwedge', :bigwedge, :symbol)
+                b.add('vv', 'vee', :vee, :symbol)
+                b.add('vvv', 'bigvee', :bigvee, :symbol)
+                b.add('nn', 'cap', :cap, :symbol)
+                b.add('nnn', 'bigcap', :bigcap, :symbol)
+                b.add('uu', 'cup', :cup, :symbol)
+                b.add('uuu', 'bigcup', :bigcup, :symbol)
+
+                # Relation symbols
+                b.add('=', :eq, :symbol)
+                b.add('!=', 'ne', :ne, :symbol)
+                b.add(':=', :assign, :symbol)
+                b.add('<', 'lt', :lt, :symbol)
+                b.add('>', 'gt', :gt, :symbol)
+                b.add('<=', 'le', :le, :symbol)
+                b.add('>=', 'ge', :ge, :symbol)
+                b.add('-<', '-lt', 'prec', :prec, :symbol)
+                b.add('>-', 'succ', :succ, :symbol)
+                b.add('-<=', 'preceq', :preceq, :symbol)
+                b.add('>-=', 'succeq', :succeq, :symbol)
+                b.add('in', :in, :symbol)
+                b.add('!in', 'notin', :notin, :symbol)
+                b.add('sub', 'subset', :subset, :symbol)
+                b.add('sup', 'supset', :supset, :symbol)
+                b.add('sube', 'subseteq', :subseteq, :symbol)
+                b.add('supe', 'supseteq', :supseteq, :symbol)
+                b.add('-=', 'equiv', :equiv, :symbol)
+                b.add('~=', 'cong', :cong, :symbol)
+                b.add('~~', 'approx', :approx, :symbol)
+                b.add('prop', 'propto', :propto, :symbol)
+
+                # Logical symbols
+                b.add('and', :and, :symbol)
+                b.add('or', :or, :symbol)
+                b.add('not', 'neg', :not, :symbol)
+                b.add('=>', 'implies', :implies, :symbol)
+                b.add('if', :if, :symbol)
+                b.add('<=>', 'iff', :iff, :symbol)
+                b.add('AA', 'forall', :forall, :symbol)
+                b.add('EE', 'exists', :exists, :symbol)
+                b.add('_|_', 'bot', :bot, :symbol)
+                b.add('TT', 'top', :top, :symbol)
+                b.add('|--', 'vdash', :vdash, :symbol)
+                b.add('|==', 'models', :models, :symbol)
+
+                # Grouping brackets
+                b.add('(', 'left(', :lparen, :lparen)
+                b.add(')', 'right)', :rparen, :rparen)
+                b.add('[', 'left[', :lbracket, :lparen)
+                b.add(']', 'right]', :rbracket, :rparen)
+                b.add('{', :lbrace, :lparen)
+                b.add('}', :rbrace, :rparen)
+                b.add('|', :vbar, :lrparen)
+                b.add(':|:', :vbar, :symbol)
+                b.add('|:', :vbar, :lparen)
+                b.add(':|', :vbar, :rparen)
+                # b.add('||', '||', :lrparen)
+                b.add('(:', '<<', 'langle', :langle, :lparen)
+                b.add(':)', '>>', 'rangle', :rangle, :rparen)
+                b.add('{:', nil, :lparen)
+                b.add(':}', nil, :rparen)
+
+                # Miscellaneous symbols
+                b.add('int', :integral, :symbol)
+                b.add('dx', :dx, :symbol)
+                b.add('dy', :dy, :symbol)
+                b.add('dz', :dz, :symbol)
+                b.add('dt', :dt, :symbol)
+                b.add('oint', :contourintegral, :symbol)
+                b.add('del', 'partial', :partial, :symbol)
+                b.add('grad', 'nabla', :nabla, :symbol)
+                b.add('+-', 'pm', :pm, :symbol)
+                b.add('O/', 'emptyset', :emptyset, :symbol)
+                b.add('oo', 'infty', :infty, :symbol)
+                b.add('aleph', :aleph, :symbol)
+                b.add('...', 'ldots', :ellipsis, :symbol)
+                b.add(':.', 'therefore', :therefore, :symbol)
+                b.add(':\'', 'because', :because, :symbol)
+                b.add('/_', 'angle', :angle, :symbol)
+                b.add('/_\\', 'triangle', :triangle, :symbol)
+                b.add('\'', 'prime', :prime, :symbol)
+                b.add('tilde', :tilde, :unary)
+                b.add('\\ ', :nbsp, :symbol)
+                b.add('frown', :frown, :symbol)
+                b.add('quad', :quad, :symbol)
+                b.add('qquad', :qquad, :symbol)
+                b.add('cdots', :cdots, :symbol)
+                b.add('vdots', :vdots, :symbol)
+                b.add('ddots', :ddots, :symbol)
+                b.add('diamond', :diamond, :symbol)
+                b.add('square', :square, :symbol)
+                b.add('|__', 'lfloor', :lfloor, :symbol)
+                b.add('__|', 'rfloor', :rfloor, :symbol)
+                b.add('|~', 'lceiling', :lceiling, :symbol)
+                b.add('~|', 'rceiling', :rceiling, :symbol)
+                b.add('CC', :dstruck_captial_c, :symbol)
+                b.add('NN', :dstruck_captial_n, :symbol)
+                b.add('QQ', :dstruck_captial_q, :symbol)
+                b.add('RR', :dstruck_captial_r, :symbol)
+                b.add('ZZ', :dstruck_captial_z, :symbol)
+                b.add('f', :f, :symbol)
+                b.add('g', :g, :symbol)
+
+
+                # Standard functions
+                b.add('lim', :lim, :symbol)
+                b.add('Lim', :Lim, :symbol)
+                b.add('min', :min, :symbol)
+                b.add('max', :max, :symbol)
+                b.add('sin', :sin, :symbol)
+                b.add('Sin', :Sin, :symbol)
+                b.add('cos', :cos, :symbol)
+                b.add('Cos', :Cos, :symbol)
+                b.add('tan', :tan, :symbol)
+                b.add('Tan', :Tan, :symbol)
+                b.add('sinh', :sinh, :symbol)
+                b.add('Sinh', :Sinh, :symbol)
+                b.add('cosh', :cosh, :symbol)
+                b.add('Cosh', :Cosh, :symbol)
+                b.add('tanh', :tanh, :symbol)
+                b.add('Tanh', :Tanh, :symbol)
+                b.add('cot', :cot, :symbol)
+                b.add('Cot', :Cot, :symbol)
+                b.add('sec', :sec, :symbol)
+                b.add('Sec', :Sec, :symbol)
+                b.add('csc', :csc, :symbol)
+                b.add('Csc', :Csc, :symbol)
+                b.add('arcsin', :arcsin, :symbol)
+                b.add('arccos', :arccos, :symbol)
+                b.add('arctan', :arctan, :symbol)
+                b.add('coth', :coth, :symbol)
+                b.add('sech', :sech, :symbol)
+                b.add('csch', :csch, :symbol)
+                b.add('exp', :exp, :symbol)
+                b.add('abs', :abs, :unary)
+                b.add('Abs', :abs, :unary)
+                b.add('norm', :norm, :unary)
+                b.add('floor', :floor, :unary)
+                b.add('ceil', :ceil, :unary)
+                b.add('log', :log, :symbol)
+                b.add('Log', :Log, :symbol)
+                b.add('ln', :ln, :symbol)
+                b.add('Ln', :Ln, :symbol)
+                b.add('det', :det, :symbol)
+                b.add('dim', :dim, :symbol)
+                b.add('mod', :mod, :symbol)
+                b.add('gcd', :gcd, :symbol)
+                b.add('lcm', :lcm, :symbol)
+                b.add('lub', :lub, :symbol)
+                b.add('glb', :glb, :symbol)
+
+                # Arrows
+                b.add('uarr', 'uparrow', :uparrow, :symbol)
+                b.add('darr', 'downarrow', :downarrow, :symbol)
+                b.add('rarr', 'rightarrow', :rightarrow, :symbol)
+                b.add('->', 'to', :to, :symbol)
+                b.add('>->', 'rightarrowtail', :rightarrowtail, :symbol)
+                b.add('->>', 'twoheadrightarrow', :twoheadrightarrow, :symbol)
+                b.add('>->>', 'twoheadrightarrowtail', :twoheadrightarrowtail, :symbol)
+                b.add('|->', 'mapsto', :mapsto, :symbol)
+                b.add('larr', 'leftarrow', :leftarrow, :symbol)
+                b.add('harr', 'leftrightarrow', :leftrightarrow, :symbol)
+                b.add('rArr', 'Rightarrow', :Rightarrow, :symbol)
+                b.add('lArr', 'Leftarrow', :Leftarrow, :symbol)
+                b.add('hArr', 'Leftrightarrow', :Leftrightarrow, :symbol)
+
+                # Other
+                b.add('sqrt', :sqrt, :unary)
+                b.add('root', :root, :binary)
+                b.add('frac', :frac, :binary)
+                b.add('/', :frac, :infix)
+                b.add('stackrel', :stackrel, :binary)
+                b.add('overset', :overset, :binary)
+                b.add('underset', :underset, :binary)
+                b.add('color', :color, :binary)
+                b.add('_', :sub, :infix)
+                b.add('^', :sup, :infix)
+                b.add('hat', :hat, :unary)
+                b.add('bar', :overline, :unary)
+                b.add('vec', :vec, :unary)
+                b.add('dot', :dot, :unary)
+                b.add('ddot', :ddot, :unary)
+                b.add('overarc', 'overparen', :overarc, :unary)
+                b.add('ul', 'underline', :underline, :unary)
+                b.add('ubrace', 'underbrace', :underbrace, :unary)
+                b.add('obrace', 'overbrace', :overbrace, :unary)
+                b.add('cancel', :cancel, :unary)
+                b.add('bb', :bold, :unary)
+                b.add('bbb', :double_struck, :unary)
+                b.add('ii', :italic, :unary)
+                b.add('bii', :bold_italic, :unary)
+                b.add('cc', :script, :unary)
+                b.add('bcc', :bold_script, :unary)
+                b.add('tt', :monospace, :unary)
+                b.add('fr', :fraktur, :unary)
+                b.add('bfr', :bold_fraktur, :unary)
+                b.add('sf', :sans_serif, :unary)
+                b.add('bsf', :bold_sans_serif, :unary)
+                b.add('sfi', :sans_serif_italic, :unary)
+                b.add('sfbi', :sans_serif_bold_italic, :unary)
+
+                # Greek letters
+                b.add('alpha', :alpha, :symbol)
+                b.add('Alpha', :Alpha, :symbol)
+                b.add('beta', :beta, :symbol)
+                b.add('Beta', :Beta, :symbol)
+                b.add('gamma', :gamma, :symbol)
+                b.add('Gamma', :Gamma, :symbol)
+                b.add('delta', :delta, :symbol)
+                b.add('Delta', :Delta, :symbol)
+                b.add('epsi', 'epsilon', :epsilon, :symbol)
+                b.add('Epsilon', :Epsilon, :symbol)
+                b.add('varepsilon', :varepsilon, :symbol)
+                b.add('zeta', :zeta, :symbol)
+                b.add('Zeta', :Zeta, :symbol)
+                b.add('eta', :eta, :symbol)
+                b.add('Eta', :Eta, :symbol)
+                b.add('theta', :theta, :symbol)
+                b.add('Theta', :Theta, :symbol)
+                b.add('vartheta', :vartheta, :symbol)
+                b.add('iota', :iota, :symbol)
+                b.add('Iota', :Iota, :symbol)
+                b.add('kappa', :kappa, :symbol)
+                b.add('Kappa', :Kappa, :symbol)
+                b.add('lambda', :lambda, :symbol)
+                b.add('Lambda', :Lambda, :symbol)
+                b.add('mu', :mu, :symbol)
+                b.add('Mu', :Mu, :symbol)
+                b.add('nu', :nu, :symbol)
+                b.add('Nu', :Nu, :symbol)
+                b.add('xi', :xi, :symbol)
+                b.add('Xi', :Xi, :symbol)
+                b.add('omicron', :omicron, :symbol)
+                b.add('Omicron', :Omicron, :symbol)
+                b.add('pi', :pi, :symbol)
+                b.add('Pi', :Pi, :symbol)
+                b.add('rho', :rho, :symbol)
+                b.add('Rho', :Rho, :symbol)
+                b.add('sigma', :sigma, :symbol)
+                b.add('Sigma', :Sigma, :symbol)
+                b.add('tau', :tau, :symbol)
+                b.add('Tau', :Tau, :symbol)
+                b.add('upsilon', :upsilon, :symbol)
+                b.add('Upsilon', :Upsilon, :symbol)
+                b.add('phi', :phi, :symbol)
+                b.add('Phi', :Phi, :symbol)
+                b.add('varphi', :varphi, :symbol)
+                b.add('chi', :chi, :symbol)
+                b.add('Chi', :Chi, :symbol)
+                b.add('psi', :psi, :symbol)
+                b.add('Psi', :Psi, :symbol)
+                b.add('omega', :omega, :symbol)
+                b.add('Omega', :Omega, :symbol)
+
+                b.build
+              end
+
     def parse(input)
       Expression.new(
           input,
@@ -203,287 +489,6 @@ module AsciiMath
 
     include AsciiMath::AST
 
-    SYMBOLS = begin
-      b = AsciiMath::SymbolTableBuilder.new
-
-      # Operation symbols
-      b.add('+', :plus, :symbol)
-      b.add('-', :minus, :symbol)
-      b.add('*', 'cdot', :cdot, :symbol)
-      b.add('**', 'ast', :ast, :symbol)
-      b.add('***', 'star', :star, :symbol)
-      b.add('//', :slash, :symbol)
-      b.add('\\\\', 'backslash', :backslash, :symbol)
-      b.add('setminus', :setminus, :symbol)
-      b.add('xx', 'times', :times, :symbol)
-      b.add('|><', 'ltimes', :ltimes, :symbol)
-      b.add('><|', 'rtimes', :rtimes, :symbol)
-      b.add('|><|', 'bowtie', :bowtie, :symbol)
-      b.add('-:', 'div', 'divide', :div, :symbol)
-      b.add('@', 'circ', :circ, :symbol)
-      b.add('o+', 'oplus', :oplus, :symbol)
-      b.add('ox', 'otimes', :otimes, :symbol)
-      b.add('o.', 'odot', :odot, :symbol)
-      b.add('sum', :sum, :symbol)
-      b.add('prod', :prod, :symbol)
-      b.add('^^', 'wedge', :wedge, :symbol)
-      b.add('^^^', 'bigwedge', :bigwedge, :symbol)
-      b.add('vv', 'vee', :vee, :symbol)
-      b.add('vvv', 'bigvee', :bigvee, :symbol)
-      b.add('nn', 'cap', :cap, :symbol)
-      b.add('nnn', 'bigcap', :bigcap, :symbol)
-      b.add('uu', 'cup', :cup, :symbol)
-      b.add('uuu', 'bigcup', :bigcup, :symbol)
-
-      # Relation symbols
-      b.add('=', :eq, :symbol)
-      b.add('!=', 'ne', :ne, :symbol)
-      b.add(':=', :assign, :symbol)
-      b.add('<', 'lt', :lt, :symbol)
-      b.add('>', 'gt', :gt, :symbol)
-      b.add('<=', 'le', :le, :symbol)
-      b.add('>=', 'ge', :ge, :symbol)
-      b.add('-<', '-lt', 'prec', :prec, :symbol)
-      b.add('>-', 'succ', :succ, :symbol)
-      b.add('-<=', 'preceq', :preceq, :symbol)
-      b.add('>-=', 'succeq', :succeq, :symbol)
-      b.add('in', :in, :symbol)
-      b.add('!in', 'notin', :notin, :symbol)
-      b.add('sub', 'subset', :subset, :symbol)
-      b.add('sup', 'supset', :supset, :symbol)
-      b.add('sube', 'subseteq', :subseteq, :symbol)
-      b.add('supe', 'supseteq', :supseteq, :symbol)
-      b.add('-=', 'equiv', :equiv, :symbol)
-      b.add('~=', 'cong', :cong, :symbol)
-      b.add('~~', 'approx', :approx, :symbol)
-      b.add('prop', 'propto', :propto, :symbol)
-
-      # Logical symbols
-      b.add('and', :and, :symbol)
-      b.add('or', :or, :symbol)
-      b.add('not', 'neg', :not, :symbol)
-      b.add('=>', 'implies', :implies, :symbol)
-      b.add('if', :if, :symbol)
-      b.add('<=>', 'iff', :iff, :symbol)
-      b.add('AA', 'forall', :forall, :symbol)
-      b.add('EE', 'exists', :exists, :symbol)
-      b.add('_|_', 'bot', :bot, :symbol)
-      b.add('TT', 'top', :top, :symbol)
-      b.add('|--', 'vdash', :vdash, :symbol)
-      b.add('|==', 'models', :models, :symbol)
-
-      # Grouping brackets
-      b.add('(', 'left(', :lparen, :lparen)
-      b.add(')', 'right)', :rparen, :rparen)
-      b.add('[', 'left[', :lbracket, :lparen)
-      b.add(']', 'right]', :rbracket, :rparen)
-      b.add('{', :lbrace, :lparen)
-      b.add('}', :rbrace, :rparen)
-      b.add('|', :vbar, :lrparen)
-      b.add(':|:', :vbar, :symbol)
-      b.add('|:', :vbar, :lparen)
-      b.add(':|', :vbar, :rparen)
-      # b.add('||', '||', :lrparen)
-      b.add('(:', '<<', 'langle', :langle, :lparen)
-      b.add(':)', '>>', 'rangle', :rangle, :rparen)
-      b.add('{:', nil, :lparen)
-      b.add(':}', nil, :rparen)
-
-      # Miscellaneous symbols
-      b.add('int', :integral, :symbol)
-      b.add('dx', :dx, :symbol)
-      b.add('dy', :dy, :symbol)
-      b.add('dz', :dz, :symbol)
-      b.add('dt', :dt, :symbol)
-      b.add('oint', :contourintegral, :symbol)
-      b.add('del', 'partial', :partial, :symbol)
-      b.add('grad', 'nabla', :nabla, :symbol)
-      b.add('+-', 'pm', :pm, :symbol)
-      b.add('O/', 'emptyset', :emptyset, :symbol)
-      b.add('oo', 'infty', :infty, :symbol)
-      b.add('aleph', :aleph, :symbol)
-      b.add('...', 'ldots', :ellipsis, :symbol)
-      b.add(':.', 'therefore', :therefore, :symbol)
-      b.add(':\'', 'because', :because, :symbol)
-      b.add('/_', 'angle', :angle, :symbol)
-      b.add('/_\\', 'triangle', :triangle, :symbol)
-      b.add('\'', 'prime', :prime, :symbol)
-      b.add('tilde', :tilde, :unary)
-      b.add('\\ ', :nbsp, :symbol)
-      b.add('frown', :frown, :symbol)
-      b.add('quad', :quad, :symbol)
-      b.add('qquad', :qquad, :symbol)
-      b.add('cdots', :cdots, :symbol)
-      b.add('vdots', :vdots, :symbol)
-      b.add('ddots', :ddots, :symbol)
-      b.add('diamond', :diamond, :symbol)
-      b.add('square', :square, :symbol)
-      b.add('|__', 'lfloor', :lfloor, :symbol)
-      b.add('__|', 'rfloor', :rfloor, :symbol)
-      b.add('|~', 'lceiling', :lceiling, :symbol)
-      b.add('~|', 'rceiling', :rceiling, :symbol)
-      b.add('CC', :dstruck_captial_c, :symbol)
-      b.add('NN', :dstruck_captial_n, :symbol)
-      b.add('QQ', :dstruck_captial_q, :symbol)
-      b.add('RR', :dstruck_captial_r, :symbol)
-      b.add('ZZ', :dstruck_captial_z, :symbol)
-      b.add('f', :f, :symbol)
-      b.add('g', :g, :symbol)
-
-
-      # Standard functions
-      b.add('lim', :lim, :symbol)
-      b.add('Lim', :Lim, :symbol)
-      b.add('min', :min, :symbol)
-      b.add('max', :max, :symbol)
-      b.add('sin', :sin, :symbol)
-      b.add('Sin', :Sin, :symbol)
-      b.add('cos', :cos, :symbol)
-      b.add('Cos', :Cos, :symbol)
-      b.add('tan', :tan, :symbol)
-      b.add('Tan', :Tan, :symbol)
-      b.add('sinh', :sinh, :symbol)
-      b.add('Sinh', :Sinh, :symbol)
-      b.add('cosh', :cosh, :symbol)
-      b.add('Cosh', :Cosh, :symbol)
-      b.add('tanh', :tanh, :symbol)
-      b.add('Tanh', :Tanh, :symbol)
-      b.add('cot', :cot, :symbol)
-      b.add('Cot', :Cot, :symbol)
-      b.add('sec', :sec, :symbol)
-      b.add('Sec', :Sec, :symbol)
-      b.add('csc', :csc, :symbol)
-      b.add('Csc', :Csc, :symbol)
-      b.add('arcsin', :arcsin, :symbol)
-      b.add('arccos', :arccos, :symbol)
-      b.add('arctan', :arctan, :symbol)
-      b.add('coth', :coth, :symbol)
-      b.add('sech', :sech, :symbol)
-      b.add('csch', :csch, :symbol)
-      b.add('exp', :exp, :symbol)
-      b.add('abs', :abs, :unary)
-      b.add('Abs', :abs, :unary)
-      b.add('norm', :norm, :unary)
-      b.add('floor', :floor, :unary)
-      b.add('ceil', :ceil, :unary)
-      b.add('log', :log, :symbol)
-      b.add('Log', :Log, :symbol)
-      b.add('ln', :ln, :symbol)
-      b.add('Ln', :Ln, :symbol)
-      b.add('det', :det, :symbol)
-      b.add('dim', :dim, :symbol)
-      b.add('mod', :mod, :symbol)
-      b.add('gcd', :gcd, :symbol)
-      b.add('lcm', :lcm, :symbol)
-      b.add('lub', :lub, :symbol)
-      b.add('glb', :glb, :symbol)
-
-      # Arrows
-      b.add('uarr', 'uparrow', :uparrow, :symbol)
-      b.add('darr', 'downarrow', :downarrow, :symbol)
-      b.add('rarr', 'rightarrow', :rightarrow, :symbol)
-      b.add('->', 'to', :to, :symbol)
-      b.add('>->', 'rightarrowtail', :rightarrowtail, :symbol)
-      b.add('->>', 'twoheadrightarrow', :twoheadrightarrow, :symbol)
-      b.add('>->>', 'twoheadrightarrowtail', :twoheadrightarrowtail, :symbol)
-      b.add('|->', 'mapsto', :mapsto, :symbol)
-      b.add('larr', 'leftarrow', :leftarrow, :symbol)
-      b.add('harr', 'leftrightarrow', :leftrightarrow, :symbol)
-      b.add('rArr', 'Rightarrow', :Rightarrow, :symbol)
-      b.add('lArr', 'Leftarrow', :Leftarrow, :symbol)
-      b.add('hArr', 'Leftrightarrow', :Leftrightarrow, :symbol)
-
-      # Other
-      b.add('sqrt', :sqrt, :unary)
-      b.add('root', :root, :binary)
-      b.add('frac', :frac, :binary)
-      b.add('/', :frac, :infix)
-      b.add('stackrel', :stackrel, :binary)
-      b.add('overset', :overset, :binary)
-      b.add('underset', :underset, :binary)
-      b.add('color', :color, :binary)
-      b.add('_', :sub, :infix)
-      b.add('^', :sup, :infix)
-      b.add('hat', :hat, :unary)
-      b.add('bar', :overline, :unary)
-      b.add('vec', :vec, :unary)
-      b.add('dot', :dot, :unary)
-      b.add('ddot', :ddot, :unary)
-      b.add('overarc', 'overparen', :overarc, :unary)
-      b.add('ul', 'underline', :underline, :unary)
-      b.add('ubrace', 'underbrace', :underbrace, :unary)
-      b.add('obrace', 'overbrace', :overbrace, :unary)
-      b.add('cancel', :cancel, :unary)
-      b.add('bb', :bold, :unary)
-      b.add('bbb', :double_struck, :unary)
-      b.add('ii', :italic, :unary)
-      b.add('bii', :bold_italic, :unary)
-      b.add('cc', :script, :unary)
-      b.add('bcc', :bold_script, :unary)
-      b.add('tt', :monospace, :unary)
-      b.add('fr', :fraktur, :unary)
-      b.add('bfr', :bold_fraktur, :unary)
-      b.add('sf', :sans_serif, :unary)
-      b.add('bsf', :bold_sans_serif, :unary)
-      b.add('sfi', :sans_serif_italic, :unary)
-      b.add('sfbi', :sans_serif_bold_italic, :unary)
-
-      # Greek letters
-      b.add('alpha', :alpha, :symbol)
-      b.add('Alpha', :Alpha, :symbol)
-      b.add('beta', :beta, :symbol)
-      b.add('Beta', :Beta, :symbol)
-      b.add('gamma', :gamma, :symbol)
-      b.add('Gamma', :Gamma, :symbol)
-      b.add('delta', :delta, :symbol)
-      b.add('Delta', :Delta, :symbol)
-      b.add('epsi', 'epsilon', :epsilon, :symbol)
-      b.add('Epsilon', :Epsilon, :symbol)
-      b.add('varepsilon', :varepsilon, :symbol)
-      b.add('zeta', :zeta, :symbol)
-      b.add('Zeta', :Zeta, :symbol)
-      b.add('eta', :eta, :symbol)
-      b.add('Eta', :Eta, :symbol)
-      b.add('theta', :theta, :symbol)
-      b.add('Theta', :Theta, :symbol)
-      b.add('vartheta', :vartheta, :symbol)
-      b.add('iota', :iota, :symbol)
-      b.add('Iota', :Iota, :symbol)
-      b.add('kappa', :kappa, :symbol)
-      b.add('Kappa', :Kappa, :symbol)
-      b.add('lambda', :lambda, :symbol)
-      b.add('Lambda', :Lambda, :symbol)
-      b.add('mu', :mu, :symbol)
-      b.add('Mu', :Mu, :symbol)
-      b.add('nu', :nu, :symbol)
-      b.add('Nu', :Nu, :symbol)
-      b.add('xi', :xi, :symbol)
-      b.add('Xi', :Xi, :symbol)
-      b.add('omicron', :omicron, :symbol)
-      b.add('Omicron', :Omicron, :symbol)
-      b.add('pi', :pi, :symbol)
-      b.add('Pi', :Pi, :symbol)
-      b.add('rho', :rho, :symbol)
-      b.add('Rho', :Rho, :symbol)
-      b.add('sigma', :sigma, :symbol)
-      b.add('Sigma', :Sigma, :symbol)
-      b.add('tau', :tau, :symbol)
-      b.add('Tau', :Tau, :symbol)
-      b.add('upsilon', :upsilon, :symbol)
-      b.add('Upsilon', :Upsilon, :symbol)
-      b.add('phi', :phi, :symbol)
-      b.add('Phi', :Phi, :symbol)
-      b.add('varphi', :varphi, :symbol)
-      b.add('chi', :chi, :symbol)
-      b.add('Chi', :Chi, :symbol)
-      b.add('psi', :psi, :symbol)
-      b.add('Psi', :Psi, :symbol)
-      b.add('omega', :omega, :symbol)
-      b.add('Omega', :Omega, :symbol)
-
-      b.build
-    end
-
     def parse_expression(tok, depth)
       e = []
 
@@ -493,7 +498,7 @@ module AsciiMath
         if t1[:type] == :infix && t1[:value] == :frac
           s2 = parse_intermediate_expression(tok, depth)
           if s2
-            e << binary(symbol(:frac), unwrap_paren(s1), unwrap_paren(s2))
+            e << infix(unwrap_paren(s1), symbol(:frac, t1[:text]), unwrap_paren(s2))
           else
             e << s1
           end
@@ -540,8 +545,12 @@ module AsciiMath
           tok.push_back(t1)
       end
 
-      if sub || sup
+      if sub && sup
         subsup(s, unwrap_paren(sub), unwrap_paren(sup))
+      elsif sub
+        sub(s, unwrap_paren(sub))
+      elsif sup
+        sup(s, unwrap_paren(sup))
       else
         s
       end
@@ -555,7 +564,7 @@ module AsciiMath
           t2 = tok.next_token
           case t2[:type]
             when :rparen, :lrparen
-              paren(t1[:value], nil, t2[:value])
+              paren(token_to_symbol(t1), nil, token_to_symbol(t2))
             else
               tok.push_back(t2)
 
@@ -564,10 +573,10 @@ module AsciiMath
               t2 = tok.next_token
               case t2[:type]
                 when :rparen, :lrparen
-                  convert_to_matrix(paren(t1[:value], e, t2[:value]))
+                  convert_to_matrix(paren(token_to_symbol(t1), e, token_to_symbol(t2)))
                 else
                   tok.push_back(t2)
-                  paren(t1[:value], e, nil)
+                  paren(token_to_symbol(t1), e, nil)
               end
           end
         when :rparen
@@ -575,20 +584,16 @@ module AsciiMath
             tok.push_back(t1)
             nil
           else
-            symbol(t1[:value])
+            token_to_symbol(t1)
           end
         when :unary
           s = unwrap_paren(parse_simple_expression(tok, depth))
-          unary(symbol(t1[:value]), s)
+          unary(token_to_symbol(t1), s)
         when :binary
           s1 = unwrap_paren(parse_simple_expression(tok, depth))
           s2 = unwrap_paren(parse_simple_expression(tok, depth))
 
-          if t1[:value] == :color
-            s1 = text(to_color_string(s1))
-          end
-
-          binary(symbol(t1[:value]), s1, s2)
+          binary(token_to_symbol(t1), s1, s2)
         when :eof
           nil
         when :number
@@ -598,8 +603,12 @@ module AsciiMath
         when :identifier
           identifier(t1[:value])
         else
-          symbol(t1[:value])
+          token_to_symbol(t1)
       end
+    end
+
+    def token_to_symbol(t1)
+      symbol(t1[:value], t1[:text])
     end
 
     def to_color_string(expression)
@@ -620,28 +629,34 @@ module AsciiMath
       end
     end
 
-    def unwrap_paren(expression)
-      if expression.is_a?(Hash) && expression[:type] == :paren
-        expression[:e]
+    def unwrap_paren(node)
+      if node.is_a?(::AsciiMath::AST::Paren)
+        group(node.lparen, node.expression, node.rparen)
       else
-        expression
+        node
       end
     end
 
-    def convert_to_matrix(expression)
-      return expression unless expression.is_a?(Hash) && expression[:type] == :paren && expression[:e].is_a?(Array)
+    def convert_to_matrix(node)
+      return node unless node.is_a?(::AsciiMath::AST::Paren) && node.expression.is_a?(::AsciiMath::AST::Sequence)
 
-      rows, separators = expression[:e].partition.with_index { |obj, i| i.even? }
-      return expression unless rows.length > 1 &&
+      rows, separators = node.expression.partition.with_index { |obj, i| i.even? }
+      return node unless rows.length > 1 &&
           rows.length > separators.length &&
           separators.all? { |item| is_matrix_separator(item) } &&
-          (rows.all? { |item| item.is_a?(Hash) && item[:type] == :paren && item[:lparen] == :lparen && item[:rparen] == :rparen } ||
-              rows.all? { |item| item.is_a?(Hash) && item[:type] == :paren && item[:lparen] == :lbracket && item[:rparen] == :rbracket })
+          (rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lparen, '(') && item.rparen == symbol(:rparen, ')') } ||
+              rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lbracket, '[') && item.rparen == symbol(:rbracket, ']') })
 
       rows = rows.map do |row|
         chunks = []
         current_chunk = []
-        row[:e].each do |item|
+
+        row_content = row.expression
+        unless row_content.is_a?(::AsciiMath::AST::Sequence)
+          row_content = expression(row_content)
+        end
+
+        row_content.each do |item|
           if is_matrix_separator(item)
             chunks << current_chunk
             current_chunk = []
@@ -652,39 +667,16 @@ module AsciiMath
 
         chunks << current_chunk
 
-        chunks.map { |c| c.length == 1 ? c[0] : c }.to_a
+        chunks.map { |c| c.length == 1 ? c[0] : expression(*c) }.to_a
       end
 
-      return expression unless rows.all? { |row| row.length == rows[0].length }
+      return node unless rows.all? { |row| row.length == rows[0].length }
 
-      matrix(expression[:lparen], rows, expression[:rparen])
+      matrix(node.lparen, rows, node.rparen)
     end
 
-    def is_matrix_separator(item)
-      item.is_a?(Hash) && item[:type] == :identifier && item[:value] == ','
-    end
-
-    def matrix?(expression)
-      return false unless expression.is_a?(Hash) && expression[:type] == :paren
-
-      rows, separators = expression[:e].partition.with_index { |obj, i| i.even? }
-
-      rows.length > 1 &&
-          rows.length > separators.length &&
-          separators.all?(&method(:is_matrix_separator)) &&
-          (rows.all? { |item| item[:type] == :paren && item[:lparen] == '(' && item[:rparen] == ')' } ||
-              rows.all? { |item| item[:type] == :paren && item[:lparen] == '[' && item[:rparen] == ']' }) &&
-          rows.all? { |item| item[:e].length == rows[0][:e].length } &&
-          rows.all? { |item| matrix_cols?(item[:e]) }
-    end
-
-    def matrix_cols?(expression)
-      return false unless expression.is_a?(Array)
-
-      cols, separators = expression.partition.with_index { |obj, i| i.even? }
-
-      cols.all? { |item| item[:type] != nil || item[:c] != ',' } &&
-          separators.all?(&method(:is_col_separator))
+    def is_matrix_separator(node)
+      node.is_a?(Identifier) && node.value == ','
     end
   end
 

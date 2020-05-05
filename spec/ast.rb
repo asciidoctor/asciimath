@@ -6,16 +6,21 @@ module AsciiMath
       include ::AsciiMath::AST
     end.new
 
+    def grseq(*expressions)
+      group(seq(*expressions))
+    end
+
     def seq(*expressions)
-      ACTUAL_AST.expression(expressions.map { |e| to_ast(e) })
+      mapped = expressions.map { |e| to_ast(e) }
+      ACTUAL_AST.expression(*mapped)
     end
 
     def paren(*args)
       case args.length
         when 1
-          lparen = :lparen
+          lparen = symbol('(')
           e = to_ast(args[0])
-          rparen = :rparen
+          rparen = symbol(')')
         when 3
           lparen = args[0]
           e = to_ast(args[1])
@@ -24,6 +29,22 @@ module AsciiMath
           raise "Incorrect argument count #{args.length}"
       end
       ACTUAL_AST.paren(lparen, e, rparen)
+    end
+
+    def group(*args)
+      case args.length
+        when 1
+          lparen = symbol('(')
+          e = to_ast(args[0])
+          rparen = symbol(')')
+        when 3
+          lparen = args[0]
+          e = to_ast(args[1])
+          rparen = args[2]
+        else
+          raise "Incorrect argument count #{args.length}"
+      end
+      ACTUAL_AST.group(lparen, e, rparen)
     end
 
     def subsup(e, sub, sup)
@@ -46,6 +67,10 @@ module AsciiMath
       ACTUAL_AST.binary(to_ast(operator), to_ast(e1), to_ast(e2))
     end
 
+    def infix(e1, operator, e2)
+      ACTUAL_AST.infix(to_ast(e1), to_ast(operator), to_ast(e2))
+    end
+
     def text(value)
       ACTUAL_AST.text(value)
     end
@@ -58,16 +83,21 @@ module AsciiMath
       ACTUAL_AST.number(value)
     end
 
-    def symbol(value)
-      ACTUAL_AST.symbol(value)
+    def symbol(text)
+      symbol = ::AsciiMath::Parser::SYMBOLS[text]
+      if symbol
+        ACTUAL_AST.symbol(symbol[:value], text)
+      else
+        nil
+      end
     end
 
     def matrix(*args)
       case args.length
         when 1
-          lparen = :lparen
+          lparen = symbol('(')
           rows = args[0]
-          rparen = :rparen
+          rparen = symbol(')')
         when 3
           lparen = args[0]
           rows = args[1]
@@ -88,7 +118,10 @@ module AsciiMath
     def to_ast(e)
       case e
         when String
-          if e =~ /[0-9]+(.[0-9]+)?/
+          s = symbol(e)
+          if s
+            s
+          elsif e =~ /[0-9]+(.[0-9]+)?/
             number(e)
           elsif e.length > 1
             text(e)
@@ -96,7 +129,7 @@ module AsciiMath
             identifier(e)
           end
         when Symbol
-          symbol(e)
+          raise "Not supported"
         when Array
           seq(*e)
         else
