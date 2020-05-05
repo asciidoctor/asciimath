@@ -362,25 +362,16 @@ module AsciiMath
 
       def initialize(lparen, rows, rparen)
         super()
-        if lparen == :lbrace
-          puts
-        end
-
         @lparen = lparen
         @rparen = rparen
         rows.map { |row| MatrixRow.new(row) }.each { |row_seq| add(row_seq) }
       end
 
       def to_s
-        begin
-          s = ""
-          s << (lparen.nil? ? '{:' : lparen.text)
-          s << child_nodes.map { |node| node.to_s }.join(",")
-          s << (rparen.nil? ? ':}' : rparen.text)
-        rescue NoMethodError => e
-          raise e
-        end
-
+        s = ""
+        s << (lparen.nil? ? '{:' : lparen.text)
+        s << child_nodes.map { |node| node.to_s }.join(",")
+        s << (rparen.nil? ? ':}' : rparen.text)
       end
 
       def ==(o)
