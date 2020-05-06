@@ -3,8 +3,6 @@ require_relative 'markup'
 
 module AsciiMath
   class LatexBuilder
-    include ::AsciiMath::MarkupBuilder
-
     def initialize
       @latex = ''
     end
@@ -201,7 +199,7 @@ module AsciiMath
           when :color
             curly do
               color do
-                append_color_text(@latex, expression.operand1)
+                ::AsciiMath::MarkupBuilder.append_color_text(@latex, expression.operand1)
               end
 
               @latex << " "

@@ -611,24 +611,6 @@ module AsciiMath
       symbol(t1[:value], t1[:text])
     end
 
-    def to_color_string(expression)
-      case expression
-        when Symbol
-          expression.to_s
-        when Array
-          expression.inject("") { |memo, e| memo << to_color_string(e) }
-        when Hash
-          case expression[:type]
-            when :unary, :binary, :subsup
-              ''
-            else
-              expression[:value].to_s
-          end
-        else
-          ''
-      end
-    end
-
     def unwrap_paren(node)
       if node.is_a?(::AsciiMath::AST::Paren)
         group(node.lparen, node.expression, node.rparen)

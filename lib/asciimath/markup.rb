@@ -458,43 +458,5 @@ module AsciiMath
         nil
       end
     end
-
-    def to_color_text(color)
-      s = ""
-      append_color_text(s, color)
-      s
-    end
-
-    def append_color_text(s, node)
-      case node
-        when ::AsciiMath::AST::Sequence
-          node.each { |n| append_color_text(s, n) }
-        when ::AsciiMath::AST::Number, ::AsciiMath::AST::Identifier, ::AsciiMath::AST::Text
-          s << node.value
-        when ::AsciiMath::AST::Symbol
-          s << node.text
-        when ::AsciiMath::AST::Group
-          append_color_text(s, node.expression)
-        when ::AsciiMath::AST::Paren
-          append_color_text(s, node.lparen)
-          append_color_text(s, node.expression)
-          append_color_text(s, node.rparen)
-        when ::AsciiMath::AST::SubSup
-          append_color_text(s, node.base_expression)
-          append_color_text(s, node.operator)
-          append_color_text(s, node.operand2)
-        when ::AsciiMath::AST::UnaryOp
-          append_color_text(s, node.operator)
-          append_color_text(s, node.operand)
-        when ::AsciiMath::AST::BinaryOp
-          append_color_text(s, node.operator)
-          append_color_text(s, node.operand1)
-          append_color_text(s, node.operand2)
-        when ::AsciiMath::AST::InfixOp
-          append_color_text(s, node.operand1)
-          append_color_text(s, node.operator)
-          append_color_text(s, node.operand2)
-      end
-    end
   end
 end
