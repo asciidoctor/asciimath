@@ -218,6 +218,10 @@ module AsciiMath
 
   class Expression
     def to_mathml(prefix = "", attrs = {})
+      if prefix.is_a? Hash
+        attrs = prefix
+        prefix = ""
+      end
       MathMLBuilder.new(prefix).append_expression(ast, attrs).to_s
     end
   end
