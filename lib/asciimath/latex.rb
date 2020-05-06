@@ -20,59 +20,59 @@ module AsciiMath
     SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]].map(&:ord)
 
     SYMBOLS = {
-      '+' => ?+,
-      '-' => ?-,
-      '*' => ?*,
-      'slash' => ?/,
-      'eq' => ?=,
-      'ne' => "\\neq",
-      'assign' => ":=",
-      'lt' => ?<,
-      'gt' => ?>,
-      'sub' => "\\text{–}",
-      'sup' => "\\text{^}",
-      'implies' => "\\Rightarrow",
-      'iff' => "\\Leftrightarrow",
-      'if' => "\\text{if}",
-      'and' => "\\text{and}",
-      'or' => "\\text{or}",
-      'lparen' => ?(,
-      'rparen' => ?),
-      'lbracket' => ?[,
-      'rbracket' => ?],
-      'lbrace' => "\\{",
-      'rbrace' => "\\}",
-      'lvert' => "\\lVert",
-      'rvert' => "\\rVert",
-      'vbar' => ?|,
+      :plus => ?+,
+      :minus => ?-,
+      :ast => ?*,
+      :slash => ?/,
+      :eq => ?=,
+      :ne => "\\neq",
+      :assign => ":=",
+      :lt => ?<,
+      :gt => ?>,
+      :sub => "\\text{–}",
+      :sup => "\\text{^}",
+      :implies => "\\Rightarrow",
+      :iff => "\\Leftrightarrow",
+      :if => "\\text{if}",
+      :and => "\\text{and}",
+      :or => "\\text{or}",
+      :lparen => ?(,
+      :rparen => ?),
+      :lbracket => ?[,
+      :rbracket => ?],
+      :lbrace => "\\{",
+      :rbrace => "\\}",
+      :lvert => "\\lVert",
+      :rvert => "\\rVert",
+      :vbar => ?|,
       nil => ?.,
-      'integral' => "\\int",
-      'dx' => "dx",
-      'dy' => "dy",
-      'dz' => "dz",
-      'dt' => "dt",
-      'contourintegral' => "\\oint",
-      'Lim' => "\\text{Lim}",
-      'Sin' => "\\text{Sin}",
-      'Cos' => "\\text{Cos}",
-      'Tan' => "\\text{Tan}",
-      'Sinh' => "\\text{Sinh}",
-      'Cosh' => "\\text{Cosh}",
-      'Tanh' => "\\text{Tanh}",
-      'Cot' => "\\text{Cot}",
-      'Sec' => "\\text{Sec}",
-      'csc' => "\\text{csc}",
-      'Csc' => "\\text{Csc}",
-      'sech' => "\\text{sech}",
-      'csch' => "\\text{csch}",
-      'Abs' => "\\text{Abs}",
-      'Log' => "\\text{Log}",
-      'Ln' => "\\text{Ln}",
-      'lcm' => "\\text{lcm}",
-      'lub' => "\\text{lub}",
-      'glb' => "\\text{glb}",
-      'partial' => "\\del",
-      'prime' => ?',
+      :integral => "\\int",
+      :dx => "dx",
+      :dy => "dy",
+      :dz => "dz",
+      :dt => "dt",
+      :contourintegral => "\\oint",
+      :Lim => "\\text{Lim}",
+      :Sin => "\\text{Sin}",
+      :Cos => "\\text{Cos}",
+      :Tan => "\\text{Tan}",
+      :Sinh => "\\text{Sinh}",
+      :Cosh => "\\text{Cosh}",
+      :Tanh => "\\text{Tanh}",
+      :Cot => "\\text{Cot}",
+      :Sec => "\\text{Sec}",
+      :csc => "\\text{csc}",
+      :Csc => "\\text{Csc}",
+      :sech => "\\text{sech}",
+      :csch => "\\text{csch}",
+      :Abs => "\\text{Abs}",
+      :Log => "\\text{Log}",
+      :Ln => "\\text{Ln}",
+      :lcm => "\\text{lcm}",
+      :lub => "\\text{lub}",
+      :glb => "\\text{glb}",
+      :partial => "\\del",
+      :prime => ?',
       :tilde => "\\~",
       :nbsp => "\\:",
       :lceiling => "\\lceil",
@@ -102,16 +102,17 @@ module AsciiMath
 
     def append(expression, separator = " ")
       case expression
-        when AsciiMath::AST::Sequence
-          len = expression.length - 1
+        when AsciiMath::AST::Sequence, AsciiMath::AST::MatrixRow 
+          c = expression.length
 
-          expression.each_with_index do |e, i|
+          expression.each do |e|
+            c -= 1
             append(e)
-            @latex << separator if i != len
+            @latex << separator if c > 0
           end
 
         when AsciiMath::AST::Symbol
-          @latex << symbol(expression.text)
+          @latex << symbol(expression.value)
 
         when AsciiMath::AST::Identifier
           append_escaped(expression.value)
@@ -125,7 +126,7 @@ module AsciiMath
           @latex << expression.value
 
         when AsciiMath::AST::Paren
-          parens(expression.lparen, expression.rparen) do
+          parens(expression.lparen.value, expression.rparen.value) do
             append(expression.expression)
           end
 
@@ -156,7 +157,7 @@ module AsciiMath
           end
 
         when AsciiMath::AST::UnaryOp
-          op = expression.operator.text
+          op = expression.operator.value
 
           case op
           when :norm
@@ -173,7 +174,7 @@ module AsciiMath
             end
           when :overarc
             overset do
-              append(AsciiMath::AST::symbol('frown'))
+              @latex << "\\frown"
             end
             
             curly do
@@ -186,7 +187,7 @@ module AsciiMath
           end
 
         when AsciiMath::AST::BinaryOp, AsciiMath::AST::InfixOp
-          op = expression.operator.text
+          op = expression.operator.value
 
           case op
           when :root
@@ -219,12 +220,14 @@ module AsciiMath
         when AsciiMath::AST::Matrix
           len = expression.length - 1
           
-          parens(expression.lparen, expression.rparen) do
+          parens(expression.lparen.value, expression.rparen.value) do
+            c = expression.length
             @latex << "\\begin{matrix} "
 
-            expression.each_with_index do |row, i|
+            expression.each do |row|
+              c -= 1
               append(row, " & ")
-              @latex << " \\\\ " if i != len
+              @latex << " \\\\ " if c > 0
             end
 
             @latex << " \\end{matrix}"
@@ -289,7 +292,7 @@ module AsciiMath
     end
 
     def symbol(s)
-        SYMBOLS[s] || "\\#{s.to_s}"
+      SYMBOLS[s] || "\\#{s.to_s}"
     end
   end
 
