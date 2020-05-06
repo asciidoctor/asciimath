@@ -1,3 +1,4 @@
+require_relative 'ast'
 require_relative 'symbol_table'
 
 module AsciiMath
@@ -280,93 +281,97 @@ module AsciiMath
                 b.build
               end
 
-    def append(expression, opts = {})
+    def append(node, opts = {})
       row_mode = opts[:row] || :avoid
       if row_mode == :force
-        case expression
-          when Array
-            append_row(expression)
+        case node
+          when ::AsciiMath::AST::Sequence
+            append_row(node)
           else
-            append_row([expression])
+            append_row([node])
         end
         return
       end
 
-      case expression
-        when Array
-          if (expression.length <= 1 && row_mode == :avoid) || row_mode == :omit
-            expression.each { |e| append(e) }
+      case node
+        when ::AsciiMath::AST::Sequence
+          if (node.length <= 1 && row_mode == :avoid) || row_mode == :omit
+            node.each { |e| append(e) }
           else
-            append_row(expression)
+            append_row(node)
           end
-        when Hash
-          case expression[:type]
-            when :text
-              append_text(expression[:value])
-            when :number
-              append_number(expression[:value])
-            when :identifier
-              append_identifier(expression[:value])
-            when :symbol
-              if (symbol = resolve_symbol(expression))
-                case symbol[:type]
-                  when :operator, :accent, :lparen, :rparen, :lrparen
-                    append_operator(symbol[:value])
-                  else
-                    append_identifier(symbol[:value])
-                end
+        when ::AsciiMath::AST::Group
+          append(node.expression)
+        when ::AsciiMath::AST::Text
+          append_text(node.value)
+        when ::AsciiMath::AST::Number
+          append_number(node.value)
+        when ::AsciiMath::AST::Identifier
+          append_identifier(node.value)
+        when ::AsciiMath::AST::Symbol
+          if (symbol = resolve_symbol(node))
+            case symbol[:type]
+              when :operator, :accent, :lparen, :rparen, :lrparen
+                append_operator(symbol[:value])
               else
-                append_identifier(expression[:value])
-              end
-            when :paren
-              append_paren(resolve_paren(expression[:lparen]), expression[:e], resolve_paren(expression[:rparen]), opts)
-            when :subsup
-              if (resolve_symbol(expression[:e]) || {})[:underover]
-                append_underover(expression[:e], expression[:sub], expression[:sup])
-              else
-                append_subsup(expression[:e], expression[:sub], expression[:sup])
-              end
-            when :unary
-              if (symbol = resolve_symbol(expression[:op]))
-                case symbol[:type]
-                  when :identifier
-                    append_identifier_unary(symbol[:value], expression[:e])
-                  when :operator
-                    append_operator_unary(symbol[:value], expression[:e])
-                  when :wrap
-                    append_paren(resolve_paren(symbol[:lparen]), expression[:e], resolve_paren(symbol[:rparen]), opts)
-                  when :accent
-                    if symbol[:position] == :over
-                      append_underover(expression[:e], nil, expression[:op])
-                    else
-                      append_underover(expression[:e], expression[:op], nil)
-                    end
-                  when :font
-                    append_font(symbol[:value], expression[:e])
-                  when :cancel
-                    append_cancel(expression[:e])
-                  when :sqrt
-                    append_sqrt(expression[:e])
-                end
-              end
-            when :binary
-              if (symbol = resolve_symbol(expression[:op]))
-                case symbol[:type]
-                  when :over
-                    append_underover(expression[:e2], nil, expression[:e1])
-                  when :under
-                    append_underover(expression[:e2], expression[:e1], nil)
-                  when :frac
-                    append_fraction(expression[:e1], expression[:e2])
-                  when :root
-                    append_root(expression[:e2], expression[:e1])
-                  when :color
-                    append_color(expression[:e1], expression[:e2])
-                end
-              end
-            when :matrix
-              append_matrix(resolve_paren(expression[:lparen]), expression[:rows], resolve_paren(expression[:rparen]))
+                append_identifier(symbol[:value])
+            end
+          else
+            append_identifier(node[:value])
           end
+        when ::AsciiMath::AST::Paren
+          append_paren(resolve_paren(node.lparen), node.expression, resolve_paren(node.rparen), opts)
+        when ::AsciiMath::AST::SubSup
+          if (resolve_symbol(node.base_expression) || {})[:underover]
+            append_underover(node.base_expression, node.sub_expression, node.sup_expression)
+          else
+            append_subsup(node.base_expression, node.sub_expression, node.sup_expression)
+          end
+        when ::AsciiMath::AST::UnaryOp
+          if (symbol = resolve_symbol(node.operator))
+            case symbol[:type]
+              when :identifier
+                append_identifier_unary(symbol[:value], node.operand)
+              when :operator
+                append_operator_unary(symbol[:value], node.operand)
+              when :wrap
+                append_paren(resolve_paren(symbol[:lparen]), node.operand, resolve_paren(symbol[:rparen]), opts)
+              when :accent
+                if symbol[:position] == :over
+                  append_underover(node.operand, nil, node.operator)
+                else
+                  append_underover(node.operand, node.operator, nil)
+                end
+              when :font
+                append_font(symbol[:value], node.operand)
+              when :cancel
+                append_cancel(node.operand)
+              when :sqrt
+                append_sqrt(node.operand)
+            end
+          end
+        when ::AsciiMath::AST::BinaryOp
+          if (symbol = resolve_symbol(node.operator))
+            case symbol[:type]
+              when :over
+                append_underover(node.operand2, nil, node.operand1)
+              when :under
+                append_underover(node.operand2, node.operand1, nil)
+              when :root
+                append_root(node.operand2, node.operand1)
+              when :color
+                append_color(to_color_text(node.operand1), node.operand2)
+            end
+          end
+        when ::AsciiMath::AST::InfixOp
+          if (symbol = resolve_symbol(node.operator))
+            case symbol[:type]
+              when :frac
+                append_fraction(node.operand1, node.operand2)
+            end
+          end
+        when ::AsciiMath::AST::Matrix
+          append_matrix(resolve_paren(node.lparen), node, resolve_paren(node.rparen))
       end
     end
 
@@ -440,19 +445,66 @@ module AsciiMath
 
     def resolve_paren(paren_symbol)
       if paren_symbol.nil?
-        nil
-      elsif (resolved = SYMBOLS[paren_symbol])
+        return nil
+      end
+
+      case paren_symbol
+        when ::AsciiMath::AST::Symbol
+          paren_value = paren_symbol.value
+        else
+          paren_value = paren_symbol
+      end
+
+      if (resolved = SYMBOLS[paren_value])
         resolved[:value]
       else
-        paren_symbol
+        paren_value
       end
     end
 
     def resolve_symbol(node)
-      if node[:type] == :symbol
-        SYMBOLS[node[:value]]
+      if node.is_a?(::AsciiMath::AST::Symbol)
+        SYMBOLS[node.value]
       else
         nil
+      end
+    end
+
+    def to_color_text(color)
+      s = ""
+      MarkupBuilder.append_color_text(s, color)
+      s
+    end
+
+    def self.append_color_text(s, node)
+      case node
+        when ::AsciiMath::AST::Sequence
+          node.each { |n| append_color_text(s, n) }
+        when ::AsciiMath::AST::Number, ::AsciiMath::AST::Identifier, ::AsciiMath::AST::Text
+          s << node.value
+        when ::AsciiMath::AST::Symbol
+          s << node.text
+        when ::AsciiMath::AST::Group
+          append_color_text(s, node.expression)
+        when ::AsciiMath::AST::Paren
+          append_color_text(s, node.lparen)
+          append_color_text(s, node.expression)
+          append_color_text(s, node.rparen)
+        when ::AsciiMath::AST::SubSup
+          append_color_text(s, node.base_expression)
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand2)
+        when ::AsciiMath::AST::UnaryOp
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand)
+        when ::AsciiMath::AST::BinaryOp
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand1)
+          append_color_text(s, node.operand2)
+        when ::AsciiMath::AST::InfixOp
+          append_color_text(s, node.operand1)
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand2)
       end
     end
   end
