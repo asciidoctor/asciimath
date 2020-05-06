@@ -1,3 +1,5 @@
+require_relative 'ast'
+
 module AsciiMath
   class LatexBuilder
     def initialize
@@ -18,59 +20,59 @@ module AsciiMath
     SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]].map(&:ord)
 
     SYMBOLS = {
-      :plus => ?+,
-      :minus => ?-,
-      :ast => ?*,
-      :slash => ?/,
-      :eq => ?=,
-      :ne => "\\neq",
-      :assign => ":=",
-      :lt => ?<,
-      :gt => ?>,
-      :sub => "\\text{–}",
-      :sup => "\\text{^}",
-      :implies => "\\Rightarrow",
-      :iff => "\\Leftrightarrow",
-      :if => "\\text{if}",
-      :and => "\\text{and}",
-      :or => "\\text{or}",
-      :lparen => ?(,
-      :rparen => ?),
-      :lbracket => ?[,
-      :rbracket => ?],
-      :lbrace => "\\{",
-      :rbrace => "\\}",
-      :lvert => "\\lVert",
-      :rvert => "\\rVert",
-      :vbar => ?|,
+      '+' => ?+,
+      '-' => ?-,
+      '*' => ?*,
+      'slash' => ?/,
+      'eq' => ?=,
+      'ne' => "\\neq",
+      'assign' => ":=",
+      'lt' => ?<,
+      'gt' => ?>,
+      'sub' => "\\text{–}",
+      'sup' => "\\text{^}",
+      'implies' => "\\Rightarrow",
+      'iff' => "\\Leftrightarrow",
+      'if' => "\\text{if}",
+      'and' => "\\text{and}",
+      'or' => "\\text{or}",
+      'lparen' => ?(,
+      'rparen' => ?),
+      'lbracket' => ?[,
+      'rbracket' => ?],
+      'lbrace' => "\\{",
+      'rbrace' => "\\}",
+      'lvert' => "\\lVert",
+      'rvert' => "\\rVert",
+      'vbar' => ?|,
       nil => ?.,
-      :integral => "\\int",
-      :dx => "dx",
-      :dy => "dy",
-      :dz => "dz",
-      :dt => "dt",
-      :contourintegral => "\\oint",
-      :Lim => "\\text{Lim}",
-      :Sin => "\\text{Sin}",
-      :Cos => "\\text{Cos}",
-      :Tan => "\\text{Tan}",
-      :Sinh => "\\text{Sinh}",
-      :Cosh => "\\text{Cosh}",
-      :Tanh => "\\text{Tanh}",
-      :Cot => "\\text{Cot}",
-      :Sec => "\\text{Sec}",
-      :csc => "\\text{csc}",
-      :Csc => "\\text{Csc}",
-      :sech => "\\text{sech}",
-      :csch => "\\text{csch}",
-      :Abs => "\\text{Abs}",
-      :Log => "\\text{Log}",
-      :Ln => "\\text{Ln}",
-      :lcm => "\\text{lcm}",
-      :lub => "\\text{lub}",
-      :glb => "\\text{glb}",
-      :partial => "\\del",
-      :prime => ?',
+      'integral' => "\\int",
+      'dx' => "dx",
+      'dy' => "dy",
+      'dz' => "dz",
+      'dt' => "dt",
+      'contourintegral' => "\\oint",
+      'Lim' => "\\text{Lim}",
+      'Sin' => "\\text{Sin}",
+      'Cos' => "\\text{Cos}",
+      'Tan' => "\\text{Tan}",
+      'Sinh' => "\\text{Sinh}",
+      'Cosh' => "\\text{Cosh}",
+      'Tanh' => "\\text{Tanh}",
+      'Cot' => "\\text{Cot}",
+      'Sec' => "\\text{Sec}",
+      'csc' => "\\text{csc}",
+      'Csc' => "\\text{Csc}",
+      'sech' => "\\text{sech}",
+      'csch' => "\\text{csch}",
+      'Abs' => "\\text{Abs}",
+      'Log' => "\\text{Log}",
+      'Ln' => "\\text{Ln}",
+      'lcm' => "\\text{lcm}",
+      'lub' => "\\text{lub}",
+      'glb' => "\\text{glb}",
+      'partial' => "\\del",
+      'prime' => ?',
       :tilde => "\\~",
       :nbsp => "\\:",
       :lceiling => "\\lceil",
@@ -100,7 +102,7 @@ module AsciiMath
 
     def append(expression, separator = " ")
       case expression
-        when Array
+        when AsciiMath::AST::Sequence
           len = expression.length - 1
 
           expression.each_with_index do |e, i|
@@ -108,145 +110,124 @@ module AsciiMath
             @latex << separator if i != len
           end
 
-        when Hash
-          case expression[:type]
-            when :symbol
-              @latex << symbol(expression[:value])
+        when AsciiMath::AST::Symbol
+          @latex << symbol(expression.text)
 
-            when :identifier
-              append_escaped(expression[:value])
+        when AsciiMath::AST::Identifier
+          append_escaped(expression.value)
 
-            when :text
-              text do
-                append_escaped(expression[:value])
-              end
+        when AsciiMath::AST::Text
+          text do
+            append_escaped(expression.value)
+          end
 
-            when :number
-              @latex << expression[:value]
+        when AsciiMath::AST::Number
+          @latex << expression.value
 
-            when :paren
-              parens(expression[:lparen], expression[:rparen]) do
-                append(expression[:e], separator)
-              end
+        when AsciiMath::AST::Paren
+          parens(expression.lparen, expression.rparen) do
+            append(expression.expression)
+          end
 
-            when :subsup
-              sub = expression[:sub]
-              sup = expression[:sup]
-              e = expression[:e]
+        when AsciiMath::AST::Group
+          append(expression.expression)
 
-              curly(e) do
-                append(e)
-              end
+        when AsciiMath::AST::SubSup
+          sub = expression.sub_expression
+          sup = expression.sup_expression
+          e = expression.base_expression
 
-              if sub
-                @latex << "_"
-                curly(sub) do
-                  append(sub)
-                end
-              end       
+          curly(e) do
+            append(e)
+          end
 
-              if sup
-                @latex << "^"
-                curly(sup) do
-                  append(sup)
-                end
-              end
+          if sub
+            @latex << "_"
+            curly(sub) do
+              append(sub)
+            end
+          end       
 
-            when :unary
-              op = expression[:op][:value]
+          if sup
+            @latex << "^"
+            curly(sup) do
+              append(sup)
+            end
+          end
 
-              case op
-              when :norm
-                parens(:lvert, :rvert) do
-                  append(expression[:e])
-                end
-              when :floor
-                parens(:lfloor, :rfloor) do
-                  append(expression[:e])
-                end
-              when :ceil
-                parens(:lceiling, :rceiling) do
-                  append(expression[:e])
-                end
-              when :overarc
-                overset do
-                  append({:type => :symbol, :value => :frown})
-                end
-                
-                curly do
-                  append(expression[:e])
-                end
-              when Symbol
-                macro(op) do
-                  append(expression[:e])
-                end
-              when String
-                macro(op) do
-                  append(expression[:e])
-                end
-              else
-                raise "Unsupported unary operation"
-              end
+        when AsciiMath::AST::UnaryOp
+          op = expression.operator.text
 
-            when :binary
-              op = expression[:op][:value]
-
-              case op
-              when :root
-                macro("sqrt", expression[:e1]) do
-                  append(expression[:e2])
-                end
+          case op
+          when :norm
+            parens(:lvert, :rvert) do
+              append(expression.operand)
+            end
+          when :floor
+            parens(:lfloor, :rfloor) do
+              append(expression.operand)
+            end
+          when :ceil
+            parens(:lceiling, :rceiling) do
+              append(expression.operand)
+            end
+          when :overarc
+            overset do
+              append(AsciiMath::AST::symbol('frown'))
+            end
             
-              when :color
-                curly do
-                  color do
-                    @latex << expression[:e1][:value]
-                  end
+            curly do
+              append(expression.operand)
+            end
+          else
+            macro(op) do
+              append(expression.operand)
+            end
+          end
 
-                  @latex << " "
-                  append(expression[:e2])
-                end
+        when AsciiMath::AST::BinaryOp, AsciiMath::AST::InfixOp
+          op = expression.operator.text
 
-              when Symbol
-                @latex << symbol(op)
-
-                curly do
-                  append(expression[:e1])
-                end
-
-                curly do
-                  append(expression[:e2])
-                end
-              
-              when String
-                @latex << op
-
-                curly do
-                  append(expression[:e1])
-                end
-
-                curly do
-                  append(expression[:e2])
-                end
-              
-              else
-                raise "Unsupported binary operation"
+          case op
+          when :root
+            macro("sqrt", expression.operand1) do
+              append(expression.operand2)
+            end
+        
+          when :color
+            curly do
+              color do
+                @latex << expression.operand1.text
               end
-            
-            when :matrix
-              rows = expression[:rows]
-              len = rows.length - 1
-              
-              parens(expression[:lparen], expression[:rparen]) do
-                @latex << "\\begin{matrix} "
 
-                rows.each_with_index do |row, i|
-                  append(row, " & ")
-                  @latex << " \\\\ " if i != len
-                end
+              @latex << " "
+              append(expression.operand2)
+            end
 
-                @latex << " \\end{matrix}"
-              end
+          else
+            @latex << symbol(op)
+
+            curly do
+              append(expression.operand1)
+            end
+
+            curly do
+              append(expression.operand2)
+            end
+          end
+        
+        when AsciiMath::AST::Matrix
+          len = expression.length - 1
+          
+          parens(expression.lparen, expression.rparen) do
+            @latex << "\\begin{matrix} "
+
+            expression.each_with_index do |row, i|
+              append(row, " & ")
+              @latex << " \\\\ " if i != len
+            end
+
+            @latex << " \\end{matrix}"
           end
       end
     end
@@ -283,22 +264,21 @@ module AsciiMath
 
     def curly(expression = nil, &block)
       case expression
-      when Hash
-        case expression[:type]
-        when :symbol, :text
+      when AsciiMath::AST::Symbol, AsciiMath::AST::Text
+        yield self
+      when AsciiMath::AST::Identifier, AsciiMath::AST::Number
+        if expression.value.length <= 1
           yield self
-          return
-        when :identifier, :number
-          if expression[:value].length <= 1
-            yield self
-            return
-          end
+        else
+          @latex << ?{
+          yield self
+          @latex << ?}
         end
+      else
+        @latex << ?{
+        yield self
+        @latex << ?}
       end
-
-      @latex << ?{
-      yield self
-      @latex << ?}
     end
 
     def append_escaped(text)
