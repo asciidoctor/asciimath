@@ -281,9 +281,20 @@ module AsciiMath
               end
 
     def append(expression, opts = {})
+      row_mode = opts[:row] || :avoid
+      if row_mode == :force
+        case expression
+          when Array
+            append_row(expression)
+          else
+            append_row([expression])
+        end
+        return
+      end
+
       case expression
         when Array
-          if expression.length <= 1 || opts[:avoid_row]
+          if (expression.length <= 1 && row_mode == :avoid) || row_mode == :omit
             expression.each { |e| append(e) }
           else
             append_row(expression)

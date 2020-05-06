@@ -5,9 +5,10 @@ module AsciiMath
   class MathMLBuilder
     include ::AsciiMath::MarkupBuilder
 
-    def initialize(prefix)
+    def initialize(prefix, opts = {})
       @prefix = prefix
       @mathml = ''
+      @row_mode = opts[:msword] ? :force : :avoid
     end
 
     def to_s
@@ -16,7 +17,7 @@ module AsciiMath
 
     def append_expression(expression, attrs = {})
       math('', attrs) do
-        append(expression, :avoid_row => true)
+        append(expression, :row => :omit)
       end
     end
 
@@ -45,28 +46,31 @@ module AsciiMath
     end
 
     def append_sqrt(expression)
-      append_tag("sqrt", expression)
+      tag("m#{"sqrt"}") do
+        append(expression, :row => @row_mode)
+      end
     end
 
     def append_cancel(expression)
       tag("menclose", :notation => "updiagonalstrike") do
-        append(expression, :avoid_row => true)
+        append(expression, :row => :omit)
       end
     end
 
     def append_root(base, index)
-      append_tag("root", base, index)
+      tag("m#{"root"}") do
+        append(base, :row => @row_mode)
+        append(index, :row => @row_mode)
+      end
     end
 
     def append_fraction(numerator, denominator)
-      append_tag("frac", numerator, denominator)
-    end
-
-    def append_tag(tag, *children)
-      tag("m#{tag}") do
-        children.each { |child| append(child) }
+      tag("m#{"frac"}") do
+        append(numerator, :row => @row_mode)
+        append(denominator, :row => @row_mode)
       end
     end
+
 
     def append_font(style, e)
       tag("mstyle", :mathvariant => style.to_s.gsub('_', '-')) do
@@ -99,39 +103,39 @@ module AsciiMath
     def append_operator_unary(operator, expression)
       mrow do
         mo(operator)
-        append(expression, :avoid_row => true)
+        append(expression, :row => @row_mode)
       end
     end
 
     def append_identifier_unary(identifier, expression)
       mrow do
         mi(identifier)
-        append(expression, :avoid_row => true)
+        append(expression, :row => @row_mode)
       end
     end
 
     def append_paren(lparen, e, rparen, opts = {})
       fenced(lparen, rparen) do
-        append(e)
+        append(e, :row => @row_mode)
       end
     end
 
     def append_subsup(base, sub, sup)
       if sub && sup
         msubsup do
-          append(base)
-          append(sub)
-          append(sup)
+          append(base, :row => @row_mode)
+          append(sub, :row => @row_mode)
+          append(sup, :row => @row_mode)
         end
       elsif sub
         msub do
-          append(base)
-          append(sub)
+          append(base, :row => @row_mode)
+          append(sub, :row => @row_mode)
         end
       elsif sup
         msup do
-          append(base)
-          append(sup)
+          append(base, :row => @row_mode)
+          append(sup, :row => @row_mode)
         end
       else
         append(base)
@@ -141,19 +145,19 @@ module AsciiMath
     def append_underover(base, sub, sup)
       if sub && sup
         munderover do
-          append(base)
-          append(sub)
-          append(sup)
+          append(base, :row => @row_mode)
+          append(sub, :row => @row_mode)
+          append(sup, :row => @row_mode)
         end
       elsif sub
         munder do
-          append(base)
-          append(sub)
+          append(base, :row => @row_mode)
+          append(sub, :row => @row_mode)
         end
       elsif sup
         mover do
-          append(base)
-          append(sup)
+          append(base, :row => @row_mode)
+          append(sup, :row => @row_mode)
         end
       else
         append(base)

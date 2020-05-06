@@ -16,11 +16,11 @@ module AsciiMath
     def append_expression(expression, inline, attrs = {})
       if inline
         inline('', attrs) do
-          append(expression, :avoid_row => true)
+          append(expression, :row => :omit)
         end
       else
         block('', attrs) do
-          append(expression, :avoid_row => true)
+          append(expression, :row => :omit)
         end
       end
     end
@@ -53,7 +53,7 @@ module AsciiMath
 
     def append_sqrt(expression)
       tag("sqrt") do
-        append(child, :avoid_row => true)
+        append(child, :row => :omit)
       end
     end
 
@@ -112,26 +112,26 @@ module AsciiMath
 
     def append_operator_unary(operator, expression)
       tag(operator) do
-        append(expression, :avoid_row => true)
+        append(expression, :row => :omit)
       end
     end
 
     def append_identifier_unary(identifier, expression)
       row do
         identifier(identifier)
-        append(expression, :avoid_row => true)
+        append(expression, :row => :omit)
       end
     end
 
     def append_paren(lparen, e, rparen, opts = {})
-      if opts[:avoid_row]
+      if opts[:row] == :omit
         brace(lparen) if lparen
-        append(e, :avoid_row => true)
+        append(e, :row => :omit)
         brace(rparen) if rparen
       else
         row do
           brace(lparen) if lparen
-          append(e, :avoid_row => true)
+          append(e, :row => :omit)
           brace(rparen) if rparen
         end
       end
