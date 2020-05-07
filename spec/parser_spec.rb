@@ -38,6 +38,8 @@ def should_generate(expected_output)
             Xml.mathml3_xsd.validate(xml_dom).each do |error|
               fail(error.message)
             end
+          when :mathml_word
+            expect(::AsciiMath::MathMLBuilder.new(:msword => true).append_expression(parsed.ast).to_s).to eq(expected)
           when :html
             expect(parsed.to_html).to eq(expected)
           when :latex
@@ -73,6 +75,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
           sub(symbol('vartheta'), '0')
       ),
       :mathml => '<math><munder><mover><mi>A</mi><mo>^</mo></mover><mo>_</mo></munder><mo>=</mo><mover><mi>A</mi><mo>^</mo></mover><mi>exp</mi><mi>j</mi><msub><mi>&#x3D1;</mi><mn>0</mn></msub></math>',
+      :mathml_word => '<math><munder><mrow><mover><mrow><mi>A</mi></mrow><mrow><mo>^</mo></mrow></mover></mrow><mrow><mo>_</mo></mrow></munder><mo>=</mo><mover><mrow><mi>A</mi></mrow><mrow><mo>^</mo></mrow></mover><mi>exp</mi><mi>j</mi><msub><mrow><mi>&#x3D1;</mi></mrow><mrow><mn>0</mn></mrow></msub></math>',
       :latex => '\\underset{\\text{–}}{\\hat{A}} = \\hat{A} \\exp j \\vartheta_0'
   ))
 
@@ -584,6 +587,10 @@ describe 'AsciiMath::Parser', :variant => :ast do
 end
 
 describe 'AsciiMath::MathMLBuilder', :variant => :mathml do
+  include_examples 'AsciiMath Examples'
+end
+
+describe 'AsciiMath::MathMLBuilder Microsoft Office', :variant => :mathml_word do
   include_examples 'AsciiMath Examples'
 end
 

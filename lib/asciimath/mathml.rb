@@ -6,6 +6,10 @@ module AsciiMath
     include ::AsciiMath::MarkupBuilder
 
     def initialize(prefix, opts = {})
+      if prefix.is_a? Hash
+        opts = prefix
+        prefix = ''
+      end
       @prefix = prefix
       @mathml = ''
       @row_mode = opts[:msword] ? :force : :avoid
