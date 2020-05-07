@@ -75,7 +75,7 @@ module AsciiMath
       :partial => "\\del",
       :prime => ?',
       :tilde => "\\~",
-      :nbsp => "\\:",
+      :nbsp => "\\;",
       :lceiling => "\\lceil",
       :rceiling => "\\rceil",
       :dstruck_captial_c => "\\mathbb{C}",
@@ -127,9 +127,7 @@ module AsciiMath
           @latex << expression.value
 
         when AsciiMath::AST::Paren
-          parens(expression.lparen.value, expression.rparen.value) do
-            append(expression.expression)
-          end
+          parens(expression.lparen.value, expression.rparen.value, expression.expression)
 
         when AsciiMath::AST::Group
           append(expression.expression)
@@ -162,17 +160,11 @@ module AsciiMath
 
           case op
           when :norm
-            parens(:lvert, :rvert) do
-              append(expression.operand)
-            end
+            parens(:lvert, :rvert, expression.operand)
           when :floor
-            parens(:lfloor, :rfloor) do
-              append(expression.operand)
-            end
+            parens(:lfloor, :rfloor, expression.operand)
           when :ceil
-            parens(:lceiling, :rceiling) do
-              append(expression.operand)
-            end
+            parens(:lceiling, :rceiling, expression.operand)
           when :overarc
             overset do
               @latex << "\\frown"
@@ -256,13 +248,25 @@ module AsciiMath
       macro(meth, *args, &block)
     end
 
-    def parens(lparen, rparen, &block)
-      if lparen || rparen
-        @latex << "\\left " << symbol(lparen) << " "
-        yield self
-        @latex << " \\right " << symbol(rparen)
+    def parens(lparen, rparen, content = nil, &block)
+      if block_given?
+        if lparen || rparen
+          @latex << "\\left " << symbol(lparen) << " "
+          yield self
+          @latex << " \\right " << symbol(rparen)
+        else
+          yield self
+        end
       else
-        yield self
+        needs_left_right = !is_small(content)
+
+        @latex << "\\left " if needs_left_right
+        @latex << symbol(lparen) << " " if lparen or needs_left_right
+
+        append(content)
+
+        @latex << " \\right" if needs_left_right
+        @latex << " " << symbol(rparen) if rparen or needs_left_right
       end
     end
 
@@ -294,6 +298,46 @@ module AsciiMath
 
     def symbol(s)
       SYMBOLS[s] || "\\#{s.to_s}"
+    end
+
+    def is_small(e)
+      case e
+        when AsciiMath::AST::SubSup
+          is_very_small(e.sub_expression) and is_very_small(e.sup_expression) and is_very_small(e.base_expression)
+        when AsciiMath::AST::Sequence
+          e.all? { |s| is_small(s) }
+        else
+          is_very_small(e)
+      end
+    end
+
+    def is_very_small(e)
+      case e
+      when AsciiMath::AST::Identifier, AsciiMath::AST::Number
+        e.value.length <= 1
+      when AsciiMath::AST::Symbol
+        case e.value
+        when :plus, :minus, :cdot, :dx, :dy, :dt, :f, :g
+          true
+        else
+          false
+        end
+      when AsciiMath::AST::UnaryOp
+        case e.operator
+        when :hat, :overline, :underline, :vec, :dot, :ddot, :color
+          is_very_small(e.operand)
+        else
+          false
+        end
+      when AsciiMath::AST::Group
+        is_very_small(e.expression)
+      when AsciiMath::AST::Sequence
+        e.all? { |s| is_very_small(e) }
+      when nil
+        true
+      else
+        false
+      end
     end
   end
 
