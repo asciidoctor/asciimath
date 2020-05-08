@@ -426,7 +426,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
           )
       ),
       :mathml => '<math><mi>s</mi><msub><mo>&#x2032;</mo><mi>i</mi></msub><mo>=</mo><mrow><mo>{</mo><mtable><mtr><mtd><mrow><mo>&#x2212;</mo><mn>1</mn></mrow></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&gt;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr><mtr><mtd><mrow><mo>+</mo><mn>1</mn></mrow></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&#x2264;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr></mtable></mrow></math>',
-      :latex => 's \'_i = \\left \\{ \\begin{matrix} - 1 & \\text{if} s_i > s_{i + 1} \\\\ + 1 & \\text{if} s_i \\le s_{i + 1} \\end{matrix} \\right .',
+      :latex => 's \'_i = \\left \\{ \\begin{matrix} - 1 & \\operatorname{if} s_i > s_{i + 1} \\\\ + 1 & \\operatorname{if} s_i \\le s_{i + 1} \\end{matrix} \\right .',
   ))
 
   example('s\'_i = {(, if s_i > s_(i + 1)),( + 1,):}', &should_generate(
@@ -444,7 +444,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
           )
       ),
       :mathml => '<math><mi>s</mi><msub><mo>&#x2032;</mo><mi>i</mi></msub><mo>=</mo><mrow><mo>{</mo><mtable><mtr><mtd></mtd><mtd><mrow><mo>if</mo><msub><mi>s</mi><mi>i</mi></msub><mo>&gt;</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mtd></mtr><mtr><mtd><mrow><mo>+</mo><mn>1</mn></mrow></mtd><mtd></mtd></mtr></mtable></mrow></math>',
-      :latex => 's \'_i = \\left \\{ \\begin{matrix}  & \\text{if} s_i > s_{i + 1} \\\\ + 1 &  \\end{matrix} \\right .',
+      :latex => 's \'_i = \\left \\{ \\begin{matrix}  & \\operatorname{if} s_i > s_{i + 1} \\\\ + 1 &  \\end{matrix} \\right .',
   ))
 
   example('{:(a,b),(c,d):}', &should_generate(
