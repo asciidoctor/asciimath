@@ -126,7 +126,7 @@ module AsciiMath
           @latex << expression.value
 
         when AsciiMath::AST::Paren
-          parens(expression.lparen.value, expression.rparen.value, expression.expression)
+          parens(expression.lparen, expression.rparen, expression.expression)
 
         when AsciiMath::AST::Group
           append(expression.expression)
@@ -212,7 +212,7 @@ module AsciiMath
         when AsciiMath::AST::Matrix
           len = expression.length - 1
           
-          parens(expression.lparen.value, expression.rparen.value) do
+          parens(expression.lparen, expression.rparen) do
             c = expression.length
             @latex << "\\begin{matrix} "
 
@@ -248,11 +248,14 @@ module AsciiMath
     end
 
     def parens(lparen, rparen, content = nil, &block)
+      l = lparen.is_a?(AsciiMath::AST::Symbol) ? lparen.value : lparen
+      r = rparen.is_a?(AsciiMath::AST::Symbol) ? rparen.value : rparen
+
       if block_given?
-        if lparen || rparen
-          @latex << "\\left " << symbol(lparen) << " "
+        if l || r
+          @latex << "\\left " << symbol(l) << " "
           yield self
-          @latex << " \\right " << symbol(rparen)
+          @latex << " \\right " << symbol(r)
         else
           yield self
         end
@@ -260,12 +263,12 @@ module AsciiMath
         needs_left_right = !is_small(content)
 
         @latex << "\\left " if needs_left_right
-        @latex << symbol(lparen) << " " if lparen or needs_left_right
+        @latex << symbol(l) << " " if l or needs_left_right
 
         append(content)
 
         @latex << " \\right" if needs_left_right
-        @latex << " " << symbol(rparen) if rparen or needs_left_right
+        @latex << " " << symbol(r) if r or needs_left_right
       end
     end
 
