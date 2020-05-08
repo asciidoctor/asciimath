@@ -316,7 +316,7 @@ module AsciiMath
         e.value.length <= 1
       when AsciiMath::AST::Symbol
         case e.value
-        when :plus, :minus, :cdot, :dx, :dy, :dz, :dt, :f, :g
+        when :plus, :minus, :cdot, :dx, :dy, :dz, :dt, :f, :g, :mod
           true
         else
           false
