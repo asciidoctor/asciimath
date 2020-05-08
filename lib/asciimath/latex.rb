@@ -62,7 +62,6 @@ module AsciiMath
       :Tanh => "\\operatorname{Tanh}",
       :Cot => "\\operatorname{Cot}",
       :Sec => "\\operatorname{Sec}",
-      :csc => "\\csc",
       :Csc => "\\operatorname{Csc}",
       :sech => "\\operatorname{sech}",
       :csch => "\\operatorname{csch}",
