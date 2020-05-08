@@ -62,7 +62,7 @@ module AsciiMath
       :Tanh => "\\operatorname{Tanh}",
       :Cot => "\\operatorname{Cot}",
       :Sec => "\\operatorname{Sec}",
-      :csc => "\\operatorname{csc}",
+      :csc => "\\csc",
       :Csc => "\\operatorname{Csc}",
       :sech => "\\operatorname{sech}",
       :csch => "\\operatorname{csch}",
@@ -317,7 +317,7 @@ module AsciiMath
         e.value.length <= 1
       when AsciiMath::AST::Symbol
         case e.value
-        when :plus, :minus, :cdot, :dx, :dy, :dt, :f, :g
+        when :plus, :minus, :cdot, :dx, :dy, :dz, :dt, :f, :g
           true
         else
           false
