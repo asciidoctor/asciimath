@@ -10,7 +10,7 @@ def escape_adoc(adoc)
 end
 
 puts "|==="
-puts '|Asciimath |Symbol |Codepoint |Value'
+puts '|AsciiMath |Symbol |Codepoint |Value'
 puts
 
 AsciiMath::Parser::SYMBOLS.each_pair do |asciimath, value|
@@ -29,7 +29,10 @@ AsciiMath::Parser::SYMBOLS.each_pair do |asciimath, value|
 
   codepoint = ""
   if val.is_a?(String)
-    codepoint = val.codepoints.map { |cp| sprintf('U+%04X', cp) }.join(' ')
+    codepoint = val.codepoints.map do |cp|
+      cpstr = sprintf('U+%04X', cp)
+      "https://codepoints.net/#{cpstr}[#{cpstr}]"
+    end.join(' ')
   end
 
   puts "|#{escape_adoc(asciimath)} |:#{sym.to_s} |#{codepoint} |#{escape_adoc(val.to_s)}"

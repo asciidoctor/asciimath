@@ -184,263 +184,263 @@ Each column element is represented using the appropriate AST type.
 == Symbol Table
 
 |===
-|Asciimath |Symbol |Codepoint |Value
+|AsciiMath |Symbol |Codepoint |Value
 
-|+ |:plus |U+002B |+
-|++-++ |:minus |U+2212 |++−++
-|++*++ |:cdot |U+22C5 |++⋅++
-|++cdot++ |:cdot |U+22C5 |++⋅++
-|++**++ |:ast |U+002A |++*++
-|++ast++ |:ast |U+002A |++*++
-|++***++ |:star |U+22C6 |++⋆++
-|++star++ |:star |U+22C6 |++⋆++
-|++//++ |:slash |U+002F |++/++
-|++\\++ |:backslash |U+005C |++\++
-|++backslash++ |:backslash |U+005C |++\++
-|++setminus++ |:setminus |U+005C |++\++
-|++xx++ |:times |U+00D7 |++×++
-|++times++ |:times |U+00D7 |++×++
-|++\|><++ |:ltimes |U+22C9 |++⋉++
-|++ltimes++ |:ltimes |U+22C9 |++⋉++
-|++><\|++ |:rtimes |U+22CA |++⋊++
-|++rtimes++ |:rtimes |U+22CA |++⋊++
-|++\|><\|++ |:bowtie |U+22C8 |++⋈++
-|++bowtie++ |:bowtie |U+22C8 |++⋈++
-|++-:++ |:div |U+00F7 |++÷++
-|++div++ |:div |U+00F7 |++÷++
-|++divide++ |:div |U+00F7 |++÷++
-|++@++ |:circ |U+26AC |++⚬++
-|++circ++ |:circ |U+26AC |++⚬++
-|++o+++ |:oplus |U+2295 |++⊕++
-|++oplus++ |:oplus |U+2295 |++⊕++
-|++ox++ |:otimes |U+2297 |++⊗++
-|++otimes++ |:otimes |U+2297 |++⊗++
-|++o.++ |:odot |U+2299 |++⊙++
-|++odot++ |:odot |U+2299 |++⊙++
-|++sum++ |:sum |U+2211 |++∑++
-|++prod++ |:prod |U+220F |++∏++
-|++^^++ |:wedge |U+2227 |++∧++
-|++wedge++ |:wedge |U+2227 |++∧++
-|++^^^++ |:bigwedge |U+22C0 |++⋀++
-|++bigwedge++ |:bigwedge |U+22C0 |++⋀++
-|++vv++ |:vee |U+2228 |++∨++
-|++vee++ |:vee |U+2228 |++∨++
-|++vvv++ |:bigvee |U+22C1 |++⋁++
-|++bigvee++ |:bigvee |U+22C1 |++⋁++
-|++nn++ |:cap |U+2229 |++∩++
-|++cap++ |:cap |U+2229 |++∩++
-|++nnn++ |:bigcap |U+22C2 |++⋂++
-|++bigcap++ |:bigcap |U+22C2 |++⋂++
-|++uu++ |:cup |U+222A |++∪++
-|++cup++ |:cup |U+222A |++∪++
-|++uuu++ |:bigcup |U+22C3 |++⋃++
-|++bigcup++ |:bigcup |U+22C3 |++⋃++
-|++=++ |:eq |U+003D |++=++
-|++!=++ |:ne |U+2260 |++≠++
-|++ne++ |:ne |U+2260 |++≠++
-|++:=++ |:assign |U+2254 |++≔++
-|++<++ |:lt |U+003C |++<++
-|++lt++ |:lt |U+003C |++<++
-|++>++ |:gt |U+003E |++>++
-|++gt++ |:gt |U+003E |++>++
-|++<=++ |:le |U+2264 |++≤++
-|++le++ |:le |U+2264 |++≤++
-|++>=++ |:ge |U+2265 |++≥++
-|++ge++ |:ge |U+2265 |++≥++
-|++-<++ |:prec |U+227A |++≺++
-|++-lt++ |:prec |U+227A |++≺++
-|++prec++ |:prec |U+227A |++≺++
-|++>-++ |:succ |U+227B |++≻++
-|++succ++ |:succ |U+227B |++≻++
-|++-<=++ |:preceq |U+2AAF |++⪯++
-|++preceq++ |:preceq |U+2AAF |++⪯++
-|++>-=++ |:succeq |U+2AB0 |++⪰++
-|++succeq++ |:succeq |U+2AB0 |++⪰++
-|++in++ |:in |U+2208 |++∈++
-|++!in++ |:notin |U+2209 |++∉++
-|++notin++ |:notin |U+2209 |++∉++
-|++sub++ |:subset |U+2282 |++⊂++
-|++subset++ |:subset |U+2282 |++⊂++
-|++sup++ |:supset |U+2283 |++⊃++
-|++supset++ |:supset |U+2283 |++⊃++
-|++sube++ |:subseteq |U+2286 |++⊆++
-|++subseteq++ |:subseteq |U+2286 |++⊆++
-|++supe++ |:supseteq |U+2287 |++⊇++
-|++supseteq++ |:supseteq |U+2287 |++⊇++
-|++-=++ |:equiv |U+2261 |++≡++
-|++equiv++ |:equiv |U+2261 |++≡++
-|++~=++ |:cong |U+2245 |++≅++
-|++cong++ |:cong |U+2245 |++≅++
-|++~~++ |:approx |U+2248 |++≈++
-|++approx++ |:approx |U+2248 |++≈++
-|++prop++ |:propto |U+221D |++∝++
-|++propto++ |:propto |U+221D |++∝++
-|++and++ |:and |U+0061 U+006E U+0064 |++and++
-|++or++ |:or |U+006F U+0072 |++or++
-|++not++ |:not |U+00AC |++¬++
-|++neg++ |:not |U+00AC |++¬++
-|++=>++ |:implies |U+21D2 |++⇒++
-|++implies++ |:implies |U+21D2 |++⇒++
-|++if++ |:if |U+0069 U+0066 |++if++
-|++<=>++ |:iff |U+21D4 |++⇔++
-|++iff++ |:iff |U+21D4 |++⇔++
-|++AA++ |:forall |U+2200 |++∀++
-|++forall++ |:forall |U+2200 |++∀++
-|++EE++ |:exists |U+2203 |++∃++
-|++exists++ |:exists |U+2203 |++∃++
-|++_\|_++ |:bot |U+22A5 |++⊥++
-|++bot++ |:bot |U+22A5 |++⊥++
-|++TT++ |:top |U+22A4 |++⊤++
-|++top++ |:top |U+22A4 |++⊤++
-|++\|--++ |:vdash |U+22A2 |++⊢++
-|++vdash++ |:vdash |U+22A2 |++⊢++
-|++\|==++ |:models |U+22A8 |++⊨++
-|++models++ |:models |U+22A8 |++⊨++
-|++(++ |:lparen |U+0028 |++(++
-|++left(++ |:lparen |U+0028 |++(++
-|++)++ |:rparen |U+0029 |++)++
-|++right)++ |:rparen |U+0029 |++)++
-|++[++ |:lbracket |U+005B |++[++
-|++left[++ |:lbracket |U+005B |++[++
-|++]++ |:rbracket |U+005D |++]++
-|++right]++ |:rbracket |U+005D |++]++
-|++{++ |:lbrace |U+007B |++{++
-|++}++ |:rbrace |U+007D |++}++
-|++\|++ |:vbar |U+007C |++\|++
-|++:\|:++ |:vbar |U+007C |++\|++
-|++\|:++ |:vbar |U+007C |++\|++
-|++:\|++ |:vbar |U+007C |++\|++
-|++(:++ |:langle |U+2329 |++〈++
-|++<<++ |:langle |U+2329 |++〈++
-|++langle++ |:langle |U+2329 |++〈++
-|++:)++ |:rangle |U+232A |++〉++
-|++>>++ |:rangle |U+232A |++〉++
-|++rangle++ |:rangle |U+232A |++〉++
-|++int++ |:integral |U+222B |++∫++
-|++dx++ |:dx |U+0064 U+0078 |++dx++
-|++dy++ |:dy |U+0064 U+0079 |++dy++
-|++dz++ |:dz |U+0064 U+007A |++dz++
-|++dt++ |:dt |U+0064 U+0074 |++dt++
-|++oint++ |:contourintegral |U+222E |++∮++
-|++del++ |:partial |U+2202 |++∂++
-|++partial++ |:partial |U+2202 |++∂++
-|++grad++ |:nabla |U+2207 |++∇++
-|++nabla++ |:nabla |U+2207 |++∇++
-|+++-++ |:pm |U+00B1 |++±++
-|++pm++ |:pm |U+00B1 |++±++
-|++O/++ |:emptyset |U+2205 |++∅++
-|++emptyset++ |:emptyset |U+2205 |++∅++
-|++oo++ |:infty |U+221E |++∞++
-|++infty++ |:infty |U+221E |++∞++
-|++aleph++ |:aleph |U+2135 |++ℵ++
-|++...++ |:ellipsis |U+2026 |++…++
-|++ldots++ |:ellipsis |U+2026 |++…++
-|++:.++ |:therefore |U+2234 |++∴++
-|++therefore++ |:therefore |U+2234 |++∴++
-|++:'++ |:because |U+2235 |++∵++
-|++because++ |:because |U+2235 |++∵++
-|++/_++ |:angle |U+2220 |++∠++
-|++angle++ |:angle |U+2220 |++∠++
-|++/_\++ |:triangle |U+25B3 |++△++
-|++triangle++ |:triangle |U+25B3 |++△++
-|++'++ |:prime |U+2032 |++′++
-|++prime++ |:prime |U+2032 |++′++
-|++tilde++ |:tilde |U+007E |++~++
-|++\ ++ |:nbsp |U+00A0 |++ ++
-|++frown++ |:frown |U+2322 |++⌢++
-|++quad++ |:quad |U+00A0 U+00A0 |++  ++
-|++qquad++ |:qquad |U+00A0 U+00A0 U+00A0 U+00A0 |++    ++
-|++cdots++ |:cdots |U+22EF |++⋯++
-|++vdots++ |:vdots |U+22EE |++⋮++
-|++ddots++ |:ddots |U+22F1 |++⋱++
-|++diamond++ |:diamond |U+22C4 |++⋄++
-|++square++ |:square |U+25A1 |++□++
-|++\|__++ |:lfloor |U+230A |++⌊++
-|++lfloor++ |:lfloor |U+230A |++⌊++
-|++__\|++ |:rfloor |U+230B |++⌋++
-|++rfloor++ |:rfloor |U+230B |++⌋++
-|++\|~++ |:lceiling |U+2308 |++⌈++
-|++lceiling++ |:lceiling |U+2308 |++⌈++
-|++~\|++ |:rceiling |U+2309 |++⌉++
-|++rceiling++ |:rceiling |U+2309 |++⌉++
-|++CC++ |:dstruck_captial_c |U+2102 |++ℂ++
-|++NN++ |:dstruck_captial_n |U+2115 |++ℕ++
-|++QQ++ |:dstruck_captial_q |U+211A |++ℚ++
-|++RR++ |:dstruck_captial_r |U+211D |++ℝ++
-|++ZZ++ |:dstruck_captial_z |U+2124 |++ℤ++
-|++f++ |:f |U+0066 |++f++
-|++g++ |:g |U+0067 |++g++
-|++lim++ |:lim |U+006C U+0069 U+006D |++lim++
-|++Lim++ |:Lim |U+004C U+0069 U+006D |++Lim++
-|++min++ |:min |U+006D U+0069 U+006E |++min++
-|++max++ |:max |U+006D U+0061 U+0078 |++max++
-|++sin++ |:sin |U+0073 U+0069 U+006E |++sin++
-|++Sin++ |:Sin |U+0053 U+0069 U+006E |++Sin++
-|++cos++ |:cos |U+0063 U+006F U+0073 |++cos++
-|++Cos++ |:Cos |U+0043 U+006F U+0073 |++Cos++
-|++tan++ |:tan |U+0074 U+0061 U+006E |++tan++
-|++Tan++ |:Tan |U+0054 U+0061 U+006E |++Tan++
-|++sinh++ |:sinh |U+0073 U+0069 U+006E U+0068 |++sinh++
-|++Sinh++ |:Sinh |U+0053 U+0069 U+006E U+0068 |++Sinh++
-|++cosh++ |:cosh |U+0063 U+006F U+0073 U+0068 |++cosh++
-|++Cosh++ |:Cosh |U+0043 U+006F U+0073 U+0068 |++Cosh++
-|++tanh++ |:tanh |U+0074 U+0061 U+006E U+0068 |++tanh++
-|++Tanh++ |:Tanh |U+0054 U+0061 U+006E U+0068 |++Tanh++
-|++cot++ |:cot |U+0063 U+006F U+0074 |++cot++
-|++Cot++ |:Cot |U+0043 U+006F U+0074 |++Cot++
-|++sec++ |:sec |U+0073 U+0065 U+0063 |++sec++
-|++Sec++ |:Sec |U+0053 U+0065 U+0063 |++Sec++
-|++csc++ |:csc |U+0063 U+0073 U+0063 |++csc++
-|++Csc++ |:Csc |U+0043 U+0073 U+0063 |++Csc++
-|++arcsin++ |:arcsin |U+0061 U+0072 U+0063 U+0073 U+0069 U+006E |++arcsin++
-|++arccos++ |:arccos |U+0061 U+0072 U+0063 U+0063 U+006F U+0073 |++arccos++
-|++arctan++ |:arctan |U+0061 U+0072 U+0063 U+0074 U+0061 U+006E |++arctan++
-|++coth++ |:coth |U+0063 U+006F U+0074 U+0068 |++coth++
-|++sech++ |:sech |U+0073 U+0065 U+0063 U+0068 |++sech++
-|++csch++ |:csch |U+0063 U+0073 U+0063 U+0068 |++csch++
-|++exp++ |:exp |U+0065 U+0078 U+0070 |++exp++
-|++abs++ |:abs |U+0061 U+0062 U+0073 |++abs++
-|++Abs++ |:abs |U+0061 U+0062 U+0073 |++abs++
-|++norm++ |:norm |U+006E U+006F U+0072 U+006D |++norm++
-|++floor++ |:floor |U+0066 U+006C U+006F U+006F U+0072 |++floor++
-|++ceil++ |:ceil |U+0063 U+0065 U+0069 U+006C |++ceil++
-|++log++ |:log |U+006C U+006F U+0067 |++log++
-|++Log++ |:Log |U+004C U+006F U+0067 |++Log++
-|++ln++ |:ln |U+006C U+006E |++ln++
-|++Ln++ |:Ln |U+004C U+006E |++Ln++
-|++det++ |:det |U+0064 U+0065 U+0074 |++det++
-|++dim++ |:dim |U+0064 U+0069 U+006D |++dim++
-|++mod++ |:mod |U+006D U+006F U+0064 |++mod++
-|++gcd++ |:gcd |U+0067 U+0063 U+0064 |++gcd++
-|++lcm++ |:lcm |U+006C U+0063 U+006D |++lcm++
-|++lub++ |:lub |U+006C U+0075 U+0062 |++lub++
-|++glb++ |:glb |U+0067 U+006C U+0062 |++glb++
-|++uarr++ |:uparrow |U+2191 |++↑++
-|++uparrow++ |:uparrow |U+2191 |++↑++
-|++darr++ |:downarrow |U+2193 |++↓++
-|++downarrow++ |:downarrow |U+2193 |++↓++
-|++rarr++ |:rightarrow |U+2192 |++→++
-|++rightarrow++ |:rightarrow |U+2192 |++→++
-|++->++ |:to |U+2192 |++→++
-|++to++ |:to |U+2192 |++→++
-|++>->++ |:rightarrowtail |U+21A3 |++↣++
-|++rightarrowtail++ |:rightarrowtail |U+21A3 |++↣++
-|++->>++ |:twoheadrightarrow |U+21A0 |++↠++
-|++twoheadrightarrow++ |:twoheadrightarrow |U+21A0 |++↠++
-|++>->>++ |:twoheadrightarrowtail |U+2916 |++⤖++
-|++twoheadrightarrowtail++ |:twoheadrightarrowtail |U+2916 |++⤖++
-|++\|->++ |:mapsto |U+21A6 |++↦++
-|++mapsto++ |:mapsto |U+21A6 |++↦++
-|++larr++ |:leftarrow |U+2190 |++←++
-|++leftarrow++ |:leftarrow |U+2190 |++←++
-|++harr++ |:leftrightarrow |U+2194 |++↔++
-|++leftrightarrow++ |:leftrightarrow |U+2194 |++↔++
-|++rArr++ |:Rightarrow |U+21D2 |++⇒++
-|++Rightarrow++ |:Rightarrow |U+21D2 |++⇒++
-|++lArr++ |:Leftarrow |U+21D0 |++⇐++
-|++Leftarrow++ |:Leftarrow |U+21D0 |++⇐++
-|++hArr++ |:Leftrightarrow |U+21D4 |++⇔++
-|++Leftrightarrow++ |:Leftrightarrow |U+21D4 |++⇔++
+|+ |:plus |https://codepoints.net/U+002B[U+002B] |+
+|++-++ |:minus |https://codepoints.net/U+2212[U+2212] |++−++
+|++*++ |:cdot |https://codepoints.net/U+22C5[U+22C5] |++⋅++
+|++cdot++ |:cdot |https://codepoints.net/U+22C5[U+22C5] |++⋅++
+|++**++ |:ast |https://codepoints.net/U+002A[U+002A] |++*++
+|++ast++ |:ast |https://codepoints.net/U+002A[U+002A] |++*++
+|++***++ |:star |https://codepoints.net/U+22C6[U+22C6] |++⋆++
+|++star++ |:star |https://codepoints.net/U+22C6[U+22C6] |++⋆++
+|++//++ |:slash |https://codepoints.net/U+002F[U+002F] |++/++
+|++\\++ |:backslash |https://codepoints.net/U+005C[U+005C] |++\++
+|++backslash++ |:backslash |https://codepoints.net/U+005C[U+005C] |++\++
+|++setminus++ |:setminus |https://codepoints.net/U+005C[U+005C] |++\++
+|++xx++ |:times |https://codepoints.net/U+00D7[U+00D7] |++×++
+|++times++ |:times |https://codepoints.net/U+00D7[U+00D7] |++×++
+|++\|><++ |:ltimes |https://codepoints.net/U+22C9[U+22C9] |++⋉++
+|++ltimes++ |:ltimes |https://codepoints.net/U+22C9[U+22C9] |++⋉++
+|++><\|++ |:rtimes |https://codepoints.net/U+22CA[U+22CA] |++⋊++
+|++rtimes++ |:rtimes |https://codepoints.net/U+22CA[U+22CA] |++⋊++
+|++\|><\|++ |:bowtie |https://codepoints.net/U+22C8[U+22C8] |++⋈++
+|++bowtie++ |:bowtie |https://codepoints.net/U+22C8[U+22C8] |++⋈++
+|++-:++ |:div |https://codepoints.net/U+00F7[U+00F7] |++÷++
+|++div++ |:div |https://codepoints.net/U+00F7[U+00F7] |++÷++
+|++divide++ |:div |https://codepoints.net/U+00F7[U+00F7] |++÷++
+|++@++ |:circ |https://codepoints.net/U+26AC[U+26AC] |++⚬++
+|++circ++ |:circ |https://codepoints.net/U+26AC[U+26AC] |++⚬++
+|++o+++ |:oplus |https://codepoints.net/U+2295[U+2295] |++⊕++
+|++oplus++ |:oplus |https://codepoints.net/U+2295[U+2295] |++⊕++
+|++ox++ |:otimes |https://codepoints.net/U+2297[U+2297] |++⊗++
+|++otimes++ |:otimes |https://codepoints.net/U+2297[U+2297] |++⊗++
+|++o.++ |:odot |https://codepoints.net/U+2299[U+2299] |++⊙++
+|++odot++ |:odot |https://codepoints.net/U+2299[U+2299] |++⊙++
+|++sum++ |:sum |https://codepoints.net/U+2211[U+2211] |++∑++
+|++prod++ |:prod |https://codepoints.net/U+220F[U+220F] |++∏++
+|++^^++ |:wedge |https://codepoints.net/U+2227[U+2227] |++∧++
+|++wedge++ |:wedge |https://codepoints.net/U+2227[U+2227] |++∧++
+|++^^^++ |:bigwedge |https://codepoints.net/U+22C0[U+22C0] |++⋀++
+|++bigwedge++ |:bigwedge |https://codepoints.net/U+22C0[U+22C0] |++⋀++
+|++vv++ |:vee |https://codepoints.net/U+2228[U+2228] |++∨++
+|++vee++ |:vee |https://codepoints.net/U+2228[U+2228] |++∨++
+|++vvv++ |:bigvee |https://codepoints.net/U+22C1[U+22C1] |++⋁++
+|++bigvee++ |:bigvee |https://codepoints.net/U+22C1[U+22C1] |++⋁++
+|++nn++ |:cap |https://codepoints.net/U+2229[U+2229] |++∩++
+|++cap++ |:cap |https://codepoints.net/U+2229[U+2229] |++∩++
+|++nnn++ |:bigcap |https://codepoints.net/U+22C2[U+22C2] |++⋂++
+|++bigcap++ |:bigcap |https://codepoints.net/U+22C2[U+22C2] |++⋂++
+|++uu++ |:cup |https://codepoints.net/U+222A[U+222A] |++∪++
+|++cup++ |:cup |https://codepoints.net/U+222A[U+222A] |++∪++
+|++uuu++ |:bigcup |https://codepoints.net/U+22C3[U+22C3] |++⋃++
+|++bigcup++ |:bigcup |https://codepoints.net/U+22C3[U+22C3] |++⋃++
+|++=++ |:eq |https://codepoints.net/U+003D[U+003D] |++=++
+|++!=++ |:ne |https://codepoints.net/U+2260[U+2260] |++≠++
+|++ne++ |:ne |https://codepoints.net/U+2260[U+2260] |++≠++
+|++:=++ |:assign |https://codepoints.net/U+2254[U+2254] |++≔++
+|++<++ |:lt |https://codepoints.net/U+003C[U+003C] |++<++
+|++lt++ |:lt |https://codepoints.net/U+003C[U+003C] |++<++
+|++>++ |:gt |https://codepoints.net/U+003E[U+003E] |++>++
+|++gt++ |:gt |https://codepoints.net/U+003E[U+003E] |++>++
+|++<=++ |:le |https://codepoints.net/U+2264[U+2264] |++≤++
+|++le++ |:le |https://codepoints.net/U+2264[U+2264] |++≤++
+|++>=++ |:ge |https://codepoints.net/U+2265[U+2265] |++≥++
+|++ge++ |:ge |https://codepoints.net/U+2265[U+2265] |++≥++
+|++-<++ |:prec |https://codepoints.net/U+227A[U+227A] |++≺++
+|++-lt++ |:prec |https://codepoints.net/U+227A[U+227A] |++≺++
+|++prec++ |:prec |https://codepoints.net/U+227A[U+227A] |++≺++
+|++>-++ |:succ |https://codepoints.net/U+227B[U+227B] |++≻++
+|++succ++ |:succ |https://codepoints.net/U+227B[U+227B] |++≻++
+|++-<=++ |:preceq |https://codepoints.net/U+2AAF[U+2AAF] |++⪯++
+|++preceq++ |:preceq |https://codepoints.net/U+2AAF[U+2AAF] |++⪯++
+|++>-=++ |:succeq |https://codepoints.net/U+2AB0[U+2AB0] |++⪰++
+|++succeq++ |:succeq |https://codepoints.net/U+2AB0[U+2AB0] |++⪰++
+|++in++ |:in |https://codepoints.net/U+2208[U+2208] |++∈++
+|++!in++ |:notin |https://codepoints.net/U+2209[U+2209] |++∉++
+|++notin++ |:notin |https://codepoints.net/U+2209[U+2209] |++∉++
+|++sub++ |:subset |https://codepoints.net/U+2282[U+2282] |++⊂++
+|++subset++ |:subset |https://codepoints.net/U+2282[U+2282] |++⊂++
+|++sup++ |:supset |https://codepoints.net/U+2283[U+2283] |++⊃++
+|++supset++ |:supset |https://codepoints.net/U+2283[U+2283] |++⊃++
+|++sube++ |:subseteq |https://codepoints.net/U+2286[U+2286] |++⊆++
+|++subseteq++ |:subseteq |https://codepoints.net/U+2286[U+2286] |++⊆++
+|++supe++ |:supseteq |https://codepoints.net/U+2287[U+2287] |++⊇++
+|++supseteq++ |:supseteq |https://codepoints.net/U+2287[U+2287] |++⊇++
+|++-=++ |:equiv |https://codepoints.net/U+2261[U+2261] |++≡++
+|++equiv++ |:equiv |https://codepoints.net/U+2261[U+2261] |++≡++
+|++~=++ |:cong |https://codepoints.net/U+2245[U+2245] |++≅++
+|++cong++ |:cong |https://codepoints.net/U+2245[U+2245] |++≅++
+|++~~++ |:approx |https://codepoints.net/U+2248[U+2248] |++≈++
+|++approx++ |:approx |https://codepoints.net/U+2248[U+2248] |++≈++
+|++prop++ |:propto |https://codepoints.net/U+221D[U+221D] |++∝++
+|++propto++ |:propto |https://codepoints.net/U+221D[U+221D] |++∝++
+|++and++ |:and |https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+006E[U+006E] https://codepoints.net/U+0064[U+0064] |++and++
+|++or++ |:or |https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0072[U+0072] |++or++
+|++not++ |:not |https://codepoints.net/U+00AC[U+00AC] |++¬++
+|++neg++ |:not |https://codepoints.net/U+00AC[U+00AC] |++¬++
+|++=>++ |:implies |https://codepoints.net/U+21D2[U+21D2] |++⇒++
+|++implies++ |:implies |https://codepoints.net/U+21D2[U+21D2] |++⇒++
+|++if++ |:if |https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+0066[U+0066] |++if++
+|++<=>++ |:iff |https://codepoints.net/U+21D4[U+21D4] |++⇔++
+|++iff++ |:iff |https://codepoints.net/U+21D4[U+21D4] |++⇔++
+|++AA++ |:forall |https://codepoints.net/U+2200[U+2200] |++∀++
+|++forall++ |:forall |https://codepoints.net/U+2200[U+2200] |++∀++
+|++EE++ |:exists |https://codepoints.net/U+2203[U+2203] |++∃++
+|++exists++ |:exists |https://codepoints.net/U+2203[U+2203] |++∃++
+|++_\|_++ |:bot |https://codepoints.net/U+22A5[U+22A5] |++⊥++
+|++bot++ |:bot |https://codepoints.net/U+22A5[U+22A5] |++⊥++
+|++TT++ |:top |https://codepoints.net/U+22A4[U+22A4] |++⊤++
+|++top++ |:top |https://codepoints.net/U+22A4[U+22A4] |++⊤++
+|++\|--++ |:vdash |https://codepoints.net/U+22A2[U+22A2] |++⊢++
+|++vdash++ |:vdash |https://codepoints.net/U+22A2[U+22A2] |++⊢++
+|++\|==++ |:models |https://codepoints.net/U+22A8[U+22A8] |++⊨++
+|++models++ |:models |https://codepoints.net/U+22A8[U+22A8] |++⊨++
+|++(++ |:lparen |https://codepoints.net/U+0028[U+0028] |++(++
+|++left(++ |:lparen |https://codepoints.net/U+0028[U+0028] |++(++
+|++)++ |:rparen |https://codepoints.net/U+0029[U+0029] |++)++
+|++right)++ |:rparen |https://codepoints.net/U+0029[U+0029] |++)++
+|++[++ |:lbracket |https://codepoints.net/U+005B[U+005B] |++[++
+|++left[++ |:lbracket |https://codepoints.net/U+005B[U+005B] |++[++
+|++]++ |:rbracket |https://codepoints.net/U+005D[U+005D] |++]++
+|++right]++ |:rbracket |https://codepoints.net/U+005D[U+005D] |++]++
+|++{++ |:lbrace |https://codepoints.net/U+007B[U+007B] |++{++
+|++}++ |:rbrace |https://codepoints.net/U+007D[U+007D] |++}++
+|++\|++ |:vbar |https://codepoints.net/U+007C[U+007C] |++\|++
+|++:\|:++ |:vbar |https://codepoints.net/U+007C[U+007C] |++\|++
+|++\|:++ |:vbar |https://codepoints.net/U+007C[U+007C] |++\|++
+|++:\|++ |:vbar |https://codepoints.net/U+007C[U+007C] |++\|++
+|++(:++ |:langle |https://codepoints.net/U+2329[U+2329] |++〈++
+|++<<++ |:langle |https://codepoints.net/U+2329[U+2329] |++〈++
+|++langle++ |:langle |https://codepoints.net/U+2329[U+2329] |++〈++
+|++:)++ |:rangle |https://codepoints.net/U+232A[U+232A] |++〉++
+|++>>++ |:rangle |https://codepoints.net/U+232A[U+232A] |++〉++
+|++rangle++ |:rangle |https://codepoints.net/U+232A[U+232A] |++〉++
+|++int++ |:integral |https://codepoints.net/U+222B[U+222B] |++∫++
+|++dx++ |:dx |https://codepoints.net/U+0064[U+0064] https://codepoints.net/U+0078[U+0078] |++dx++
+|++dy++ |:dy |https://codepoints.net/U+0064[U+0064] https://codepoints.net/U+0079[U+0079] |++dy++
+|++dz++ |:dz |https://codepoints.net/U+0064[U+0064] https://codepoints.net/U+007A[U+007A] |++dz++
+|++dt++ |:dt |https://codepoints.net/U+0064[U+0064] https://codepoints.net/U+0074[U+0074] |++dt++
+|++oint++ |:contourintegral |https://codepoints.net/U+222E[U+222E] |++∮++
+|++del++ |:partial |https://codepoints.net/U+2202[U+2202] |++∂++
+|++partial++ |:partial |https://codepoints.net/U+2202[U+2202] |++∂++
+|++grad++ |:nabla |https://codepoints.net/U+2207[U+2207] |++∇++
+|++nabla++ |:nabla |https://codepoints.net/U+2207[U+2207] |++∇++
+|+++-++ |:pm |https://codepoints.net/U+00B1[U+00B1] |++±++
+|++pm++ |:pm |https://codepoints.net/U+00B1[U+00B1] |++±++
+|++O/++ |:emptyset |https://codepoints.net/U+2205[U+2205] |++∅++
+|++emptyset++ |:emptyset |https://codepoints.net/U+2205[U+2205] |++∅++
+|++oo++ |:infty |https://codepoints.net/U+221E[U+221E] |++∞++
+|++infty++ |:infty |https://codepoints.net/U+221E[U+221E] |++∞++
+|++aleph++ |:aleph |https://codepoints.net/U+2135[U+2135] |++ℵ++
+|++...++ |:ellipsis |https://codepoints.net/U+2026[U+2026] |++…++
+|++ldots++ |:ellipsis |https://codepoints.net/U+2026[U+2026] |++…++
+|++:.++ |:therefore |https://codepoints.net/U+2234[U+2234] |++∴++
+|++therefore++ |:therefore |https://codepoints.net/U+2234[U+2234] |++∴++
+|++:'++ |:because |https://codepoints.net/U+2235[U+2235] |++∵++
+|++because++ |:because |https://codepoints.net/U+2235[U+2235] |++∵++
+|++/_++ |:angle |https://codepoints.net/U+2220[U+2220] |++∠++
+|++angle++ |:angle |https://codepoints.net/U+2220[U+2220] |++∠++
+|++/_\++ |:triangle |https://codepoints.net/U+25B3[U+25B3] |++△++
+|++triangle++ |:triangle |https://codepoints.net/U+25B3[U+25B3] |++△++
+|++'++ |:prime |https://codepoints.net/U+2032[U+2032] |++′++
+|++prime++ |:prime |https://codepoints.net/U+2032[U+2032] |++′++
+|++tilde++ |:tilde |https://codepoints.net/U+007E[U+007E] |++~++
+|++\ ++ |:nbsp |https://codepoints.net/U+00A0[U+00A0] |++ ++
+|++frown++ |:frown |https://codepoints.net/U+2322[U+2322] |++⌢++
+|++quad++ |:quad |https://codepoints.net/U+00A0[U+00A0] https://codepoints.net/U+00A0[U+00A0] |++  ++
+|++qquad++ |:qquad |https://codepoints.net/U+00A0[U+00A0] https://codepoints.net/U+00A0[U+00A0] https://codepoints.net/U+00A0[U+00A0] https://codepoints.net/U+00A0[U+00A0] |++    ++
+|++cdots++ |:cdots |https://codepoints.net/U+22EF[U+22EF] |++⋯++
+|++vdots++ |:vdots |https://codepoints.net/U+22EE[U+22EE] |++⋮++
+|++ddots++ |:ddots |https://codepoints.net/U+22F1[U+22F1] |++⋱++
+|++diamond++ |:diamond |https://codepoints.net/U+22C4[U+22C4] |++⋄++
+|++square++ |:square |https://codepoints.net/U+25A1[U+25A1] |++□++
+|++\|__++ |:lfloor |https://codepoints.net/U+230A[U+230A] |++⌊++
+|++lfloor++ |:lfloor |https://codepoints.net/U+230A[U+230A] |++⌊++
+|++__\|++ |:rfloor |https://codepoints.net/U+230B[U+230B] |++⌋++
+|++rfloor++ |:rfloor |https://codepoints.net/U+230B[U+230B] |++⌋++
+|++\|~++ |:lceiling |https://codepoints.net/U+2308[U+2308] |++⌈++
+|++lceiling++ |:lceiling |https://codepoints.net/U+2308[U+2308] |++⌈++
+|++~\|++ |:rceiling |https://codepoints.net/U+2309[U+2309] |++⌉++
+|++rceiling++ |:rceiling |https://codepoints.net/U+2309[U+2309] |++⌉++
+|++CC++ |:dstruck_captial_c |https://codepoints.net/U+2102[U+2102] |++ℂ++
+|++NN++ |:dstruck_captial_n |https://codepoints.net/U+2115[U+2115] |++ℕ++
+|++QQ++ |:dstruck_captial_q |https://codepoints.net/U+211A[U+211A] |++ℚ++
+|++RR++ |:dstruck_captial_r |https://codepoints.net/U+211D[U+211D] |++ℝ++
+|++ZZ++ |:dstruck_captial_z |https://codepoints.net/U+2124[U+2124] |++ℤ++
+|++f++ |:f |https://codepoints.net/U+0066[U+0066] |++f++
+|++g++ |:g |https://codepoints.net/U+0067[U+0067] |++g++
+|++lim++ |:lim |https://codepoints.net/U+006C[U+006C] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006D[U+006D] |++lim++
+|++Lim++ |:Lim |https://codepoints.net/U+004C[U+004C] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006D[U+006D] |++Lim++
+|++min++ |:min |https://codepoints.net/U+006D[U+006D] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006E[U+006E] |++min++
+|++max++ |:max |https://codepoints.net/U+006D[U+006D] https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+0078[U+0078] |++max++
+|++sin++ |:sin |https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006E[U+006E] |++sin++
+|++Sin++ |:Sin |https://codepoints.net/U+0053[U+0053] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006E[U+006E] |++Sin++
+|++cos++ |:cos |https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0073[U+0073] |++cos++
+|++Cos++ |:Cos |https://codepoints.net/U+0043[U+0043] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0073[U+0073] |++Cos++
+|++tan++ |:tan |https://codepoints.net/U+0074[U+0074] https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+006E[U+006E] |++tan++
+|++Tan++ |:Tan |https://codepoints.net/U+0054[U+0054] https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+006E[U+006E] |++Tan++
+|++sinh++ |:sinh |https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006E[U+006E] https://codepoints.net/U+0068[U+0068] |++sinh++
+|++Sinh++ |:Sinh |https://codepoints.net/U+0053[U+0053] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006E[U+006E] https://codepoints.net/U+0068[U+0068] |++Sinh++
+|++cosh++ |:cosh |https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0068[U+0068] |++cosh++
+|++Cosh++ |:Cosh |https://codepoints.net/U+0043[U+0043] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0068[U+0068] |++Cosh++
+|++tanh++ |:tanh |https://codepoints.net/U+0074[U+0074] https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+006E[U+006E] https://codepoints.net/U+0068[U+0068] |++tanh++
+|++Tanh++ |:Tanh |https://codepoints.net/U+0054[U+0054] https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+006E[U+006E] https://codepoints.net/U+0068[U+0068] |++Tanh++
+|++cot++ |:cot |https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0074[U+0074] |++cot++
+|++Cot++ |:Cot |https://codepoints.net/U+0043[U+0043] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0074[U+0074] |++Cot++
+|++sec++ |:sec |https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0065[U+0065] https://codepoints.net/U+0063[U+0063] |++sec++
+|++Sec++ |:Sec |https://codepoints.net/U+0053[U+0053] https://codepoints.net/U+0065[U+0065] https://codepoints.net/U+0063[U+0063] |++Sec++
+|++csc++ |:csc |https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0063[U+0063] |++csc++
+|++Csc++ |:Csc |https://codepoints.net/U+0043[U+0043] https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0063[U+0063] |++Csc++
+|++arcsin++ |:arcsin |https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+0072[U+0072] https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006E[U+006E] |++arcsin++
+|++arccos++ |:arccos |https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+0072[U+0072] https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0073[U+0073] |++arccos++
+|++arctan++ |:arctan |https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+0072[U+0072] https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+0074[U+0074] https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+006E[U+006E] |++arctan++
+|++coth++ |:coth |https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0074[U+0074] https://codepoints.net/U+0068[U+0068] |++coth++
+|++sech++ |:sech |https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0065[U+0065] https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+0068[U+0068] |++sech++
+|++csch++ |:csch |https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+0073[U+0073] https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+0068[U+0068] |++csch++
+|++exp++ |:exp |https://codepoints.net/U+0065[U+0065] https://codepoints.net/U+0078[U+0078] https://codepoints.net/U+0070[U+0070] |++exp++
+|++abs++ |:abs |https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+0062[U+0062] https://codepoints.net/U+0073[U+0073] |++abs++
+|++Abs++ |:abs |https://codepoints.net/U+0061[U+0061] https://codepoints.net/U+0062[U+0062] https://codepoints.net/U+0073[U+0073] |++abs++
+|++norm++ |:norm |https://codepoints.net/U+006E[U+006E] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0072[U+0072] https://codepoints.net/U+006D[U+006D] |++norm++
+|++floor++ |:floor |https://codepoints.net/U+0066[U+0066] https://codepoints.net/U+006C[U+006C] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0072[U+0072] |++floor++
+|++ceil++ |:ceil |https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+0065[U+0065] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006C[U+006C] |++ceil++
+|++log++ |:log |https://codepoints.net/U+006C[U+006C] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0067[U+0067] |++log++
+|++Log++ |:Log |https://codepoints.net/U+004C[U+004C] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0067[U+0067] |++Log++
+|++ln++ |:ln |https://codepoints.net/U+006C[U+006C] https://codepoints.net/U+006E[U+006E] |++ln++
+|++Ln++ |:Ln |https://codepoints.net/U+004C[U+004C] https://codepoints.net/U+006E[U+006E] |++Ln++
+|++det++ |:det |https://codepoints.net/U+0064[U+0064] https://codepoints.net/U+0065[U+0065] https://codepoints.net/U+0074[U+0074] |++det++
+|++dim++ |:dim |https://codepoints.net/U+0064[U+0064] https://codepoints.net/U+0069[U+0069] https://codepoints.net/U+006D[U+006D] |++dim++
+|++mod++ |:mod |https://codepoints.net/U+006D[U+006D] https://codepoints.net/U+006F[U+006F] https://codepoints.net/U+0064[U+0064] |++mod++
+|++gcd++ |:gcd |https://codepoints.net/U+0067[U+0067] https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+0064[U+0064] |++gcd++
+|++lcm++ |:lcm |https://codepoints.net/U+006C[U+006C] https://codepoints.net/U+0063[U+0063] https://codepoints.net/U+006D[U+006D] |++lcm++
+|++lub++ |:lub |https://codepoints.net/U+006C[U+006C] https://codepoints.net/U+0075[U+0075] https://codepoints.net/U+0062[U+0062] |++lub++
+|++glb++ |:glb |https://codepoints.net/U+0067[U+0067] https://codepoints.net/U+006C[U+006C] https://codepoints.net/U+0062[U+0062] |++glb++
+|++uarr++ |:uparrow |https://codepoints.net/U+2191[U+2191] |++↑++
+|++uparrow++ |:uparrow |https://codepoints.net/U+2191[U+2191] |++↑++
+|++darr++ |:downarrow |https://codepoints.net/U+2193[U+2193] |++↓++
+|++downarrow++ |:downarrow |https://codepoints.net/U+2193[U+2193] |++↓++
+|++rarr++ |:rightarrow |https://codepoints.net/U+2192[U+2192] |++→++
+|++rightarrow++ |:rightarrow |https://codepoints.net/U+2192[U+2192] |++→++
+|++->++ |:to |https://codepoints.net/U+2192[U+2192] |++→++
+|++to++ |:to |https://codepoints.net/U+2192[U+2192] |++→++
+|++>->++ |:rightarrowtail |https://codepoints.net/U+21A3[U+21A3] |++↣++
+|++rightarrowtail++ |:rightarrowtail |https://codepoints.net/U+21A3[U+21A3] |++↣++
+|++->>++ |:twoheadrightarrow |https://codepoints.net/U+21A0[U+21A0] |++↠++
+|++twoheadrightarrow++ |:twoheadrightarrow |https://codepoints.net/U+21A0[U+21A0] |++↠++
+|++>->>++ |:twoheadrightarrowtail |https://codepoints.net/U+2916[U+2916] |++⤖++
+|++twoheadrightarrowtail++ |:twoheadrightarrowtail |https://codepoints.net/U+2916[U+2916] |++⤖++
+|++\|->++ |:mapsto |https://codepoints.net/U+21A6[U+21A6] |++↦++
+|++mapsto++ |:mapsto |https://codepoints.net/U+21A6[U+21A6] |++↦++
+|++larr++ |:leftarrow |https://codepoints.net/U+2190[U+2190] |++←++
+|++leftarrow++ |:leftarrow |https://codepoints.net/U+2190[U+2190] |++←++
+|++harr++ |:leftrightarrow |https://codepoints.net/U+2194[U+2194] |++↔++
+|++leftrightarrow++ |:leftrightarrow |https://codepoints.net/U+2194[U+2194] |++↔++
+|++rArr++ |:Rightarrow |https://codepoints.net/U+21D2[U+21D2] |++⇒++
+|++Rightarrow++ |:Rightarrow |https://codepoints.net/U+21D2[U+21D2] |++⇒++
+|++lArr++ |:Leftarrow |https://codepoints.net/U+21D0[U+21D0] |++⇐++
+|++Leftarrow++ |:Leftarrow |https://codepoints.net/U+21D0[U+21D0] |++⇐++
+|++hArr++ |:Leftrightarrow |https://codepoints.net/U+21D4[U+21D4] |++⇔++
+|++Leftrightarrow++ |:Leftrightarrow |https://codepoints.net/U+21D4[U+21D4] |++⇔++
 |++sqrt++ |:sqrt | |++sqrt++
 |++root++ |:root | |++root++
 |++frac++ |:frac | |++frac++
@@ -449,21 +449,21 @@ Each column element is represented using the appropriate AST type.
 |++overset++ |:overset | |++overset++
 |++underset++ |:underset | |++underset++
 |++color++ |:color | |++color++
-|++_++ |:sub |U+005F |++_++
-|++^++ |:sup |U+005E |++^++
-|++hat++ |:hat |U+005E |++^++
-|++bar++ |:overline |U+00AF |++¯++
-|++vec++ |:vec |U+2192 |++→++
-|++dot++ |:dot |U+002E |++.++
-|++ddot++ |:ddot |U+002E U+002E |++..++
-|++overarc++ |:overarc |U+23DC |++⏜++
-|++overparen++ |:overarc |U+23DC |++⏜++
-|++ul++ |:underline |U+005F |++_++
-|++underline++ |:underline |U+005F |++_++
-|++ubrace++ |:underbrace |U+23DF |++⏟++
-|++underbrace++ |:underbrace |U+23DF |++⏟++
-|++obrace++ |:overbrace |U+23DE |++⏞++
-|++overbrace++ |:overbrace |U+23DE |++⏞++
+|++_++ |:sub |https://codepoints.net/U+005F[U+005F] |++_++
+|++^++ |:sup |https://codepoints.net/U+005E[U+005E] |++^++
+|++hat++ |:hat |https://codepoints.net/U+005E[U+005E] |++^++
+|++bar++ |:overline |https://codepoints.net/U+00AF[U+00AF] |++¯++
+|++vec++ |:vec |https://codepoints.net/U+2192[U+2192] |++→++
+|++dot++ |:dot |https://codepoints.net/U+002E[U+002E] |++.++
+|++ddot++ |:ddot |https://codepoints.net/U+002E[U+002E] https://codepoints.net/U+002E[U+002E] |++..++
+|++overarc++ |:overarc |https://codepoints.net/U+23DC[U+23DC] |++⏜++
+|++overparen++ |:overarc |https://codepoints.net/U+23DC[U+23DC] |++⏜++
+|++ul++ |:underline |https://codepoints.net/U+005F[U+005F] |++_++
+|++underline++ |:underline |https://codepoints.net/U+005F[U+005F] |++_++
+|++ubrace++ |:underbrace |https://codepoints.net/U+23DF[U+23DF] |++⏟++
+|++underbrace++ |:underbrace |https://codepoints.net/U+23DF[U+23DF] |++⏟++
+|++obrace++ |:overbrace |https://codepoints.net/U+23DE[U+23DE] |++⏞++
+|++overbrace++ |:overbrace |https://codepoints.net/U+23DE[U+23DE] |++⏞++
 |++cancel++ |:cancel | |++cancel++
 |++bb++ |:bold | |++bold++
 |++bbb++ |:double_struck | |++double_struck++
@@ -478,56 +478,56 @@ Each column element is represented using the appropriate AST type.
 |++bsf++ |:bold_sans_serif | |++bold_sans_serif++
 |++sfi++ |:sans_serif_italic | |++sans_serif_italic++
 |++sfbi++ |:sans_serif_bold_italic | |++sans_serif_bold_italic++
-|++alpha++ |:alpha |U+03B1 |++α++
-|++Alpha++ |:Alpha |U+0391 |++Α++
-|++beta++ |:beta |U+03B2 |++β++
-|++Beta++ |:Beta |U+0392 |++Β++
-|++gamma++ |:gamma |U+03B3 |++γ++
-|++Gamma++ |:Gamma |U+0393 |++Γ++
-|++delta++ |:delta |U+03B4 |++δ++
-|++Delta++ |:Delta |U+0394 |++Δ++
-|++epsi++ |:epsilon |U+03B5 |++ε++
-|++epsilon++ |:epsilon |U+03B5 |++ε++
-|++Epsilon++ |:Epsilon |U+0395 |++Ε++
-|++varepsilon++ |:varepsilon |U+025B |++ɛ++
-|++zeta++ |:zeta |U+03B6 |++ζ++
-|++Zeta++ |:Zeta |U+0396 |++Ζ++
-|++eta++ |:eta |U+03B7 |++η++
-|++Eta++ |:Eta |U+0397 |++Η++
-|++theta++ |:theta |U+03B8 |++θ++
-|++Theta++ |:Theta |U+0398 |++Θ++
-|++vartheta++ |:vartheta |U+03D1 |++ϑ++
-|++iota++ |:iota |U+03B9 |++ι++
-|++Iota++ |:Iota |U+0399 |++Ι++
-|++kappa++ |:kappa |U+03BA |++κ++
-|++Kappa++ |:Kappa |U+039A |++Κ++
-|++lambda++ |:lambda |U+03BB |++λ++
-|++Lambda++ |:Lambda |U+039B |++Λ++
-|++mu++ |:mu |U+03BC |++μ++
-|++Mu++ |:Mu |U+039C |++Μ++
-|++nu++ |:nu |U+03BD |++ν++
-|++Nu++ |:Nu |U+039D |++Ν++
-|++xi++ |:xi |U+03BE |++ξ++
-|++Xi++ |:Xi |U+039E |++Ξ++
-|++omicron++ |:omicron |U+03BF |++ο++
-|++Omicron++ |:Omicron |U+039F |++Ο++
-|++pi++ |:pi |U+03C0 |++π++
-|++Pi++ |:Pi |U+03A0 |++Π++
-|++rho++ |:rho |U+03C1 |++ρ++
-|++Rho++ |:Rho |U+03A1 |++Ρ++
-|++sigma++ |:sigma |U+03C3 |++σ++
-|++Sigma++ |:Sigma |U+03A3 |++Σ++
-|++tau++ |:tau |U+03C4 |++τ++
-|++Tau++ |:Tau |U+03A4 |++Τ++
-|++upsilon++ |:upsilon |U+03C5 |++υ++
-|++Upsilon++ |:Upsilon |U+03A5 |++Υ++
-|++phi++ |:phi |U+03C6 |++φ++
-|++Phi++ |:Phi |U+03A6 |++Φ++
-|++varphi++ |:varphi |U+03D5 |++ϕ++
-|++chi++ |:chi |U+03C7 |++χ++
-|++Chi++ |:Chi |U+03A7 |++Χ++
-|++psi++ |:psi |U+03C8 |++ψ++
-|++Psi++ |:Psi |U+03A8 |++Ψ++
-|++omega++ |:omega |U+03C9 |++ω++
-|++Omega++ |:Omega |U+03A9 |++Ω++
+|++alpha++ |:alpha |https://codepoints.net/U+03B1[U+03B1] |++α++
+|++Alpha++ |:Alpha |https://codepoints.net/U+0391[U+0391] |++Α++
+|++beta++ |:beta |https://codepoints.net/U+03B2[U+03B2] |++β++
+|++Beta++ |:Beta |https://codepoints.net/U+0392[U+0392] |++Β++
+|++gamma++ |:gamma |https://codepoints.net/U+03B3[U+03B3] |++γ++
+|++Gamma++ |:Gamma |https://codepoints.net/U+0393[U+0393] |++Γ++
+|++delta++ |:delta |https://codepoints.net/U+03B4[U+03B4] |++δ++
+|++Delta++ |:Delta |https://codepoints.net/U+0394[U+0394] |++Δ++
+|++epsi++ |:epsilon |https://codepoints.net/U+03B5[U+03B5] |++ε++
+|++epsilon++ |:epsilon |https://codepoints.net/U+03B5[U+03B5] |++ε++
+|++Epsilon++ |:Epsilon |https://codepoints.net/U+0395[U+0395] |++Ε++
+|++varepsilon++ |:varepsilon |https://codepoints.net/U+025B[U+025B] |++ɛ++
+|++zeta++ |:zeta |https://codepoints.net/U+03B6[U+03B6] |++ζ++
+|++Zeta++ |:Zeta |https://codepoints.net/U+0396[U+0396] |++Ζ++
+|++eta++ |:eta |https://codepoints.net/U+03B7[U+03B7] |++η++
+|++Eta++ |:Eta |https://codepoints.net/U+0397[U+0397] |++Η++
+|++theta++ |:theta |https://codepoints.net/U+03B8[U+03B8] |++θ++
+|++Theta++ |:Theta |https://codepoints.net/U+0398[U+0398] |++Θ++
+|++vartheta++ |:vartheta |https://codepoints.net/U+03D1[U+03D1] |++ϑ++
+|++iota++ |:iota |https://codepoints.net/U+03B9[U+03B9] |++ι++
+|++Iota++ |:Iota |https://codepoints.net/U+0399[U+0399] |++Ι++
+|++kappa++ |:kappa |https://codepoints.net/U+03BA[U+03BA] |++κ++
+|++Kappa++ |:Kappa |https://codepoints.net/U+039A[U+039A] |++Κ++
+|++lambda++ |:lambda |https://codepoints.net/U+03BB[U+03BB] |++λ++
+|++Lambda++ |:Lambda |https://codepoints.net/U+039B[U+039B] |++Λ++
+|++mu++ |:mu |https://codepoints.net/U+03BC[U+03BC] |++μ++
+|++Mu++ |:Mu |https://codepoints.net/U+039C[U+039C] |++Μ++
+|++nu++ |:nu |https://codepoints.net/U+03BD[U+03BD] |++ν++
+|++Nu++ |:Nu |https://codepoints.net/U+039D[U+039D] |++Ν++
+|++xi++ |:xi |https://codepoints.net/U+03BE[U+03BE] |++ξ++
+|++Xi++ |:Xi |https://codepoints.net/U+039E[U+039E] |++Ξ++
+|++omicron++ |:omicron |https://codepoints.net/U+03BF[U+03BF] |++ο++
+|++Omicron++ |:Omicron |https://codepoints.net/U+039F[U+039F] |++Ο++
+|++pi++ |:pi |https://codepoints.net/U+03C0[U+03C0] |++π++
+|++Pi++ |:Pi |https://codepoints.net/U+03A0[U+03A0] |++Π++
+|++rho++ |:rho |https://codepoints.net/U+03C1[U+03C1] |++ρ++
+|++Rho++ |:Rho |https://codepoints.net/U+03A1[U+03A1] |++Ρ++
+|++sigma++ |:sigma |https://codepoints.net/U+03C3[U+03C3] |++σ++
+|++Sigma++ |:Sigma |https://codepoints.net/U+03A3[U+03A3] |++Σ++
+|++tau++ |:tau |https://codepoints.net/U+03C4[U+03C4] |++τ++
+|++Tau++ |:Tau |https://codepoints.net/U+03A4[U+03A4] |++Τ++
+|++upsilon++ |:upsilon |https://codepoints.net/U+03C5[U+03C5] |++υ++
+|++Upsilon++ |:Upsilon |https://codepoints.net/U+03A5[U+03A5] |++Υ++
+|++phi++ |:phi |https://codepoints.net/U+03C6[U+03C6] |++φ++
+|++Phi++ |:Phi |https://codepoints.net/U+03A6[U+03A6] |++Φ++
+|++varphi++ |:varphi |https://codepoints.net/U+03D5[U+03D5] |++ϕ++
+|++chi++ |:chi |https://codepoints.net/U+03C7[U+03C7] |++χ++
+|++Chi++ |:Chi |https://codepoints.net/U+03A7[U+03A7] |++Χ++
+|++psi++ |:psi |https://codepoints.net/U+03C8[U+03C8] |++ψ++
+|++Psi++ |:Psi |https://codepoints.net/U+03A8[U+03A8] |++Ψ++
+|++omega++ |:omega |https://codepoints.net/U+03C9[U+03C9] |++ω++
+|++Omega++ |:Omega |https://codepoints.net/U+03A9[U+03A9] |++Ω++
 |===
