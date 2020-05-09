@@ -12,7 +12,13 @@ module AsciiMath
       end
       @prefix = prefix
       @mathml = ''
-      @row_mode = opts[:msword] ? :force : :avoid
+      if opts[:msword]
+        @row_mode = :force
+        @fence_mode = :fenced
+      else
+        @row_mode = :avoid
+        @fence_mode = :row
+      end
     end
 
     def to_s
@@ -174,10 +180,16 @@ module AsciiMath
 
     def fenced(lparen, rparen)
       if lparen || rparen
-        mrow do
-          mo(lparen) if lparen
-          yield self
-          mo(rparen) if rparen
+        if @fence_mode == :fenced
+          mfenced(:open => lparen || '', :close => rparen || '') do
+            yield self
+          end
+        else
+          mrow do
+            mo(lparen) if lparen
+            yield self
+            mo(rparen) if rparen
+          end
         end
       else
         yield self
