@@ -136,22 +136,16 @@ module AsciiMath
           sup = expression.sup_expression
           e = expression.base_expression
 
-          curly(e) do
-            append(e)
-          end
+          curly(e)
 
           if sub
             @latex << "_"
-            curly(sub) do
-              append(sub)
-            end
+            curly(sub)
           end       
 
           if sup
             @latex << "^"
-            curly(sup) do
-              append(sup)
-            end
+            curly(sup)
           end
 
         when AsciiMath::AST::UnaryOp
@@ -273,20 +267,24 @@ module AsciiMath
     end
 
     def curly(expression = nil, &block)
-      case expression
-      when AsciiMath::AST::Symbol, AsciiMath::AST::Text
-        yield self
-      when AsciiMath::AST::Identifier, AsciiMath::AST::Number
-        if expression.value.length <= 1
-          yield self
-        else
-          @latex << ?{
-          yield self
-          @latex << ?}
-        end
-      else
+      if block_given?
         @latex << ?{
         yield self
+        @latex << ?}
+      else
+        case expression
+        when AsciiMath::AST::Symbol, AsciiMath::AST::Text
+          append(expression)
+          return
+        when AsciiMath::AST::Identifier, AsciiMath::AST::Number
+          if expression.value.length <= 1
+            append(expression)
+            return
+          end
+        end
+
+        @latex << ?{
+        append(expression)
         @latex << ?}
       end
     end
