@@ -2,15 +2,11 @@ require_relative 'markup'
 require_relative 'symbol_table'
 
 module AsciiMath
-  class MathMLBuilder
-    include ::AsciiMath::MarkupBuilder
+  class MathMLBuilder < ::AsciiMath::MarkupBuilder
 
-    def initialize(prefix, opts = {})
-      if prefix.is_a? Hash
-        opts = prefix
-        prefix = ''
-      end
-      @prefix = prefix
+    def initialize(opts = {})
+      super(opts[:symbol_table] || DEFAULT_DISPLAY_SYMBOL_TABLE)
+      @prefix = opts[:prefix] || ''
       @mathml = ''
       if opts[:msword]
         @row_mode = :force
@@ -242,7 +238,7 @@ module AsciiMath
         attrs = prefix
         prefix = ""
       end
-      MathMLBuilder.new(prefix).append_expression(ast, attrs).to_s
+      MathMLBuilder.new(:prefix => prefix).append_expression(ast, attrs).to_s
     end
   end
 end

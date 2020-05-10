@@ -13,13 +13,13 @@ puts "|==="
 puts '|AsciiMath |Symbol |Codepoint |Value'
 puts
 
-AsciiMath::Parser::SYMBOLS.each_pair do |asciimath, value|
+AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE.each_pair do |asciimath, value|
   sym = value[:value]
   unless sym.is_a?(Symbol)
     next
   end
 
-  mathml = AsciiMath::MathMLBuilder::SYMBOLS[sym]
+  mathml = AsciiMath::MathMLBuilder::DEFAULT_DISPLAY_SYMBOL_TABLE[sym]
 
   if mathml
     val = mathml[:value]

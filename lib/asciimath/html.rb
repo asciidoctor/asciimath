@@ -1,11 +1,12 @@
 require_relative 'markup'
 
 module AsciiMath
-  class HTMLBuilder
-    include ::AsciiMath::MarkupBuilder
+  class HTMLBuilder < ::AsciiMath::MarkupBuilder
 
-    def initialize(prefix)
-      @prefix = prefix
+    def initialize(opts = {})
+      super(opts[:symbol_table] || DEFAULT_DISPLAY_SYMBOL_TABLE)
+      @prefix = opts[:prefifx] || ''
+      @inline = opts[:inline]
       @html = ''
     end
 
@@ -13,8 +14,8 @@ module AsciiMath
       @html
     end
 
-    def append_expression(expression, inline, attrs = {})
-      if inline
+    def append_expression(expression, attrs = {})
+      if @inline
         inline('', attrs) do
           append(expression, :row => :omit)
         end
@@ -242,7 +243,7 @@ module AsciiMath
 
   class Expression
     def to_html(prefix = "", inline = true, attrs = {})
-      HTMLBuilder.new(prefix).append_expression(ast, inline, attrs).to_s
+      HTMLBuilder.new(:prefix => prefix, :inline => inline).append_expression(ast, attrs).to_s
     end
   end
 end
