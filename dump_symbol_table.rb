@@ -2,6 +2,8 @@ require_relative 'lib/asciimath'
 
 def escape_adoc(adoc)
   case adoc
+    when nil
+      ''
     when '+'
       adoc
     else
@@ -10,7 +12,7 @@ def escape_adoc(adoc)
 end
 
 puts "|==="
-puts '|AsciiMath |Symbol |Codepoint |Value'
+puts '|AsciiMath |Symbol |MathML Value |LaTeX Value'
 puts
 
 AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE.each_pair do |asciimath, value|
@@ -27,6 +29,8 @@ AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE.each_pair do |asciimath, value|
     val = "Missing!!!!!"
   end
 
+  latex = AsciiMath::LatexBuilder::SYMBOLS[sym] || "\\#{sym.to_s}"
+
   codepoint = ""
   if val.is_a?(String)
     codepoint = val.codepoints.map do |cp|
@@ -35,7 +39,7 @@ AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE.each_pair do |asciimath, value|
     end.join(' ')
   end
 
-  puts "|#{escape_adoc(asciimath)} |:#{sym.to_s} |#{codepoint} |#{escape_adoc(val.to_s)}"
+  puts "|#{escape_adoc(asciimath)} |:#{sym.to_s} |#{escape_adoc(val.to_s)} (#{codepoint}) |#{escape_adoc(latex)}"
 end
 
 puts "|==="
