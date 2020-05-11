@@ -364,6 +364,7 @@ module AsciiMath
       b.add('Ln', :Ln, :symbol)
       b.add('det', :det, :symbol)
       b.add('dim', :dim, :symbol)
+      b.add('ker', :ker, :symbol)
       b.add('mod', :mod, :symbol)
       b.add('gcd', :gcd, :symbol)
       b.add('lcm', :lcm, :symbol)
