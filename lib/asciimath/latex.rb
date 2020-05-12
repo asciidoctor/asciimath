@@ -99,6 +99,27 @@ module AsciiMath
       :sans_serif_bold_italic => "\\mathsf",
     }
 
+    COLOURS = {
+      [0xFF, 0xFF, 0xFF] => "white",
+      [0xFF, 0x00, 0x00] => "red",
+      [0x00, 0xFF, 0x00] => "green",
+      [0x00, 0x00, 0xFF] => "blue",
+      [0xBF, 0x80, 0x40] => "brown",
+      [0x00, 0xAD, 0xEF] => "cyan",
+      [0x40, 0x40, 0x40] => "darkgray",
+      [0x80, 0x80, 0x80] => "gray",
+      [0xBF, 0xBF, 0xBF] => "lightgray",
+      [0xA4, 0xDB, 0x00] => "lime",
+      [0xE9, 0x00, 0x8A] => "magenta",
+      [0x8E, 0x86, 0x00] => "olive",
+      [0xFF, 0x80, 0x00] => "orange",
+      [0xFF, 0xBF, 0xBF] => "pink",
+      [0xBF, 0x00, 0x40] => "purple",
+      [0x00, 0x80, 0x80] => "teal",
+      [0x80, 0x00, 0x80] => "violet",
+      [0xFF, 0xF2, 0x00] => "yellow",
+    }
+
     def append(expression, separator = " ")
       case expression
         when Array
@@ -188,9 +209,19 @@ module AsciiMath
         
           when :color
             curly do
-              color('RGB') do
-                color_value = expression.operand1
-                @latex << color_value.red.to_s << ',' << color_value.green.to_s << ',' << color_value.blue.to_s
+              color_value = expression.operand1
+              red = color_value.red
+              green = color_value.green
+              blue = color_value.blue
+
+              if COLOURS.has_key? [red, green, blue]
+                  color do
+                    @latex << COLOURS[[red, green, blue]]
+                  end
+              else
+                color('RGB') do
+                  @latex << red.to_s << ',' << green.to_s << ',' << blue.to_s
+                end
               end
 
               @latex << " "
