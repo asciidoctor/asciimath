@@ -1,5 +1,6 @@
 require 'strscan'
 require_relative 'ast'
+require_relative 'color_table'
 require_relative 'symbol_table'
 
 # Parser for ASCIIMath expressions.
@@ -198,22 +199,22 @@ module AsciiMath
 
   class Parser
     def self.add_default_colors(b)
-      b.add('aqua', :aqua, :color, {:r => 0, :g => 255, :b => 255})
-      b.add('black', :black, :color, {:r => 0, :g => 0, :b => 0})
-      b.add('blue', :blue, :color, {:r => 0, :g => 0, :b => 255})
-      b.add('fuchsia', :fuchsia, :color, {:r => 255, :g => 0, :b => 255})
-      b.add('gray', :gray, :color, {:r => 128, :g => 128, :b => 128})
-      b.add('green', :green, :color, {:r => 0, :g => 128, :b => 0})
-      b.add('lime', :lime, :color, {:r => 0, :g => 255, :b => 0})
-      b.add('maroon', :maroon, :color, {:r => 128, :g => 0, :b => 0})
-      b.add('navy', :navy, :color, {:r => 0, :g => 0, :b => 128})
-      b.add('olive', :olive, :color, {:r => 128, :g => 128, :b => 0})
-      b.add('purple', :purple, :color, {:r => 128, :g => 0, :b => 128})
-      b.add('red', :red, :color, {:r => 255, :g => 0, :b => 0})
-      b.add('silver', :silver, :color, {:r => 192, :g => 192, :b => 192})
-      b.add('teal', :teal, :color, {:r => 0, :g => 128, :b => 128})
-      b.add('white', :white, :color, {:r => 255, :g => 255, :b => 255})
-      b.add('yellow', :yellow, :color, {:r => 255, :g => 255, :b => 0})
+      b.add('aqua', 0, 255, 255)
+      b.add('black', 0, 0, 0)
+      b.add('blue', 0, 0, 255)
+      b.add('fuchsia', 255, 0, 255)
+      b.add('gray', 128, 128, 128)
+      b.add('green', 0, 128, 0)
+      b.add('lime', 0, 255, 0)
+      b.add('maroon', 128, 0, 0)
+      b.add('navy', 0, 0, 128)
+      b.add('olive', 128, 128, 0)
+      b.add('purple', 128, 0, 128)
+      b.add('red', 255, 0, 0)
+      b.add('silver', 192, 192, 192)
+      b.add('teal', 0, 128, 128)
+      b.add('white', 255, 255, 255)
+      b.add('yellow', 255, 255, 0)
       b
     end
 
@@ -736,7 +737,7 @@ module AsciiMath
       end
     end
 
-    DEFAULT_COLOR_TABLE = ::AsciiMath::Parser.add_default_colors(AsciiMath::SymbolTableBuilder.new).build
+    DEFAULT_COLOR_TABLE = ::AsciiMath::Parser.add_default_colors(AsciiMath::ColorTableBuilder.new).build
     DEFAULT_PARSER_SYMBOL_TABLE = ::AsciiMath::Parser.add_default_parser_symbols(AsciiMath::SymbolTableBuilder.new, DEFAULT_COLOR_TABLE).build
   end
 
