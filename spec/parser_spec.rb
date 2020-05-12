@@ -552,7 +552,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
           binary(symbol('color'), color(0, 0, 255, 'blue'), group(subsup('a', 'b', 'c')))
       ),
       :mathml => '<math><mstyle mathcolor="#ff0000"><mi>x</mi></mstyle><mstyle mathcolor="#112233"><mi>y</mi></mstyle><mstyle mathcolor="#1234ab"><mi>z</mi></mstyle><mstyle mathcolor="#0000ff"><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup></mstyle></math>',
-      :latex => '{\\color[RGB]{255,0,0} x} {\\color[RGB]{17,34,51} y} {\\color[RGB]{18,52,171} z} {\\color[RGB]{0,0,255} a_b^c}',
+      :latex => '{\\color{red} x} {\\color[RGB]{17,34,51} y} {\\color[RGB]{18,52,171} z} {\\color{blue} a_b^c}',
   ))
 
   example('{ x\ : \ x in A ^^ x in B }', &should_generate(
