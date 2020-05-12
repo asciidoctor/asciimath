@@ -197,7 +197,27 @@ module AsciiMath
   end
 
   class Parser
-    def self.add_default_parser_symbols(b)
+    def self.add_default_colors(b)
+      b.add('aqua', :aqua, :color, {:r => 0, :g => 255, :b => 255})
+      b.add('black', :black, :color, {:r => 0, :g => 0, :b => 0})
+      b.add('blue', :blue, :color, {:r => 0, :g => 0, :b => 255})
+      b.add('fuchsia', :fuchsia, :color, {:r => 255, :g => 0, :b => 255})
+      b.add('gray', :gray, :color, {:r => 128, :g => 128, :b => 128})
+      b.add('green', :green, :color, {:r => 0, :g => 128, :b => 0})
+      b.add('lime', :lime, :color, {:r => 0, :g => 255, :b => 0})
+      b.add('maroon', :maroon, :color, {:r => 128, :g => 0, :b => 0})
+      b.add('navy', :navy, :color, {:r => 0, :g => 0, :b => 128})
+      b.add('olive', :olive, :color, {:r => 128, :g => 128, :b => 0})
+      b.add('purple', :purple, :color, {:r => 128, :g => 0, :b => 128})
+      b.add('red', :red, :color, {:r => 255, :g => 0, :b => 0})
+      b.add('silver', :silver, :color, {:r => 192, :g => 192, :b => 192})
+      b.add('teal', :teal, :color, {:r => 0, :g => 128, :b => 128})
+      b.add('white', :white, :color, {:r => 255, :g => 255, :b => 255})
+      b.add('yellow', :yellow, :color, {:r => 255, :g => 255, :b => 0})
+      b
+    end
+
+    def self.add_default_parser_symbols(b, color_table)
       # Operation symbols
       b.add('+', :plus, :symbol)
       b.add('-', :minus, :symbol)
@@ -393,7 +413,7 @@ module AsciiMath
       b.add('stackrel', :stackrel, :binary)
       b.add('overset', :overset, :binary)
       b.add('underset', :underset, :binary)
-      b.add('color', :color, :binary)
+      b.add('color', :color, :binary, :convert_operand1 => Proc.new { |node| ::AsciiMath::Parser.convert_to_color(node, color_table) })
       b.add('_', :sub, :infix)
       b.add('^', :sup, :infix)
       b.add('hat', :hat, :unary)
@@ -475,8 +495,6 @@ module AsciiMath
 
       b
     end
-
-    DEFAULT_PARSER_SYMBOL_TABLE = ::AsciiMath::Parser.add_default_parser_symbols(AsciiMath::SymbolTableBuilder.new).build
 
     def initialize(symbol_table)
       @symbol_table = symbol_table
@@ -592,10 +610,14 @@ module AsciiMath
           end
         when :unary
           s = unwrap_paren(parse_simple_expression(tok, depth))
+          s = t1[:convert_operand].call(s) if t1[:convert_operand]
           unary(token_to_symbol(t1), s)
         when :binary
           s1 = unwrap_paren(parse_simple_expression(tok, depth))
           s2 = unwrap_paren(parse_simple_expression(tok, depth))
+
+          s1 = t1[:convert_operand1].call(s1) if t1[:convert_operand1]
+          s2 = t1[:convert_operand2].call(s2) if t1[:convert_operand2]
 
           binary(token_to_symbol(t1), s1, s2)
         when :eof
@@ -664,6 +686,58 @@ module AsciiMath
     def is_matrix_separator(node)
       node.is_a?(Identifier) && node.value == ','
     end
+
+    def self.convert_to_color(color_expression, color_table)
+      s = ""
+      ::AsciiMath::Parser.append_color_text(s, color_expression)
+      s
+
+      case s
+        when /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i
+          color_value = {:r => $1.to_i(16), :g => $2.to_i(16), :b => $3.to_i(16), }
+        when /#([0-9a-f])([0-9a-f])([0-9a-f])/i
+          color_value = {:r => "#{$1}#{$1}".to_i(16), :g => "#{$2}#{$2}".to_i(16), :b => "#{$3}#{$3}".to_i(16), }
+        else
+          color_value = color_table[s.downcase] || {:r => 0, :g => 0, :b => 0}
+      end
+
+      ::AsciiMath::AST::Color.new(color_value[:r], color_value[:g], color_value[:b], s)
+    end
+
+    def self.append_color_text(s, node)
+      case node
+        when ::AsciiMath::AST::Sequence
+          node.each { |n| append_color_text(s, n) }
+        when ::AsciiMath::AST::Number, ::AsciiMath::AST::Identifier, ::AsciiMath::AST::Text
+          s << node.value
+        when ::AsciiMath::AST::Symbol
+          s << node.text
+        when ::AsciiMath::AST::Group
+          append_color_text(s, node.expression)
+        when ::AsciiMath::AST::Paren
+          append_color_text(s, node.lparen)
+          append_color_text(s, node.expression)
+          append_color_text(s, node.rparen)
+        when ::AsciiMath::AST::SubSup
+          append_color_text(s, node.base_expression)
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand2)
+        when ::AsciiMath::AST::UnaryOp
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand)
+        when ::AsciiMath::AST::BinaryOp
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand1)
+          append_color_text(s, node.operand2)
+        when ::AsciiMath::AST::InfixOp
+          append_color_text(s, node.operand1)
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand2)
+      end
+    end
+
+    DEFAULT_COLOR_TABLE = ::AsciiMath::Parser.add_default_colors(AsciiMath::SymbolTableBuilder.new).build
+    DEFAULT_PARSER_SYMBOL_TABLE = ::AsciiMath::Parser.add_default_parser_symbols(AsciiMath::SymbolTableBuilder.new, DEFAULT_COLOR_TABLE).build
   end
 
   class Expression

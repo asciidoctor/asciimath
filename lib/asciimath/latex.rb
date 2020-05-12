@@ -1,5 +1,4 @@
 require_relative 'ast'
-require_relative 'markup'
 
 module AsciiMath
   class LatexBuilder
@@ -102,6 +101,12 @@ module AsciiMath
 
     def append(expression, separator = " ")
       case expression
+        when Array
+          expression.each { |e| append(e, separator) }
+        when String
+          @latex << expression
+        when Symbol
+          @latex << expression.to_s
         when AsciiMath::AST::Sequence, AsciiMath::AST::MatrixRow 
           c = expression.length
 
@@ -183,8 +188,9 @@ module AsciiMath
         
           when :color
             curly do
-              color do
-                ::AsciiMath::MarkupBuilder.append_color_text(@latex, expression.operand1)
+              color('RGB') do
+                color_value = expression.operand1
+                @latex << color_value.red.to_s << ',' << color_value.green.to_s << ',' << color_value.blue.to_s
               end
 
               @latex << " "

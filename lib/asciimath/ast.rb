@@ -63,6 +63,10 @@ module AsciiMath
       Matrix.new(lparen, rows, rparen)
     end
 
+    def color(r, g, b, text)
+      Color.new(r, g, b, text)
+    end
+
     class Node
       attr_reader :parent
 
@@ -199,7 +203,8 @@ module AsciiMath
       end
 
       def to_s
-        s = base_expression.to_s
+        s = ""
+        s << base_expression.to_s
         sub = sub_expression
         if sub
           s << "_" << sub.to_s
@@ -346,13 +351,50 @@ module AsciiMath
       end
 
       def to_s
-        @text
+        text
       end
     end
 
     class Identifier < ValueNode
       def initialize(value)
         super(value.dup.freeze)
+      end
+    end
+
+    class Color < ValueNode
+      attr_reader :text
+
+      def initialize(r, g, b, text)
+        super({:r => r, :g => g, :b => b}.freeze)
+        @text = text.dup.freeze
+      end
+
+      def red
+        value[:r]
+      end
+
+      def green
+        value[:g]
+      end
+
+      def blue
+        value[:b]
+      end
+
+      def ==(o)
+        o.class == self.class &&
+            o.red == red &&
+            o.green == green &&
+            o.blue == blue &&
+            o.text == text
+      end
+
+      def to_hex_rgb
+        sprintf('#%02x%02x%02x', red, green, blue)
+      end
+
+      def to_s
+        text
       end
     end
 

@@ -544,13 +544,15 @@ RSpec.shared_examples 'AsciiMath Examples' do
       :latex => '\\cancel{a_b^c} {\\cancel{a}}_b^c',
   ))
 
-  example('color(red)(x) colortext(blue)(a_b^c)', &should_generate(
+  example('color(red)(x) color(#123)(y) color(#1234ab)(z) colortext(blue)(a_b^c)', &should_generate(
       :ast => seq(
-          binary(symbol('color'), grseq('r', 'e', 'd'), group('x')),
-          binary(symbol('color'), 'blue', group(subsup('a', 'b', 'c')))
+          binary(symbol('color'), color(255, 0, 0, 'red'), group('x')),
+          binary(symbol('color'), color(17, 34, 51, '#123'), group('y')),
+          binary(symbol('color'), color(18, 52, 171, '#1234ab'), group('z')),
+          binary(symbol('color'), color(0, 0, 255, 'blue'), group(subsup('a', 'b', 'c')))
       ),
-      :mathml => '<math><mstyle mathcolor="red"><mi>x</mi></mstyle><mstyle mathcolor="blue"><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup></mstyle></math>',
-      :latex => '{\\color{red} x} {\\color{blue} a_b^c}',
+      :mathml => '<math><mstyle mathcolor="#ff0000"><mi>x</mi></mstyle><mstyle mathcolor="#112233"><mi>y</mi></mstyle><mstyle mathcolor="#1234ab"><mi>z</mi></mstyle><mstyle mathcolor="#0000ff"><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup></mstyle></math>',
+      :latex => '{\\color[RGB]{255,0,0} x} {\\color[RGB]{17,34,51} y} {\\color[RGB]{18,52,171} z} {\\color[RGB]{0,0,255} a_b^c}',
   ))
 
   example('{ x\ : \ x in A ^^ x in B }', &should_generate(

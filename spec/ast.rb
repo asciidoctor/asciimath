@@ -83,6 +83,10 @@ module AsciiMath
       ACTUAL_AST.number(value)
     end
 
+    def color(r, g, b, value)
+      ACTUAL_AST.color(r, g, b, value)
+    end
+
     def symbol(text)
       symbol = ::AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE[text]
       if symbol
