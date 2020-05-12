@@ -43,118 +43,52 @@ identifier = [A-z]
 
 == Abstract Syntax Tree
 
-The parser returns an abstract syntax tree consisting of Hashes and Arrays.
+The parser returns an abstract syntax tree consisting of `AsciiMath::AST::Node` objects.
 Each expression 'node' of the AST is one of the following forms:
 
 AsciiMath::
-`asciimath` is converted to a an Array of expressions.
+`asciimath` is converted to a `AsciiMath::AST::Sequence`.
 An empty Array is converted to nil by the parser.
-A single element Array is unwrapped to just the element.
+A single element `AsciiMath::AST::Sequence` is unwrapped to just the element.
 +
-Sequences of expressions are returned as an Array of nodes.
+Sequences of expressions are returned as `AsciiMath::AST::Sequence`s as well.
 
 Parentheses::
-`lparen asciimath rparen` is converted to a Hash of the following form
-+
-[source]
-----
-{
-  :type => :paren
-  :e => <sub node>
-  :lparen => <left Symbol>
-  :rparen => <right Symbol>
-}
-----
+`lparen asciimath rparen` is converted to `AsciiMath::AST::Paren`.
+When a `paren` expression is used to group the operands of unary or binary operators a `AsciiMath::AST::Group` is used instead.
+The `group` node retains the parentheses, but these are not rendered in the final output.
 
 Super and Sub Script::
-`simp sub`, `simp super` and `simp sub super` are converted to a Hash of the following form.
-+
-[source]
-----
-{
-  :type => :subsup
-  :e => <base node>
-  :sub => <subscript node>
-  :sup => <superscript node>
-}
-----
+`simp sub`, `simp super` and `simp sub super` are converted to `AsciiMath::AST::SubSup`.
 
 Unary Expressions::
-`unary_op simp` is converted to a Hash of the following form.
-+
-[source]
-----
-{
-  :type => :unary
-  :e => <operand node>
-  :op => <operator node>
-}
-----
+`unary_op simp` is converted to `AsciiMath::AST::UnaryOp`.
 
 Binary Expressions::
-`binary_op simp simp` is converted to a Hash of the following form.
+`binary_op simp simp` is converted to `AsciiMath::AST::BinaryOp`.
 +
-`intermediate / intermediate` is converted to the equivalent `frac` based binary expression.
-For instance the AsciiMath string `a / b` would be returned as `{:type => :binary, :op => :frac, :e1 => "a", :e2 => "b"}`.
-+
-[source]
-----
-{
-  :type => :binary
-  :e1 => <first operand node>
-  :e2 => <second operand node>
-  :op => <operator node>
-}
-----
+`intermediate / intermediate` is converted to `AsciiMath::AST::InfixOp`.
 
 Symbols::
 +
-`symbol` (mathematical operators, function names, arrows, accents, greek letters, etc.) is converted to a Hash of the following form.
+`symbol` (mathematical operators, function names, arrows, accents, greek letters, etc.) is converted to `AsciiMath::AST::Symbol`.
 The <<symbol_table>> below list all the symbols that are recognized by the parser.
-+
-[source]
-----
-{
-  :type => :symbol
-  :value => <value Symbol>
-}
-----
 
 Identifiers::
 +
-`identifier` is converted to a Hash of the following form.
-+
-[source]
-----
-{
-  :type => :identifier
-  :value => <value String>
-}
-----
+`identifier` is converted to `AsciiMath::AST::Identifier`.
 
 Text::
 +
-`text` is converted to a Hash of the following form.
-+
-[source]
-----
-{
-  :type => :text
-  :value => <value String>
-}
-----
+`text` is converted to `AsciiMath::AST::Text`.
 
 Numbers::
 +
-`number` is converted to a Hash of the following form.
+`number` is converted to `AsciiMath::AST::Number`.
+
+Colors::
 +
-[source]
-----
-{
-  :type => :number
-  :value => <value String>
-}
-----
+The first operand of the `color` binary operator is converted to `AsciiMath::AST::Color`.
 
 Matrices::
 Matrices in AsciiMath are a special case of nested `paren_expr`.
@@ -165,20 +99,10 @@ The elements of each row must also be separated by commas.
 Each row must contain the same number of elements.
 +
 When the parser detects a well-formed matrix expression it will strip away the `paren_expr` representation of the matrix and each row.
-Instead it returns a Hash of the following form.
-The `rows` value contains an Array with one element per row.
-Each row Array contains one element per column.
-Each column element is represented using the appropriate AST type.
-+
-[source]
-----
-{
-    :type => :matrix
-    :rows => <Array of Arrays of nodes>
-    :lparen => <left Symbol>
-    :rparen => <right Symbol>
-}
-----
+Instead it returns a `AsciiMath::AST::Matrix`.
+The matrix node contains a `AsciiMath::AST::MatrixRow` for each row of the matrix.
+Each `AsciiMath::AST::MatrixRow` contains a child node per column.
+Empty matrix cells are represented as `AsciiMath::AST::Empty`.
 
 [[symbol_table]]
 == Symbol Table
