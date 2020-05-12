@@ -218,7 +218,7 @@ module AsciiMath
       b
     end
 
-    def self.add_default_parser_symbols(b, color_table)
+    def self.add_default_parser_symbols(b)
       # Operation symbols
       b.add('+', :plus, :symbol)
       b.add('-', :minus, :symbol)
@@ -414,7 +414,7 @@ module AsciiMath
       b.add('stackrel', :stackrel, :binary)
       b.add('overset', :overset, :binary)
       b.add('underset', :underset, :binary)
-      b.add('color', :color, :binary, :convert_operand1 => Proc.new { |node| ::AsciiMath::Parser.convert_to_color(node, color_table) })
+      b.add('color', :color, :binary, :convert_operand1 => ::AsciiMath::Parser.instance_method(:convert_to_color))
       b.add('_', :sub, :infix)
       b.add('^', :sup, :infix)
       b.add('hat', :hat, :unary)
@@ -497,8 +497,9 @@ module AsciiMath
       b
     end
 
-    def initialize(symbol_table)
+    def initialize(symbol_table, color_table)
       @symbol_table = symbol_table
+      @color_table = color_table
     end
 
     def parse(input)
@@ -611,14 +612,14 @@ module AsciiMath
           end
         when :unary
           s = unwrap_paren(parse_simple_expression(tok, depth))
-          s = t1[:convert_operand].call(s) if t1[:convert_operand]
+          s = convert_node(s, t1[:convert_operand])
           unary(token_to_symbol(t1), s)
         when :binary
           s1 = unwrap_paren(parse_simple_expression(tok, depth))
           s2 = unwrap_paren(parse_simple_expression(tok, depth))
 
-          s1 = t1[:convert_operand1].call(s1) if t1[:convert_operand1]
-          s2 = t1[:convert_operand2].call(s2) if t1[:convert_operand2]
+          s1 = convert_node(s1, t1[:convert_operand1])
+          s2 = convert_node(s2, t1[:convert_operand2])
 
           binary(token_to_symbol(t1), s1, s2)
         when :eof
@@ -688,9 +689,20 @@ module AsciiMath
       node.is_a?(Identifier) && node.value == ','
     end
 
-    def self.convert_to_color(color_expression, color_table)
+    def convert_node(node, converter)
+      case converter
+        when nil
+          node
+        when UnboundMethod
+          converter.bind(self).call(node)
+        when Method, Proc
+          converter.call(node)
+      end
+    end
+
+    def convert_to_color(color_expression)
       s = ""
-      ::AsciiMath::Parser.append_color_text(s, color_expression)
+      append_color_text(s, color_expression)
       s
 
       case s
@@ -699,13 +711,13 @@ module AsciiMath
         when /#([0-9a-f])([0-9a-f])([0-9a-f])/i
           color_value = {:r => "#{$1}#{$1}".to_i(16), :g => "#{$2}#{$2}".to_i(16), :b => "#{$3}#{$3}".to_i(16), }
         else
-          color_value = color_table[s.downcase] || {:r => 0, :g => 0, :b => 0}
+          color_value = @color_table[s.downcase] || {:r => 0, :g => 0, :b => 0}
       end
 
-      ::AsciiMath::AST::Color.new(color_value[:r], color_value[:g], color_value[:b], s)
+      color(color_value[:r], color_value[:g], color_value[:b], s)
     end
 
-    def self.append_color_text(s, node)
+    def append_color_text(s, node)
       case node
         when ::AsciiMath::AST::Sequence
           node.each { |n| append_color_text(s, n) }
@@ -738,7 +750,7 @@ module AsciiMath
     end
 
     DEFAULT_COLOR_TABLE = ::AsciiMath::Parser.add_default_colors(AsciiMath::ColorTableBuilder.new).build
-    DEFAULT_PARSER_SYMBOL_TABLE = ::AsciiMath::Parser.add_default_parser_symbols(AsciiMath::SymbolTableBuilder.new, DEFAULT_COLOR_TABLE).build
+    DEFAULT_PARSER_SYMBOL_TABLE = ::AsciiMath::Parser.add_default_parser_symbols(AsciiMath::SymbolTableBuilder.new).build
   end
 
   class Expression
@@ -754,7 +766,7 @@ module AsciiMath
     end
   end
 
-  def self.parse(asciimath, parser_symbol_table = ::AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE)
-    Parser.new(parser_symbol_table).parse(asciimath)
+  def self.parse(asciimath, parser_symbol_table = ::AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE, parser_color_table = ::AsciiMath::Parser::DEFAULT_COLOR_TABLE)
+    Parser.new(parser_symbol_table, parser_color_table).parse(asciimath)
   end
 end
