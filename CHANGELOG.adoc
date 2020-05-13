@@ -1,9 +1,10 @@
 = Asciimath Changelog
 
-== 1.0.10
+== 2.0.0
 
 Enhancements::
 
+  * The AsciiMath parser has been significantly improved and should now have reached feature parity with the original Javascript implementation.
   * Issue #16: add initial LaTeX output support (@GarkGarcia)
   * Issue #26: avoid generating `<mfenced>` tags in MathML output
 
