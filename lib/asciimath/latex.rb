@@ -2,8 +2,11 @@ require_relative 'ast'
 
 module AsciiMath
   class LatexBuilder
-    def initialize
+    attr_reader :symbols_table
+
+    def initialize(symbols_table = nil)
       @latex = ''
+      @symbols_table = symbols_table.nil? ? SymbolsTable : symbols_table
     end
 
     def to_s
@@ -14,12 +17,8 @@ module AsciiMath
       append(expression)
       self
     end
-
-    private
-
-    SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]].map(&:ord)
-
-    SYMBOLS = {
+    
+    SymbolsTable = {
       :plus => ?+,
       :minus => ?-,
       :ast => ?*,
@@ -97,7 +96,11 @@ module AsciiMath
       :bold_sans_serif => "\\mathsf",
       :sans_serif_italic => "\\mathsf",
       :sans_serif_bold_italic => "\\mathsf",
-    }
+    }.freeze
+
+    private
+
+    SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]].map(&:ord)
 
     COLOURS = {
       [0xFF, 0xFF, 0xFF] => "white",
@@ -334,7 +337,7 @@ module AsciiMath
     end
 
     def symbol(s)
-      SYMBOLS[s] || "\\#{s.to_s}"
+      @symbols_table[s] || "\\#{s.to_s}"
     end
 
     def is_small(e)
