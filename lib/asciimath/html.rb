@@ -4,7 +4,7 @@ module AsciiMath
   class HTMLBuilder < ::AsciiMath::MarkupBuilder
 
     def initialize(opts = {})
-      super(opts[:symbol_table] || SYMBOL_TABLE)
+      super(opts[:symbol_table] || DEFAULT_SYMBOL_TABLE)
       @prefix = opts[:prefifx] || ''
       @inline = opts[:inline]
       @html = ''
