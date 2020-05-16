@@ -337,7 +337,18 @@ module AsciiMath
     end
 
     def resolve_symbol(s)
-      @symbol_table[s] || "\\#{s.to_s}"
+      symbol = @symbol_table[s]
+
+      case symbol
+      when String
+        return symbol
+      when Hash
+        return symbol[:value]
+      when nil
+        return "\\#{s.to_s}"
+      else
+        raise "Invalid entry in symbol table"
+      end
     end
 
     def is_small(e)
