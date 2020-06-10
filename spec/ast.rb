@@ -88,7 +88,7 @@ module AsciiMath
     end
 
     def symbol(text)
-      symbol = ::AsciiMath::Parser::DEFAULT_SYMBOL_TABLE[text]
+      symbol = ::AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE[text]
       if symbol
         ACTUAL_AST.symbol(symbol[:value], text)
       else
