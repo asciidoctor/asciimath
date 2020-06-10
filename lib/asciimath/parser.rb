@@ -750,7 +750,7 @@ module AsciiMath
     end
 
     DEFAULT_COLOR_TABLE = ::AsciiMath::Parser.add_default_colors(AsciiMath::ColorTableBuilder.new).build
-    DEFAULT_SYMBOL_TABLE = ::AsciiMath::Parser.add_default_parser_symbols(AsciiMath::SymbolTableBuilder.new).build
+    DEFAULT_PARSER_SYMBOL_TABLE = ::AsciiMath::Parser.add_default_parser_symbols(AsciiMath::SymbolTableBuilder.new).build
   end
 
   class Expression
@@ -766,7 +766,7 @@ module AsciiMath
     end
   end
 
-  def self.parse(asciimath, parser_symbol_table = ::AsciiMath::Parser::DEFAULT_SYMBOL_TABLE, parser_color_table = ::AsciiMath::Parser::DEFAULT_COLOR_TABLE)
+  def self.parse(asciimath, parser_symbol_table = ::AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE, parser_color_table = ::AsciiMath::Parser::DEFAULT_COLOR_TABLE)
     Parser.new(parser_symbol_table, parser_color_table).parse(asciimath)
   end
 end

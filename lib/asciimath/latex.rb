@@ -6,7 +6,7 @@ module AsciiMath
 
     def initialize(symbol_table = nil)
       @latex = ''
-      @symbol_table = symbol_table.nil? ? DEFAULT_SYMBOL_TABLE : symbol_table
+      @symbol_table = symbol_table.nil? ? DEFAULT_DISPLAY_SYMBOL_TABLE : symbol_table
     end
 
     def to_s
@@ -18,7 +18,7 @@ module AsciiMath
       self
     end
     
-    DEFAULT_SYMBOL_TABLE = {
+    DEFAULT_DISPLAY_SYMBOL_TABLE = {
       :plus => ?+,
       :minus => ?-,
       :ast => ?*,

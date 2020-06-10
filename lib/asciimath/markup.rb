@@ -277,7 +277,7 @@ module AsciiMath
       b
     end
 
-    DEFAULT_SYMBOL_TABLE = ::AsciiMath::MarkupBuilder.add_default_display_symbols(AsciiMath::SymbolTableBuilder.new).build
+    DEFAULT_DISPLAY_SYMBOL_TABLE = ::AsciiMath::MarkupBuilder.add_default_display_symbols(AsciiMath::SymbolTableBuilder.new).build
 
     def initialize(symbol_table)
       @symbol_table = symbol_table
