@@ -1,5 +1,11 @@
 = Asciimath Changelog
 
+== 2.0.1
+
+Bug fixes::
+
+  * Issue #48: fix parsing of single column matrices (@ronaldtse)
+
 == 2.0.0
 
 Enhancements::
