@@ -1,10 +1,10 @@
 #encoding: utf-8
 require 'rspec'
 require 'asciimath'
-require 'ast'
+require_relative 'ast'
 
 RSpec.configure do |c|
-  include ::AsciiMath::ASTHelper
+  c.include ::AsciiMath::ASTHelper
 end
 
 describe 'AsciiMath::Parser', :variant => :ast do

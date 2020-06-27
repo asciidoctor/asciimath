@@ -1,7 +1,7 @@
 #encoding: utf-8
 require 'rspec'
 require 'asciimath'
-require 'ast'
+require_relative 'ast'
 require 'nokogiri'
 
 
