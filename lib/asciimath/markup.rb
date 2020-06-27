@@ -163,6 +163,7 @@ module AsciiMath
       b.add(:Ln, 'Ln', :identifier)
       b.add(:det, 'det', :identifier)
       b.add(:dim, 'dim', :identifier)
+      b.add(:ker, 'ker', :identifier)
       b.add(:mod, 'mod', :identifier)
       b.add(:gcd, 'gcd', :identifier)
       b.add(:lcm, 'lcm', :identifier)
