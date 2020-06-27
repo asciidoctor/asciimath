@@ -97,7 +97,7 @@ my_tokens_table = AsciiMath::SymbolTableBuilder.new
 AsciiMath::Parser.add_default_parser_symbols(my_tokens_table)
 my_tokens_table.add('mysymbol', :mysymbol, :symbol)
 
-AsciiMath::parse("a + mycustomsymbol + b", my_tokens_table.build)
+AsciiMath::parse("a + mysymbol + b", my_tokens_table.build)
 ----
 
 Furthermore, the behaviour of the tokenizer be customized by altering the value 
