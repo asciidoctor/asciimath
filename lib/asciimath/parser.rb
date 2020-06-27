@@ -663,21 +663,21 @@ module AsciiMath
 
         row_content = row.expression
         unless row_content.is_a?(::AsciiMath::AST::Sequence)
-          row_content = expression(row_content)
-        end
-
-        row_content.each do |item|
-          if is_matrix_separator(item)
-            chunks << current_chunk
-            current_chunk = []
-          else
-            current_chunk << item
+          [expression(row_content)]
+        else
+          row_content.each do |item|
+            if is_matrix_separator(item)
+              chunks << current_chunk
+              current_chunk = []
+            else
+              current_chunk << item
+            end
           end
+
+          chunks << current_chunk
+
+          chunks.map { |c| c.length == 1 ? c[0] : expression(*c) }.to_a
         end
-
-        chunks << current_chunk
-
-        chunks.map { |c| c.length == 1 ? c[0] : expression(*c) }.to_a
       end
 
       return node unless rows.all? { |row| row.length == rows[0].length }
