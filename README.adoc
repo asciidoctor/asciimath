@@ -93,15 +93,11 @@ The parser can be extended by passing a custum tokenization table:
 
 [source, ruby]
 ----
-my_tokens_table = {}
+my_tokens_table = AsciiMath::SymbolTableBuilder.new
+AsciiMath::Parser.add_default_parser_symbols(my_tokens_table)
+my_tokens_table.add('mysymbol', :mysymbol, :symbol)
 
-AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE.each do |key|
-  my_tokens_table[key] = AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE[key]
-end
-
-my_tokens_table['mysymbol'] = {:value => :mysymbol, :type => :symbol}
-
-AsciiMath::parse("a + mycustomsymbol + b", my_tokens_table)
+AsciiMath::parse("a + mycustomsymbol + b", my_tokens_table.build)
 ----
 
 Furthermore, the behaviour of the tokenizer be customized by altering the value 
@@ -109,16 +105,12 @@ associated with a token in `AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE`:
 
 [source, ruby]
 ----
-my_tokens_table = {}
-
-AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE.each do |key|
-  my_tokens_table[key] = AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE[key]
-end
-
-my_tokens_table['alpha'] = {:value => :beta, :type => :symbol}
+my_tokens_table = AsciiMath::SymbolTableBuilder.new
+AsciiMath::Parser.add_default_parser_symbols(my_tokens_table)
+my_tokens_table.add('alpha', :beta, :symbol)
 
 # Now "alpha + beta" is equivalent to "beta + beta"
-AsciiMath::parse("alpha + beta", my_tokens_table)
+AsciiMath::parse("alpha + beta", my_tokens_table.build)
 ----
 
 The same behaviour applies to each individual render (`MathMLBuilder`, 
@@ -127,16 +119,12 @@ table (or modifying exisisting entries), users can customize it's output:
 
 [source, ruby]
 ----
-my_rendering_table = {}
-
-AsciiMath::MarkupBuilder::DEFAULT_DISPLAY_SYMBOL_TABLE.each do |key|
-  my_tokens_table[key] = AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE[key]
-end
-
-my_rendering_table['alpha'] = {:value => '\u03b2', :type => :identifier}
+my_rendering_table = AsciiMath::SymbolTableBuilder.new
+AsciiMath::MarkupBuilder.add_default_display_symbols(my_rendering_table)
+my_rendering_table.add('alpha', '\u03b2', :identifier)
 
 # Now "alpha + beta" is equivalent to "beta + beta"
-AsciiMath::parse("alpha + beta").to_mathml(my_rendering_table)
+AsciiMath::parse("alpha + beta").to_mathml(my_rendering_table.build)
 ----
 
 ## Notes on the HTML Output
