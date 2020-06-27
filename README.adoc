@@ -87,6 +87,57 @@ asciimath latex "an asciimath string"
 
 This command will print out the generated code on stdout.
 
+## Extentions and Customization
+
+The parser can be extended by passing a custum tokenization table:
+
+[source, ruby]
+----
+my_tokens_table = {}
+
+AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE.each do |key|
+  my_tokens_table[key] = AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE[key]
+end
+
+my_tokens_table['mysymbol'] = {:value => :mysymbol, :type => :symbol}
+
+AsciiMath::parse("a + mycustomsymbol + b", my_tokens_table)
+----
+
+Furthermore, the behaviour of the tokenizer be customized by altering the value 
+associated with a token in `AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE`:
+
+[source, ruby]
+----
+my_tokens_table = {}
+
+AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE.each do |key|
+  my_tokens_table[key] = AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE[key]
+end
+
+my_tokens_table['alpha'] = {:value => :beta, :type => :symbol}
+
+# Now "alpha + beta" is equivalent to "beta + beta"
+AsciiMath::parse("alpha + beta", my_tokens_table)
+----
+
+The same behaviour applies to each individual render (`MathMLBuilder`, 
+`HTMLBuilder` and `LatexBuilder`). By adding entries to a rendere's rendering 
+table (or modifying exisisting entries), users can customize it's output:
+
+[source, ruby]
+----
+my_rendering_table = {}
+
+AsciiMath::MarkupBuilder::DEFAULT_DISPLAY_SYMBOL_TABLE.each do |key|
+  my_tokens_table[key] = AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE[key]
+end
+
+my_rendering_table['alpha'] = {:value => '\u03b2', :type => :identifier}
+
+# Now "alpha + beta" is equivalent to "beta + beta"
+AsciiMath::parse("alpha + beta").to_mathml(my_rendering_table)
+----
 
 ## Notes on the HTML Output
 

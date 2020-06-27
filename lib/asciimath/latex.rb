@@ -2,8 +2,11 @@ require_relative 'ast'
 
 module AsciiMath
   class LatexBuilder
-    def initialize
+    attr_reader :symbol_table
+
+    def initialize(symbol_table = nil)
       @latex = ''
+      @symbol_table = symbol_table.nil? ? DEFAULT_DISPLAY_SYMBOL_TABLE : symbol_table
     end
 
     def to_s
@@ -14,12 +17,8 @@ module AsciiMath
       append(expression)
       self
     end
-
-    private
-
-    SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]].map(&:ord)
-
-    SYMBOLS = {
+    
+    DEFAULT_DISPLAY_SYMBOL_TABLE = {
       :plus => ?+,
       :minus => ?-,
       :ast => ?*,
@@ -97,7 +96,11 @@ module AsciiMath
       :bold_sans_serif => "\\mathsf",
       :sans_serif_italic => "\\mathsf",
       :sans_serif_bold_italic => "\\mathsf",
-    }
+    }.freeze
+
+    private
+
+    SPECIAL_CHARACTERS = [?&, ?%, ?$, ?#, ?_, ?{, ?}, ?~, ?^, ?[, ?]].map(&:ord)
 
     COLOURS = {
       [0xFF, 0xFF, 0xFF] => "white",
@@ -138,7 +141,7 @@ module AsciiMath
           end
 
         when AsciiMath::AST::Symbol
-          @latex << symbol(expression.value)
+          @latex << resolve_symbol(expression.value)
 
         when AsciiMath::AST::Identifier
           append_escaped(expression.value)
@@ -229,7 +232,7 @@ module AsciiMath
             end
 
           else
-            @latex << symbol(op)
+            @latex << resolve_symbol(op)
 
             curly do
               append(expression.operand1)
@@ -259,7 +262,7 @@ module AsciiMath
     end
 
     def macro(macro, *args)
-      @latex << symbol(macro)
+      @latex << resolve_symbol(macro)
 
       if args.length != 0
         @latex << "["
@@ -284,9 +287,9 @@ module AsciiMath
 
       if block_given?
         if l || r
-          @latex << "\\left " << symbol(l) << " "
+          @latex << "\\left " << resolve_symbol(l) << " "
           yield self
-          @latex << " \\right " << symbol(r)
+          @latex << " \\right " << resolve_symbol(r)
         else
           yield self
         end
@@ -294,12 +297,12 @@ module AsciiMath
         needs_left_right = !is_small(content)
 
         @latex << "\\left " if needs_left_right
-        @latex << symbol(l) << " " if l or needs_left_right
+        @latex << resolve_symbol(l) << " " if l or needs_left_right
 
         append(content)
 
         @latex << " \\right" if needs_left_right
-        @latex << " " << symbol(r) if r or needs_left_right
+        @latex << " " << resolve_symbol(r) if r or needs_left_right
       end
     end
 
@@ -333,8 +336,19 @@ module AsciiMath
       end
     end
 
-    def symbol(s)
-      SYMBOLS[s] || "\\#{s.to_s}"
+    def resolve_symbol(s)
+      symbol = @symbol_table[s]
+
+      case symbol
+      when String
+        return symbol
+      when Hash
+        return symbol[:value]
+      when nil
+        return "\\#{s.to_s}"
+      else
+        raise "Invalid entry in symbol table"
+      end
     end
 
     def is_small(e)
@@ -379,8 +393,8 @@ module AsciiMath
   end
 
   class Expression
-    def to_latex
-      LatexBuilder.new().append_expression(ast).to_s
+    def to_latex(symbol_table = nil)
+      LatexBuilder.new(symbol_table).append_expression(ast).to_s
     end
   end
 end
