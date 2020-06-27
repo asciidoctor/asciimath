@@ -2,6 +2,11 @@
 
 == 2.0.1
 
+Enhancements::
+
+  * Issue #40: add `ker` as standard symbol (@GarkGarcia)
+  * Issue #46: allow customisation of the parsing and rendering symbol tables (@GarkGarcia)
+
 Bug fixes::
 
   * Issue #48: fix parsing of single column matrices (@ronaldtse)
