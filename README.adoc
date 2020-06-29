@@ -7,7 +7,7 @@ ifdef::status[]
 [discrete]
 ## Status
 
-image:https://travis-ci.org/pepijnve/asciimath.svg?branch=master["Linux Build Status", link="https://travis-ci.org/asciidoctor/asciimath"]
+image:https://travis-ci.org/asciidoctor/asciimath.svg?branch=master["Linux Build Status", link="https://travis-ci.org/asciidoctor/asciimath"]
 image:https://img.shields.io/gem/v/asciimath.svg?label=gem%20version[Gem Version, link=https://rubygems.org/gems/asciimath]
 endif::status[]
 
