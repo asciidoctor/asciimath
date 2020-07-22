@@ -572,6 +572,16 @@ RSpec.shared_examples 'AsciiMath Examples' do
       :latex => '\\left \\{ x \\; : \\; x \\in A \\wedge x \\in B \\right \\}',
   ))
 
+  example('ii', &should_generate(
+      :ast => unary(symbol('ii'), identifier('')),
+      :mathml => '<math><mstyle mathvariant="italic"><mi></mi></mstyle></math>'
+  ))
+
+  example('hat', &should_generate(
+      :ast => unary(symbol('hat'), identifier('')),
+      :mathml => '<math><mover><mi></mi><mo>^</mo></mover></math>'
+  ))
+
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
 
   if version[0] > 1 || version[1] > 8

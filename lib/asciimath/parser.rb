@@ -612,12 +612,16 @@ module AsciiMath
             token_to_symbol(t1)
           end
         when :unary
-          s = unwrap_paren(parse_simple_expression(tok, depth))
+          parse_simple_expression = parse_simple_expression(tok, depth)
+          s = unwrap_paren(parse_simple_expression)
+          s = identifier('') if s.nil?
           s = convert_node(s, t1[:convert_operand])
           unary(token_to_symbol(t1), s)
         when :binary
           s1 = unwrap_paren(parse_simple_expression(tok, depth))
+          s1 = identifier('') if s1.nil?
           s2 = unwrap_paren(parse_simple_expression(tok, depth))
+          s2 = identifier('') if s2.nil?
 
           s1 = convert_node(s1, t1[:convert_operand1])
           s2 = convert_node(s2, t1[:convert_operand2])

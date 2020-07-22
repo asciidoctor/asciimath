@@ -1,5 +1,11 @@
 = Asciimath Changelog
 
+== 2.0.2
+
+Bug fixes::
+
+  * Issue #50: fix parsing error when unary and binary operators are missing an operand
+
 == 2.0.1
 
 Enhancements::
