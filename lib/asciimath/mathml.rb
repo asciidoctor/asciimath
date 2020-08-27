@@ -149,19 +149,24 @@ module AsciiMath
     end
 
     def append_underover(base, sub, sup)
+      attrs = {}
+
+      attrs[:accent] = true if is_accent(sup)
+      attrs[:accentunder] = true if is_accent(sub)
+
       if sub && sup
-        munderover do
+        munderover(attrs) do
           append(base, :row => @row_mode)
           append(sub, :row => @row_mode)
           append(sup, :row => @row_mode)
         end
       elsif sub
-        munder do
+        munder(attrs) do
           append(base, :row => @row_mode)
           append(sub, :row => @row_mode)
         end
       elsif sup
-        mover do
+        mover(attrs) do
           append(base, :row => @row_mode)
           append(sup, :row => @row_mode)
         end

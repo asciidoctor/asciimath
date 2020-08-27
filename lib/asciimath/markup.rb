@@ -475,5 +475,10 @@ module AsciiMath
           nil
       end
     end
+
+    def is_accent(node)
+      resolved = resolve_symbol(node)
+      !resolved.nil? && resolved[:type] == :accent
+    end
   end
 end

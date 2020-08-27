@@ -74,8 +74,8 @@ RSpec.shared_examples 'AsciiMath Examples' do
           'j',
           sub(symbol('vartheta'), '0')
       ),
-      :mathml => '<math><munder><mover><mi>A</mi><mo>^</mo></mover><mo>_</mo></munder><mo>=</mo><mover><mi>A</mi><mo>^</mo></mover><mi>exp</mi><mi>j</mi><msub><mi>&#x3D1;</mi><mn>0</mn></msub></math>',
-      :mathml_word => '<math><munder><mrow><mover><mrow><mi>A</mi></mrow><mrow><mo>^</mo></mrow></mover></mrow><mrow><mo>_</mo></mrow></munder><mo>=</mo><mover><mrow><mi>A</mi></mrow><mrow><mo>^</mo></mrow></mover><mi>exp</mi><mi>j</mi><msub><mrow><mi>&#x3D1;</mi></mrow><mrow><mn>0</mn></mrow></msub></math>',
+      :mathml => '<math><munder><mover accent="true"><mi>A</mi><mo>^</mo></mover><mo>_</mo></munder><mo>=</mo><mover accent="true"><mi>A</mi><mo>^</mo></mover><mi>exp</mi><mi>j</mi><msub><mi>&#x3D1;</mi><mn>0</mn></msub></math>',
+      :mathml_word => '<math><munder><mrow><mover accent="true"><mrow><mi>A</mi></mrow><mrow><mo>^</mo></mrow></mover></mrow><mrow><mo>_</mo></mrow></munder><mo>=</mo><mover accent="true"><mrow><mi>A</mi></mrow><mrow><mo>^</mo></mrow></mover><mi>exp</mi><mi>j</mi><msub><mrow><mi>&#x3D1;</mi></mrow><mrow><mn>0</mn></mrow></msub></math>',
       :latex => '\\underset{\\text{–}}{\\hat{A}} = \\hat{A} \\exp j \\vartheta_0'
   ))
 
@@ -272,7 +272,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
           unary(symbol('ul'), group('A')),
           unary(symbol('vec'), group('v')),
       ),
-      :mathml => '<math><mover><mrow><mi>a</mi><mi>b</mi></mrow><mo>^</mo></mover><mover><mrow><mi>x</mi><mi>y</mi></mrow><mo>&#xAF;</mo></mover><munder><mi>A</mi><mo>_</mo></munder><mover><mi>v</mi><mo>&#x2192;</mo></mover></math>',
+      :mathml => '<math><mover accent="true"><mrow><mi>a</mi><mi>b</mi></mrow><mo>^</mo></mover><mover accent="true"><mrow><mi>x</mi><mi>y</mi></mrow><mo>&#xAF;</mo></mover><munder accentunder="true"><mi>A</mi><mo>_</mo></munder><mover accent="true"><mi>v</mi><mo>&#x2192;</mo></mover></math>',
       :html => '<span class="math-inline"><span class="math-blank">&#x200D;</span><span class="math-underover"><span class="math-smaller"><span class="math-operator">^</span></span><span class="math-row"><span class="math-identifier">a</span><span class="math-identifier">b</span></span><span class="math-smaller"><span class="math-blank">&#x200D;</span></span></span><span class="math-blank">&#x200D;</span><span class="math-underover"><span class="math-smaller"><span class="math-operator">&#xAF;</span></span><span class="math-row"><span class="math-identifier">x</span><span class="math-identifier">y</span></span><span class="math-smaller"><span class="math-blank">&#x200D;</span></span></span><span class="math-blank">&#x200D;</span><span class="math-underover"><span class="math-smaller"><span class="math-blank">&#x200D;</span></span><span class="math-identifier">A</span><span class="math-smaller"><span class="math-operator">_</span></span></span><span class="math-blank">&#x200D;</span><span class="math-underover"><span class="math-smaller"><span class="math-operator">&#x2192;</span></span><span class="math-identifier">v</span><span class="math-smaller"><span class="math-blank">&#x200D;</span></span></span></span>',
       :latex => '\\hat{a b} \\overline{x y} \\underline{A} \\vec{v}',
   ))
@@ -418,7 +418,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
           unary(symbol('ubrace'), grseq('1', symbol('+'), '2')),
           unary(symbol('obrace'), group(symbol('('), seq('3', symbol('+'), '4'), nil))
       ),
-      :mathml => '<math><munder><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow><mo>&#x23DF;</mo></munder><mover><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mo>&#x23DE;</mo></mover></math>',
+      :mathml => '<math><munder accentunder="true"><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow><mo>&#x23DF;</mo></munder><mover accent="true"><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mo>&#x23DE;</mo></mover></math>',
       :latex => '\\underbrace{1 + 2} \\overbrace{3 + 4}',
   ))
 
@@ -519,7 +519,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
 
   example('overarc a_b^c', &should_generate(
       :ast => subsup(unary(symbol('overarc'), 'a'), 'b', 'c'),
-      :mathml => '<math><msubsup><mover><mi>a</mi><mo>&#x23DC;</mo></mover><mi>b</mi><mi>c</mi></msubsup></math>',
+      :mathml => '<math><msubsup><mover accent="true"><mi>a</mi><mo>&#x23DC;</mo></mover><mi>b</mi><mi>c</mi></msubsup></math>',
       :latex => '{\\overset{\\frown}{a}}_b^c'
   ))
 
