@@ -579,7 +579,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
 
   example('hat', &should_generate(
       :ast => unary(symbol('hat'), identifier('')),
-      :mathml => '<math><mover><mi></mi><mo>^</mo></mover></math>'
+      :mathml => '<math><mover accent="true"><mi></mi><mo>^</mo></mover></math>'
   ))
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
