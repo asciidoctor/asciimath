@@ -4,7 +4,7 @@ require_relative 'symbol_table'
 module AsciiMath
   class MarkupBuilder
     # Operation symbols
-    def self.add_default_display_symbols(b)
+    def self.add_default_display_symbols(b, fix_phi: true)
       b.add(:plus, '+', :operator)
       b.add(:minus, "\u2212", :operator)
       b.add(:cdot, "\u22C5", :operator)
@@ -265,9 +265,14 @@ module AsciiMath
       b.add(:Tau, "\u03a4", :identifier)
       b.add(:upsilon, "\u03c5", :identifier)
       b.add(:Upsilon, "\u03a5", :identifier)
-      b.add(:phi, "\u03c6", :identifier)
+      if fix_phi
+        b.add(:phi, "\u03d5", :identifier)
+        b.add(:varphi, "\u03c6", :identifier)
+      else
+        b.add(:phi, "\u03c6", :identifier)
+        b.add(:varphi, "\u03d5", :identifier)
+      end
       b.add(:Phi, "\u03a6", :identifier)
-      b.add(:varphi, "\u03d5", :identifier)
       b.add(:chi, "\u03c7", :identifier)
       b.add(:Chi, "\u03a7", :identifier)
       b.add(:psi, "\u03c8", :identifier)
@@ -278,7 +283,18 @@ module AsciiMath
       b
     end
 
-    DEFAULT_DISPLAY_SYMBOL_TABLE = ::AsciiMath::MarkupBuilder.add_default_display_symbols(AsciiMath::SymbolTableBuilder.new).build
+    private
+    DEFAULT_SYMBOL_TABLE = ::AsciiMath::MarkupBuilder.add_default_display_symbols(AsciiMath::SymbolTableBuilder.new, fix_phi: false).build
+    DEFAULT_SYMBOL_TABLE_FIX_PHI = ::AsciiMath::MarkupBuilder.add_default_display_symbols(AsciiMath::SymbolTableBuilder.new, fix_phi: true).build
+
+    public
+    def self.default_display_symbol_table(fix_phi: true)
+      if fix_phi
+        DEFAULT_SYMBOL_TABLE_FIX_PHI
+      else
+        DEFAULT_SYMBOL_TABLE
+      end
+    end
 
     def initialize(symbol_table)
       @symbol_table = symbol_table

@@ -5,7 +5,7 @@ module AsciiMath
   class MathMLBuilder < ::AsciiMath::MarkupBuilder
 
     def initialize(opts = {})
-      super(opts[:symbol_table] || DEFAULT_DISPLAY_SYMBOL_TABLE)
+      super(opts[:symbol_table] || ::AsciiMath::MarkupBuilder.default_display_symbol_table(fix_phi: opts.fetch(:fix_phi, true)))
       @prefix = opts[:prefix] || ''
       @mathml = ''
       if opts[:msword]

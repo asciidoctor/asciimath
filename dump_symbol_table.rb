@@ -21,7 +21,7 @@ AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE.each_pair do |asciimath, value|
     next
   end
 
-  mathml = AsciiMath::MathMLBuilder::DEFAULT_DISPLAY_SYMBOL_TABLE[sym]
+  mathml = AsciiMath::MathMLBuilder.default_display_symbol_table[sym]
 
   if mathml
     val = mathml[:value]
