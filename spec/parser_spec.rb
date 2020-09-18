@@ -75,7 +75,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
           sub(symbol('vartheta'), '0')
       ),
       :mathml => '<math><munder><mover accent="true"><mi>A</mi><mo>^</mo></mover><mo>_</mo></munder><mo>=</mo><mover accent="true"><mi>A</mi><mo>^</mo></mover><mi>exp</mi><mi>j</mi><msub><mi>&#x3D1;</mi><mn>0</mn></msub></math>',
-      :mathml_word => '<math><munder><mrow><mover accent="true"><mrow><mi>A</mi></mrow><mrow><mo>^</mo></mrow></mover></mrow><mrow><mo>_</mo></mrow></munder><mo>=</mo><mover accent="true"><mrow><mi>A</mi></mrow><mrow><mo>^</mo></mrow></mover><mi>exp</mi><mi>j</mi><msub><mrow><mi>&#x3D1;</mi></mrow><mrow><mn>0</mn></mrow></msub></math>',
+      :mathml_word => '<math><munder><mrow><mover accent="true"><mrow><mi>A</mi></mrow><mo>^</mo></mover></mrow><mrow><mo>_</mo></mrow></munder><mo>=</mo><mover accent="true"><mrow><mi>A</mi></mrow><mo>^</mo></mover><mi>exp</mi><mi>j</mi><msub><mrow><mi>&#x3D1;</mi></mrow><mrow><mn>0</mn></mrow></msub></math>',
       :latex => '\\underset{\\text{–}}{\\hat{A}} = \\hat{A} \\exp j \\vartheta_0'
   ))
 
