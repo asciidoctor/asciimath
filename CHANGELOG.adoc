@@ -5,6 +5,7 @@
 Enhancements::
 
   * Issue #51: generate `accent` and `accentunder` attributes on `munder`, `mover`, and `munderover` tags when appropriate
+  * Issue #52: map `phi` to U+03D5 and `varphi` to U+03C6 by default.
 
 Bug fixes::
 
