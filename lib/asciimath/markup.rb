@@ -221,6 +221,7 @@ module AsciiMath
       b.add(:bold_sans_serif, :bold_sans_serif, :font)
       b.add(:sans_serif_italic, :sans_serif_italic, :font)
       b.add(:sans_serif_bold_italic, :sans_serif_bold_italic, :font)
+      b.add(:roman, :normal, :font)
 
       # Greek letters
       b.add(:alpha, "\u03b1", :identifier)

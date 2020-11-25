@@ -577,6 +577,11 @@ RSpec.shared_examples 'AsciiMath Examples' do
       :mathml => '<math><mstyle mathvariant="italic"><mi></mi></mstyle></math>'
   ))
 
+  example('rm(ms)', &should_generate(
+      :ast => unary(symbol('rm'), grseq(identifier('m'), identifier('s'))),
+      :mathml => '<math><mstyle mathvariant="normal"><mrow><mi>m</mi><mi>s</mi></mrow></mstyle></math>'
+  ))
+
   example('hat', &should_generate(
       :ast => unary(symbol('hat'), identifier('')),
       :mathml => '<math><mover accent="true"><mi></mi><mo>^</mo></mover></math>'

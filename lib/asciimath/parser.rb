@@ -441,6 +441,7 @@ module AsciiMath
       b.add('bsf', :bold_sans_serif, :unary)
       b.add('sfi', :sans_serif_italic, :unary)
       b.add('sfbi', :sans_serif_bold_italic, :unary)
+      b.add('rm', :roman, :unary)
 
       # Greek letters
       b.add('alpha', :alpha, :symbol)

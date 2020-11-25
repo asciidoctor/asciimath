@@ -96,6 +96,7 @@ module AsciiMath
       :bold_sans_serif => "\\mathsf",
       :sans_serif_italic => "\\mathsf",
       :sans_serif_bold_italic => "\\mathsf",
+      :roman => "\\mathrm",
     }.freeze
 
     private
