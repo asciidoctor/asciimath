@@ -708,7 +708,6 @@ module AsciiMath
     def convert_to_color(color_expression)
       s = ""
       append_color_text(s, color_expression)
-      s
 
       case s
         when /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i
