@@ -244,8 +244,6 @@ module AsciiMath
           end
         
         when AsciiMath::AST::Matrix
-          len = expression.length - 1
-          
           parens(expression.lparen, expression.rparen) do
             c = expression.length
             @latex << "\\begin{matrix} "
