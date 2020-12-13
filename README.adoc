@@ -1,4 +1,5 @@
 # AsciiMath
+:uri-project: https://github.com/asciidoctor/asciimath
 ifndef::env-site[:status:]
 
 An http://asciimath.org[AsciiMath] parser and MathML/LaTeX generator written in pure Ruby.
@@ -7,7 +8,7 @@ ifdef::status[]
 [discrete]
 ## Status
 
-image:https://travis-ci.org/asciidoctor/asciimath.svg?branch=master["Linux Build Status", link="https://travis-ci.org/asciidoctor/asciimath"]
+image:{uri-project}/workflows/CI/badge.svg?branch=master["Build Status", link={uri-project}/actions?query=branch%3Amaster]
 image:https://img.shields.io/gem/v/asciimath.svg?label=gem%20version[Gem Version, link=https://rubygems.org/gems/asciimath]
 endif::status[]
 
