@@ -14,12 +14,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
-      - name: Reinstall Bundler
-        if: matrix.os == 'windows-latest' && matrix.ruby == 'jruby'
-        # Temporary workaround for https://github.com/ruby/setup-ruby/issues/129
-        run: |
-          gem uninstall -x bundler
-          gem install -N bundler -v 2.1.4
       - name: Build
         run: bundle install --jobs 4 --retry 3
       - name: Test
