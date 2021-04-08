@@ -15,6 +15,7 @@ module AsciiMath
         @row_mode = :avoid
         @fence_mode = :row
       end
+      @escape_non_ascii = opts.fetch(:escape_non_ascii, true)
     end
 
     def to_s
@@ -239,7 +240,7 @@ module AsciiMath
           @mathml << "&lt;"
         elsif cp == 62
           @mathml << "&gt;"
-        elsif cp > 127
+        elsif cp > 127 && @escape_non_ascii
           @mathml << "&#x#{cp.to_s(16).upcase};"
         else
           @mathml << cp

@@ -7,6 +7,7 @@ module AsciiMath
       super(opts[:symbol_table] || ::AsciiMath::MarkupBuilder.default_display_symbol_table(fix_phi: opts.fetch(:fix_phi, true)))
       @prefix = opts[:prefifx] || ''
       @inline = opts[:inline]
+      @escape_non_ascii = opts.fetch(:escape_non_ascii, true)
       @html = ''
     end
 
@@ -227,7 +228,7 @@ module AsciiMath
             @html << "&lt;"
           elsif cp == 62
             @html << "&gt;"
-          elsif cp > 127
+          elsif cp > 127 && @escape_non_ascii
             @html << "&#x#{cp.to_s(16).upcase};"
           else
             @html << cp

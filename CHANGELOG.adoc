@@ -2,9 +2,13 @@
 
 == 2.0.3
 
+Enhancements::
+
+  * Issue #59: make escaping of non-ASCII characters in MathML and HTML output optional.
+
 Bug fixes::
 
-* Issue #58: produce `<mo>` tags instead of `<mi>` tags for non-alphanumeric strings.
+  * Issue #58: produce `<mo>` tags instead of `<mi>` tags for non-alphanumeric strings.
 
 == 2.0.2
 
