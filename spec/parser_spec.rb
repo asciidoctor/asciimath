@@ -587,9 +587,11 @@ RSpec.shared_examples 'AsciiMath Examples' do
       :mathml => '<math><mover accent="true"><mi></mi><mo>^</mo></mover></math>'
   ))
 
-  example('40%', &should_generate(
-    :ast => seq(number('40'), identifier('%')),
-    :mathml => '<math><mn>40</mn><mo>%</mo></math>'
+  example('40% * 3!', &should_generate(
+    :ast => seq('40', '%', symbol('*'), '3', '!'),
+    :mathml => '<math><mn>40</mn><mo>%</mo><mo>&#x22C5;</mo><mn>3</mn><mo>!</mo></math>',
+    :html => '<span class="math-inline"><span class="math-number">40</span><span class="math-operator">%</span><span class="math-operator">&#x22C5;</span><span class="math-number">3</span><span class="math-operator">!</span></span>',
+    :latex => '40 \% \cdot 3 !'
   ))
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
