@@ -303,6 +303,8 @@ module AsciiMath
       b.add(':}', nil, :rparen)
 
       # Miscellaneous symbols
+      b.add('%', :percent, :symbol)
+      b.add('!', :exclamation, :symbol)
       b.add('int', :integral, :symbol)
       b.add('dx', :dx, :symbol)
       b.add('dy', :dy, :symbol)

@@ -45,6 +45,8 @@ module AsciiMath
       :rvert => "\\rVert",
       :vbar => ?|,
       nil => ?.,
+      :percent => "\\%",
+      :exclamation => ?!,
       :integral => "\\int",
       :dx => "dx",
       :dy => "dy",

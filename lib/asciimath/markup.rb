@@ -83,6 +83,8 @@ module AsciiMath
       b.add(:parallel, "\u2225", :lrparen)
 
       # Miscellaneous symbols
+      b.add(:percent, '%', :operator)
+      b.add(:exclamation, '!', :operator)
       b.add(:integral, "\u222B", :operator)
       b.add(:dx, 'dx', :identifier)
       b.add(:dy, 'dy', :identifier)
