@@ -329,7 +329,7 @@ module AsciiMath
         when ::AsciiMath::AST::Number
           append_number(node.value)
         when ::AsciiMath::AST::Identifier
-          append_identifier(node.value)
+          append_identifier_or_operator(node.value)
         when ::AsciiMath::AST::Symbol
           if (symbol = resolve_symbol(node))
             case symbol[:type]
@@ -339,7 +339,7 @@ module AsciiMath
                 append_identifier(symbol[:value])
             end
           else
-            append_identifier(node[:value])
+            append_identifier_or_operator(node[:value])
           end
         when ::AsciiMath::AST::Paren
           append_paren(resolve_paren(node.lparen), node.expression, resolve_paren(node.rparen), opts)
@@ -403,6 +403,14 @@ module AsciiMath
 
     def append_operator(operator)
       raise NotImplementedError.new __method__.to_s
+    end
+
+    def append_identifier_or_operator(value)
+      if value.empty? || value =~ /[[:alnum:]].*/
+        append_identifier(value)
+      else
+        append_operator(value)
+      end
     end
 
     def append_identifier(identifier)

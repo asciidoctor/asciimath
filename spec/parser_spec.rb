@@ -568,7 +568,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
           seq('x', symbol('\ '), ':', symbol('\ '), 'x', symbol('in'), 'A', symbol('^^'), 'x', symbol('in'), 'B'),
           symbol('}')
       ),
-      :mathml => '<math><mrow><mo>{</mo><mrow><mi>x</mi><mo>&#xA0;</mo><mi>:</mi><mo>&#xA0;</mo><mi>x</mi><mo>&#x2208;</mo><mi>A</mi><mo>&#x2227;</mo><mi>x</mi><mo>&#x2208;</mo><mi>B</mi></mrow><mo>}</mo></mrow></math>',
+      :mathml => '<math><mrow><mo>{</mo><mrow><mi>x</mi><mo>&#xA0;</mo><mo>:</mo><mo>&#xA0;</mo><mi>x</mi><mo>&#x2208;</mo><mi>A</mi><mo>&#x2227;</mo><mi>x</mi><mo>&#x2208;</mo><mi>B</mi></mrow><mo>}</mo></mrow></math>',
       :latex => '\\left \\{ x \\; : \\; x \\in A \\wedge x \\in B \\right \\}',
   ))
 
@@ -585,6 +585,11 @@ RSpec.shared_examples 'AsciiMath Examples' do
   example('hat', &should_generate(
       :ast => unary(symbol('hat'), identifier('')),
       :mathml => '<math><mover accent="true"><mi></mi><mo>^</mo></mover></math>'
+  ))
+
+  example('40%', &should_generate(
+    :ast => seq(number('40'), identifier('%')),
+    :mathml => '<math><mn>40</mn><mo>%</mo></math>'
   ))
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }

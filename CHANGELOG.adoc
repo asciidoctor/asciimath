@@ -1,5 +1,11 @@
 = Asciimath Changelog
 
+== 2.0.3
+
+Bug fixes::
+
+* Issue #58: produce `<mo>` tags instead of `<mi>` tags for non-alphanumeric strings.
+
 == 2.0.2
 
 Enhancements::
