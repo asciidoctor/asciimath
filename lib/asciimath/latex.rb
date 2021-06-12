@@ -382,7 +382,7 @@ module AsciiMath
       when AsciiMath::AST::Group
         is_very_small(e.expression)
       when AsciiMath::AST::Sequence
-        e.all? { |s| is_very_small(e) }
+        e.all? { |s| is_very_small(s) }
       when nil
         true
       else
