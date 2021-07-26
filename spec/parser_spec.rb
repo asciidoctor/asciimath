@@ -7,11 +7,11 @@ require 'nokogiri'
 
 module Xml
   def self.mathml2_xsd
-    @schema ||= File.open(File.expand_path('../schema/mathml2/mathml2.xsd', __FILE__)) { |io| Nokogiri::XML::Schema(io) }
+    @mathml2_schema ||= File.open(File.expand_path('../schema/mathml2/mathml2.xsd', __FILE__)) { |io| Nokogiri::XML::Schema(io) }
   end
 
   def self.mathml3_xsd
-    @schema ||= File.open(File.expand_path('../schema/mathml3/mathml3.xsd', __FILE__)) { |io| Nokogiri::XML::Schema(io) }
+    @mathml3_schema ||= File.open(File.expand_path('../schema/mathml3/mathml3.xsd', __FILE__)) { |io| Nokogiri::XML::Schema(io) }
   end
 
   def self.parse(content)
@@ -31,12 +31,14 @@ def should_generate(expected_output)
             expect(parsed.ast).to eq(expected)
           when :mathml
             expect(parsed.to_mathml).to eq(expected)
-            xml_dom = Xml.parse(parsed.to_mathml(:xmlns => 'http://www.w3.org/1998/Math/MathML'))
-            Xml.mathml2_xsd.validate(xml_dom).each do |error|
-              fail(error.message)
-            end
-            Xml.mathml3_xsd.validate(xml_dom).each do |error|
-              fail(error.message)
+            if defined?(RUBY_ENGINE) && RUBY_ENGINE != 'jruby'
+              xml_dom = Xml.parse(parsed.to_mathml(:xmlns => 'http://www.w3.org/1998/Math/MathML'))
+              Xml.mathml2_xsd.validate(xml_dom).each do |error|
+                fail(error.message)
+              end
+              Xml.mathml3_xsd.validate(xml_dom).each do |error|
+                fail(error.message)
+              end
             end
           when :mathml_word
             expect(::AsciiMath::MathMLBuilder.new(:msword => true).append_expression(parsed.ast).to_s).to eq(expected)
