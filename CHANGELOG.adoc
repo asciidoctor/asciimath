@@ -9,6 +9,7 @@ Enhancements::
 Bug fixes::
 
   * Issue #58: produce `<mo>` tags instead of `<mi>` tags for non-alphanumeric strings.
+  * Issue #62: resolve infinite recursion in LaTeX generator.
 
 == 2.0.2
 
