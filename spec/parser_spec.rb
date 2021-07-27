@@ -337,7 +337,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
 
   example('|(a,b),(c,d)|=ad-bc', &should_generate(
       :ast => seq(
-          matrix(symbol('|'), [%w(a b), %w(c d)], symbol('|'),),
+          matrix(symbol('|'), [%w(a b), %w(c d)], symbol('|')),
           symbol('='),
           'a', 'd',
           symbol('-'),
@@ -594,6 +594,20 @@ RSpec.shared_examples 'AsciiMath Examples' do
     :mathml => '<math><mn>40</mn><mo>%</mo><mo>&#x22C5;</mo><mn>3</mn><mo>!</mo></math>',
     :html => '<span class="math-inline"><span class="math-number">40</span><span class="math-operator">%</span><span class="math-operator">&#x22C5;</span><span class="math-number">3</span><span class="math-operator">!</span></span>',
     :latex => '40 \% \cdot 3 !'
+  ))
+
+  example('R(alpha_(K+1)|x)', &should_generate(
+    :ast => seq('R', paren(symbol('('), seq(sub('alpha', grseq('K', symbol('+'), '1')), seq(symbol('|'), 'x')), symbol(')'))),
+    :mathml => '<math><mi>R</mi><mrow><mo>(</mo><mrow><msub><mi>&#x3B1;</mi><mrow><mi>K</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo>|</mo><mi>x</mi></mrow></mrow><mo>)</mo></mrow></math>',
+    :latex => 'R \\left ( \\alpha_{K + 1} | x \\right )'
+  ))
+
+  example('|(a),(b)|', &should_generate(
+    :ast => matrix(symbol('|'), [%w(a), %w(b)], symbol('|')),
+  ))
+
+  example('|a+b|', &should_generate(
+    :ast => paren(symbol('|'), seq('a', '+', 'b'), symbol('|')),
   ))
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }

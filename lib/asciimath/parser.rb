@@ -507,7 +507,7 @@ module AsciiMath
     def parse(input)
       Expression.new(
           input,
-          parse_expression(Tokenizer.new(input, @symbol_table), 0)
+          parse_expression(Tokenizer.new(input, @symbol_table), nil)
       )
     end
 
@@ -515,26 +515,26 @@ module AsciiMath
 
     include AsciiMath::AST
 
-    def parse_expression(tok, depth)
+    def parse_expression(tok, close_paren_type)
       e = []
 
-      while (s1 = parse_intermediate_expression(tok, depth))
+      while (i1 = parse_intermediate_expression(tok, close_paren_type))
         t1 = tok.next_token
 
         if t1[:type] == :infix && t1[:value] == :frac
-          s2 = parse_intermediate_expression(tok, depth)
-          if s2
-            e << infix(unwrap_paren(s1), symbol(:frac, t1[:text]), unwrap_paren(s2))
+          i2 = parse_intermediate_expression(tok, close_paren_type)
+          if i2
+            e << infix(unwrap_paren(i1), symbol(:frac, t1[:text]), unwrap_paren(i2))
           else
-            e << s1
+            e << i1
           end
         elsif t1[:type] == :eof
-          e << s1
+          e << i1
           break
         else
-          e << s1
+          e << i1
           tok.push_back(t1)
-          if (t1[:type] == :lrparen || t1[:type] == :rparen) && depth > 0
+          if t1[:type] == close_paren_type
             break
           end
         end
@@ -543,8 +543,8 @@ module AsciiMath
       expression(*e)
     end
 
-    def parse_intermediate_expression(tok, depth)
-      s = parse_simple_expression(tok, depth)
+    def parse_intermediate_expression(tok, close_paren_type)
+      s = parse_simple_expression(tok, close_paren_type)
       sub = nil
       sup = nil
 
@@ -553,17 +553,17 @@ module AsciiMath
         when :infix
           case t1[:value]
             when :sub
-              sub = parse_simple_expression(tok, depth)
+              sub = parse_simple_expression(tok, close_paren_type)
               if sub
                 t2 = tok.next_token
                 if t2[:type] == :infix && t2[:value] == :sup
-                  sup = parse_simple_expression(tok, depth)
+                  sup = parse_simple_expression(tok, close_paren_type)
                 else
                   tok.push_back(t2)
                 end
               end
             when :sup
-              sup = parse_simple_expression(tok, depth)
+              sup = parse_simple_expression(tok, close_paren_type)
             else
               tok.push_back(t1)
           end
@@ -582,46 +582,54 @@ module AsciiMath
       end
     end
 
-    def parse_simple_expression(tok, depth)
+    def parse_simple_expression(tok, close_paren_type)
       t1 = tok.next_token
 
       case t1[:type]
         when :lparen, :lrparen
+          if t1[:type] == :lparen
+            close_with = :rparen
+          else
+            close_with = :lrparen
+          end
+
           t2 = tok.next_token
-          case t2[:type]
-            when :rparen, :lrparen
-              paren(token_to_symbol(t1), nil, token_to_symbol(t2))
+          if t2[:type] == close_with
+            paren(token_to_symbol(t1), nil, token_to_symbol(t2))
+          else
+            tok.push_back(t2)
+
+            e = parse_expression(tok, close_with)
+
+            t2 = tok.next_token
+            if t2[:type] == close_with
+              convert_to_matrix(paren(token_to_symbol(t1), e, token_to_symbol(t2)))
             else
               tok.push_back(t2)
-
-              e = parse_expression(tok, depth + 1)
-
-              t2 = tok.next_token
-              case t2[:type]
-                when :rparen, :lrparen
-                  convert_to_matrix(paren(token_to_symbol(t1), e, token_to_symbol(t2)))
-                else
-                  tok.push_back(t2)
-                  paren(token_to_symbol(t1), e, nil)
+              if t1[:type] == :lrparen
+                concat_expressions(token_to_symbol(t1), e)
+              else
+                paren(token_to_symbol(t1), e, nil)
               end
+            end
           end
         when :rparen
-          if depth > 0
+          if close_paren_type.nil?
+            token_to_symbol(t1)
+          else
             tok.push_back(t1)
             nil
-          else
-            token_to_symbol(t1)
           end
         when :unary
-          parse_simple_expression = parse_simple_expression(tok, depth)
+          parse_simple_expression = parse_simple_expression(tok, close_paren_type)
           s = unwrap_paren(parse_simple_expression)
           s = identifier('') if s.nil?
           s = convert_node(s, t1[:convert_operand])
           unary(token_to_symbol(t1), s)
         when :binary
-          s1 = unwrap_paren(parse_simple_expression(tok, depth))
+          s1 = unwrap_paren(parse_simple_expression(tok, close_paren_type))
           s1 = identifier('') if s1.nil?
-          s2 = unwrap_paren(parse_simple_expression(tok, depth))
+          s2 = unwrap_paren(parse_simple_expression(tok, close_paren_type))
           s2 = identifier('') if s2.nil?
 
           s1 = convert_node(s1, t1[:convert_operand1])
@@ -638,6 +646,31 @@ module AsciiMath
           identifier(t1[:value])
         else
           token_to_symbol(t1)
+      end
+    end
+
+    def concat_expressions(e1, e2)
+      case e1
+        when Sequence
+          case e2
+            when Sequence
+              expression(*(e1.to_a), *(e2.to_a))
+            when nil
+              e1
+            else
+              expression(*(e1.to_a), e2)
+          end
+        when nil
+          e2
+        else
+          case e2
+            when Sequence
+              expression(e1, *(e2.to_a))
+            when nil
+              e1
+            else
+              expression(e1, e2)
+          end
       end
     end
 
