@@ -14,7 +14,7 @@ describe 'AsciiMath::Parser', :variant => :ast do
     my_tokens_table.add('mysymbol', :mysymbol, :symbol)
 
     parsed = AsciiMath::parse("a + mysymbol + b", my_tokens_table.build)
-    expect(parsed.ast).to eq(seq(identifier('a'), symbol('+'), ::AsciiMath::AST::Symbol.new(:mysymbol, 'mysymbol'), symbol('+'), identifier('b')))
+    expect(parsed.ast).to eq(seq(identifier('a'), symbol('+'), ::AsciiMath::AST::Symbol.new(:mysymbol, 'mysymbol', :symbol), symbol('+'), identifier('b')))
   end
 
   it "should support replacing standard symbols" do
@@ -23,6 +23,6 @@ describe 'AsciiMath::Parser', :variant => :ast do
     my_tokens_table.add('+', :foo, :symbol)
 
     parsed = AsciiMath::parse("a + b", my_tokens_table.build)
-    expect(parsed.ast).to eq(seq(identifier('a'), ::AsciiMath::AST::Symbol.new(:foo, '+'), identifier('b')))
+    expect(parsed.ast).to eq(seq(identifier('a'), ::AsciiMath::AST::Symbol.new(:foo, '+', :symbol), identifier('b')))
   end
 end
