@@ -516,7 +516,7 @@ module AsciiMath
     include AsciiMath::AST
 
     def parse_expression(tok, close_paren_type)
-      e = []
+      e = nil
 
       while (i1 = parse_intermediate_expression(tok, close_paren_type))
         t1 = tok.next_token
@@ -524,15 +524,15 @@ module AsciiMath
         if t1[:type] == :infix && t1[:value] == :frac
           i2 = parse_intermediate_expression(tok, close_paren_type)
           if i2
-            e << infix(unwrap_paren(i1), symbol(:frac, t1[:text]), unwrap_paren(i2))
+            e = concat_expressions(e, infix(unwrap_paren(i1), token_to_symbol(t1), unwrap_paren(i2)))
           else
-            e << i1
+            e = concat_expressions(e, i1)
           end
         elsif t1[:type] == :eof
-          e << i1
+          e = concat_expressions(e, i1)
           break
         else
-          e << i1
+          e = concat_expressions(e, i1)
           tok.push_back(t1)
           if t1[:type] == close_paren_type
             break
@@ -540,7 +540,7 @@ module AsciiMath
         end
       end
 
-      expression(*e)
+      e
     end
 
     def parse_intermediate_expression(tok, close_paren_type)
@@ -675,11 +675,11 @@ module AsciiMath
     end
 
     def token_to_symbol(t1)
-      symbol(t1[:value], t1[:text])
+      symbol(t1[:value], t1[:text], t1[:type])
     end
 
     def unwrap_paren(node)
-      if node.is_a?(::AsciiMath::AST::Paren)
+      if node.is_a?(::AsciiMath::AST::Paren) && (node.lparen.nil? || node.lparen.type == :lparen) && (node.rparen.nil? || node.rparen.type == :rparen)
         group(node.lparen, node.expression, node.rparen)
       else
         node
@@ -693,8 +693,8 @@ module AsciiMath
       return node unless rows.length > 1 &&
           rows.length > separators.length &&
           separators.all? { |item| is_matrix_separator(item) } &&
-          (rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lparen, '(') && item.rparen == symbol(:rparen, ')') } ||
-              rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lbracket, '[') && item.rparen == symbol(:rbracket, ']') })
+          (rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lparen, '(', :lparen) && item.rparen == symbol(:rparen, ')', :rparen) } ||
+              rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lbracket, '[', :lparen) && item.rparen == symbol(:rbracket, ']', :rparen) })
 
       rows = rows.map do |row|
         chunks = []

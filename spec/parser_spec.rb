@@ -597,8 +597,8 @@ RSpec.shared_examples 'AsciiMath Examples' do
   ))
 
   example('R(alpha_(K+1)|x)', &should_generate(
-    :ast => seq('R', paren(symbol('('), seq(sub('alpha', grseq('K', symbol('+'), '1')), seq(symbol('|'), 'x')), symbol(')'))),
-    :mathml => '<math><mi>R</mi><mrow><mo>(</mo><mrow><msub><mi>&#x3B1;</mi><mrow><mi>K</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo>|</mo><mi>x</mi></mrow></mrow><mo>)</mo></mrow></math>',
+    :ast => seq('R', paren(symbol('('), seq(sub('alpha', grseq('K', symbol('+'), '1')), symbol('|'), 'x'), symbol(')'))),
+    :mathml => '<math><mi>R</mi><mrow><mo>(</mo><mrow><msub><mi>&#x3B1;</mi><mrow><mi>K</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>|</mo><mi>x</mi></mrow><mo>)</mo></mrow></math>',
     :latex => 'R \\left ( \\alpha_{K + 1} | x \\right )'
   ))
 
@@ -608,6 +608,14 @@ RSpec.shared_examples 'AsciiMath Examples' do
 
   example('|a+b|', &should_generate(
     :ast => paren(symbol('|'), seq('a', '+', 'b'), symbol('|')),
+  ))
+
+  example('|a+b|/c', &should_generate(
+    :ast => infix(paren(symbol('|'), seq('a', '+', 'b'), symbol('|')), '/', 'c'),
+  ))
+
+  example('[[a,b,|,c],[d,e,|,f]]', &should_generate(
+    :ast => matrix(symbol('['), [['a', 'b', symbol('|'), 'c'], ['d', 'e', symbol('|'), 'f']], symbol(']')),
   ))
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }

@@ -51,8 +51,8 @@ module AsciiMath
       Number.new(value)
     end
 
-    def symbol(symbol, text)
-      Symbol.new(symbol, text)
+    def symbol(symbol, text, type)
+      Symbol.new(symbol, text, type)
     end
 
     def identifier(value)
@@ -340,14 +340,16 @@ module AsciiMath
 
     class Symbol < ValueNode
       attr_reader :text
+      attr_reader :type
 
-      def initialize(value, text)
+      def initialize(value, text, type)
         super(value)
         @text = text.dup.freeze
+        @type = type
       end
 
       def ==(o)
-        super && o.text == text
+        super && o.text == text && o.type == type
       end
 
       def to_s
