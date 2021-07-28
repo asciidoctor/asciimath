@@ -618,6 +618,12 @@ RSpec.shared_examples 'AsciiMath Examples' do
     :ast => matrix(symbol('['), [['a', 'b', symbol('|'), 'c'], ['d', 'e', symbol('|'), 'f']], symbol(']')),
   ))
 
+  example('~a mlt b mgt -+c', &should_generate(
+    :ast => seq(symbol('~'), 'a', symbol('mlt'), 'b', symbol('mgt'), symbol('-+'), 'c'),
+    :latex => '\\sim a \\ll b \\gg \\mp c',
+    :mathml => '<math><mo>&#x223C;</mo><mi>a</mi><mo>&#x226A;</mo><mi>b</mi><mo>&#x226B;</mo><mo>&#x2213;</mo><mi>c</mi></math>'
+    ))
+
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
 
   if version[0] > 1 || version[1] > 8
