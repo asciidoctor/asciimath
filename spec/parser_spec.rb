@@ -624,6 +624,13 @@ RSpec.shared_examples 'AsciiMath Examples' do
     :mathml => '<math><mo>&#x223C;</mo><mi>a</mi><mo>&#x226A;</mo><mi>b</mi><mo>&#x226B;</mo><mo>&#x2213;</mo><mi>c</mi></math>'
     ))
 
+  example('a+b+...+c', &should_generate(
+    :ast => seq('a', symbol('+'), 'b', symbol('+'), symbol('...'), symbol('+'), 'c'),
+    :latex => 'a + b + \ldots + c',
+    :mathml => '<math><mi>a</mi><mo>+</mo><mi>b</mi><mo>+</mo><mo>&#x2026;</mo><mo>+</mo><mi>c</mi></math>'
+    ))
+    
+
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
 
   if version[0] > 1 || version[1] > 8

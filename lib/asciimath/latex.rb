@@ -85,6 +85,7 @@ module AsciiMath
       :f => "f",
       :g => "g",
       :to => "\\rightarrow",
+      :ellipsis => "\\ldots",
       :bold => "\\mathbf",
       :double_struck => "\\mathbb",
       :italic => "\\mathit",
