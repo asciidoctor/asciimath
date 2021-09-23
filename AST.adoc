@@ -257,8 +257,8 @@ Empty matrix cells are represented as `AsciiMath::AST::Empty`.
 |++oo++ |:infty |++∞++ (https://codepoints.net/U+221E[U+221E]) |++\infty++
 |++infty++ |:infty |++∞++ (https://codepoints.net/U+221E[U+221E]) |++\infty++
 |++aleph++ |:aleph |++ℵ++ (https://codepoints.net/U+2135[U+2135]) |++\aleph++
-|++...++ |:ellipsis |++…++ (https://codepoints.net/U+2026[U+2026]) |++\ellipsis++
-|++ldots++ |:ellipsis |++…++ (https://codepoints.net/U+2026[U+2026]) |++\ellipsis++
+|++...++ |:ellipsis |++…++ (https://codepoints.net/U+2026[U+2026]) |++\ldots++
+|++ldots++ |:ellipsis |++…++ (https://codepoints.net/U+2026[U+2026]) |++\ldots++
 |++:.++ |:therefore |++∴++ (https://codepoints.net/U+2234[U+2234]) |++\therefore++
 |++therefore++ |:therefore |++∴++ (https://codepoints.net/U+2234[U+2234]) |++\therefore++
 |++:'++ |:because |++∵++ (https://codepoints.net/U+2235[U+2235]) |++\because++
