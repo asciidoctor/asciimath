@@ -1,13 +1,14 @@
 # AsciiMath
+:uri-project: https://github.com/asciidoctor/asciimath
 ifndef::env-site[:status:]
 
-An http://asciimath.org[AsciiMath] parser and MathML generator written in pure Ruby.
+An http://asciimath.org[AsciiMath] parser and MathML/LaTeX generator written in pure Ruby.
 
 ifdef::status[]
 [discrete]
 ## Status
 
-image:https://travis-ci.org/pepijnve/asciimath.svg?branch=master["Linux Build Status", link="https://travis-ci.org/asciidoctor/asciimath"]
+image:{uri-project}/workflows/CI/badge.svg?branch=master["Build Status", link={uri-project}/actions?query=branch%3Amaster]
 image:https://img.shields.io/gem/v/asciimath.svg?label=gem%20version[Gem Version, link=https://rubygems.org/gems/asciimath]
 endif::status[]
 
@@ -48,15 +49,16 @@ parsed_expression = AsciiMath.parse(asciimath)
 
 The parsed expression is a set of nested Array and Hash objects.
 
-This expression can then be converted to MathML or HTML (experimental.
+This expression can then be converted to MathML, HTML (experimental) or LaTeX.
 
 [source,ruby]
 ----
 math_ml = parsed_expression.to_mathml
 html = parsed_expression.to_html
+latex = parsed_expression.to_latex
 ----
 
-The MathML or HTML code is returned as a String.
+The MathML, HTML or LaTeX code is returned as a String.
 
 ### Command line
 
@@ -78,8 +80,53 @@ asciimath mathml "an asciimath string"
 asciimath html "an asciimath string"
 ----
 
+.LaTeX Generation
+[source]
+----
+asciimath latex "an asciimath string"
+----
+
 This command will print out the generated code on stdout.
 
+## Extentions and Customization
+
+The parser can be extended by passing a custum tokenization table:
+
+[source, ruby]
+----
+my_tokens_table = AsciiMath::SymbolTableBuilder.new
+AsciiMath::Parser.add_default_parser_symbols(my_tokens_table)
+my_tokens_table.add('mysymbol', :mysymbol, :symbol)
+
+AsciiMath::parse("a + mysymbol + b", my_tokens_table.build)
+----
+
+Furthermore, the behaviour of the tokenizer be customized by altering the value 
+associated with a token in `AsciiMath::Tokenizer::DEFAULT_PARSE_SYMBOL_TABLE`:
+
+[source, ruby]
+----
+my_tokens_table = AsciiMath::SymbolTableBuilder.new
+AsciiMath::Parser.add_default_parser_symbols(my_tokens_table)
+my_tokens_table.add('alpha', :beta, :symbol)
+
+# Now "alpha + beta" is equivalent to "beta + beta"
+AsciiMath::parse("alpha + beta", my_tokens_table.build)
+----
+
+The same behaviour applies to each individual render (`MathMLBuilder`, 
+`HTMLBuilder` and `LatexBuilder`). By adding entries to a rendere's rendering 
+table (or modifying exisisting entries), users can customize it's output:
+
+[source, ruby]
+----
+my_rendering_table = AsciiMath::SymbolTableBuilder.new
+AsciiMath::MarkupBuilder.add_default_display_symbols(my_rendering_table)
+my_rendering_table.add('alpha', '\u03b2', :identifier)
+
+# Now "alpha + beta" is equivalent to "beta + beta"
+AsciiMath::parse("alpha + beta").to_mathml(my_rendering_table.build)
+----
 
 ## Notes on the HTML Output
 
@@ -94,6 +141,23 @@ Known issues are as follows:
 
 Rendering the HTML output correctly requires the inclusion of `style/math.css` in the html document.
 There is currently no specific required font for this output, it simply selects a `serif` font family - change the `@font-family` attribute in the `.math-inline` class to select something specific.
+
+## Notes on the LaTeX Output
+
+All LaTeX commands and environments used in the output are coverved by 
+https://ctan.org/pkg/amsmath[`amsmath`] and `amssymb`, with a few exceptions:
+
+ * `\color`
+ * `\cancel`
+ * `\mathscr`
+ * `\twoheadrightarrowtail`
+
+The `\color` command is supported by the 
+https://www.ctan.org/pkg/xcolor[`xcolor`] package, which is included in most 
+LaTeX distributions. The `\cancel` command is supported by the 
+https://www.ctan.org/pkg/cancel[cancel] package, also included in most LaTeX 
+distributions. The other commands are supported by the 
+https://ctan.org/pkg/stix[`stix`] package.
 
 ## Contributing
 

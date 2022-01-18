@@ -1,4 +1,7 @@
 require 'strscan'
+require_relative 'ast'
+require_relative 'color_table'
+require_relative 'symbol_table'
 
 # Parser for ASCIIMath expressions.
 #
@@ -33,28 +36,18 @@ module AsciiMath
   # The :type key indicates the semantics of the token. The value for :type will be one
   # of the following symbols:
   #
-  # - :identifier a symbolic name or a bit of text without any further semantics
+  # - :symbol a symbolic name or a bit of text without any further semantics
   # - :text a bit of arbitrary text
   # - :number a number
   # - :operator a mathematical operator symbol
   # - :unary a unary operator (e.g., sqrt, text, ...)
-  # - :font a unary font command (e.g., bb, cc, ...)
   # - :infix an infix operator (e.g, /, _, ^, ...)
   # - :binary a binary operator (e.g., frac, root, ...)
-  # - :accent an accent character
   # - :eof indicates no more tokens are available
-  #
-  # Each token type may also have an :underover modifier. When present and set to true
-  # sub- and superscript expressions associated with the token will be rendered as
-  # under- and overscriptabove and below rather than as sub- or superscript.
-  #
-  # :accent tokens additionally have a :postion value which is set to either :over or :under.
-  # This determines if the accent should be rendered over or under the expression to which
-  # it applies.
   #
   class Tokenizer
     WHITESPACE = /\s+/
-    NUMBER = /-?[0-9]+(?:\.[0-9]+)?/
+    NUMBER = /[0-9]+(?:\.[0-9]+)?/
     QUOTED_TEXT = /"[^"]*"/
     TEX_TEXT = /text\([^)]*\)/
 
@@ -66,7 +59,7 @@ module AsciiMath
       @string = StringScanner.new(string)
       @symbols = symbols
       lookahead = @symbols.keys.map { |k| k.length }.max
-      @symbol_regexp = /([^\s0-9]{1,#{lookahead}})/
+      @symbol_regexp = /((?:\\[\s0-9]|[^\s0-9]){1,#{lookahead}})/
       @push_back = nil
     end
 
@@ -86,19 +79,19 @@ module AsciiMath
       return {:value => nil, :type => :eof} if @string.eos?
 
       case @string.peek(1)
-      when '"'
-        read_quoted_text
-      when 't'
-        case @string.peek(5)
-        when 'text('
-          read_tex_text
+        when '"'
+          read_quoted_text
+        when 't'
+          case @string.peek(5)
+            when 'text('
+              read_tex_text
+            else
+              read_symbol
+          end
+        when '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+          read_number || read_symbol
         else
           read_symbol
-        end
-      when '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-        read_number || read_symbol
-      else
-        read_symbol
       end
     end
 
@@ -173,7 +166,12 @@ module AsciiMath
           s.chop!
         end
         @string.pos = position + bytesize(s)
-        @symbols[s] || {:value => s, :type => :identifier}
+        symbol = @symbols[s]
+        if symbol
+          symbol.merge({:text => s})
+        else
+          {:value => s, :type => :identifier}
+        end
       end
     end
 
@@ -185,7 +183,7 @@ module AsciiMath
     # Returns the matched String or the value returned by the block if one was given
     def read_value(regexp)
       s = @string.scan(regexp)
-      if s
+      if s && block_given?
         yield s
       else
         s
@@ -200,298 +198,347 @@ module AsciiMath
   end
 
   class Parser
-    SYMBOLS = {
-        # Operation symbols
-        '+' => {:value => '+', :type => :operator},
-        '-' => {:value => "\u2212", :type => :operator},
-        '*' => {:value => "\u22C5", :type => :operator},
-        '**' => {:value => "\u002A", :type => :operator},
-        '***' => {:value => "\u22C6", :type => :operator},
-        '//' => {:value => '/', :type => :operator},
-        '\\\\' => {:value => '\\', :type => :operator},
-        'xx' => {:value => "\u00D7", :type => :operator},
-        '-:' => {:value => "\u00F7", :type => :operator},
-        '|><' => {:value => "\u22C9", :type => :operator},
-        '><|' => {:value => "\u22CA", :type => :operator},
-        '|><|' => {:value => "\u22C8", :type => :operator},
-        '@' => {:value => "\u26AC", :type => :operator},
-        'o+' => {:value => "\u2295", :type => :operator},
-        'ox' => {:value => "\u2297", :type => :operator},
-        'o.' => {:value => "\u2299", :type => :operator},
-        'sum' => {:value => "\u2211", :type => :operator, :underover => true},
-        'prod' => {:value => "\u220F", :type => :operator, :underover => true},
-        '^^' => {:value => "\u2227", :type => :operator},
-        '^^^' => {:value => "\u22C0", :type => :operator, :underover => true},
-        'vv' => {:value => "\u2228", :type => :operator},
-        'vvv' => {:value => "\u22C1", :type => :operator, :underover => true},
-        'nn' => {:value => "\u2229", :type => :operator},
-        'nnn' => {:value => "\u22C2", :type => :operator, :underover => true},
-        'uu' => {:value => "\u222A", :type => :operator},
-        'uuu' => {:value => "\u22C3", :type => :operator, :underover => true},
+    def self.add_default_colors(b)
+      b.add('aqua', 0, 255, 255)
+      b.add('black', 0, 0, 0)
+      b.add('blue', 0, 0, 255)
+      b.add('fuchsia', 255, 0, 255)
+      b.add('gray', 128, 128, 128)
+      b.add('green', 0, 128, 0)
+      b.add('lime', 0, 255, 0)
+      b.add('maroon', 128, 0, 0)
+      b.add('navy', 0, 0, 128)
+      b.add('olive', 128, 128, 0)
+      b.add('purple', 128, 0, 128)
+      b.add('red', 255, 0, 0)
+      b.add('silver', 192, 192, 192)
+      b.add('teal', 0, 128, 128)
+      b.add('white', 255, 255, 255)
+      b.add('yellow', 255, 255, 0)
+      b
+    end
 
-        # Relation symbols
-        '=' => {:value => '=', :type => :operator},
-        '!=' => {:value => "\u2260", :type => :operator},
-        ':=' => {:value => ':=', :type => :operator},
-        '<' => {:value => "\u003C", :type => :operator},
-        'lt' => {:value => "\u003C", :type => :operator},
-        '>' => {:value => "\u003E", :type => :operator},
-        'gt' => {:value => "\u003E", :type => :operator},
-        '<=' => {:value => "\u2264", :type => :operator},
-        'le' => {:value => "\u2264", :type => :operator},
-        '>=' => {:value => "\u2265", :type => :operator},
-        'ge' => {:value => "\u2265", :type => :operator},
-        '-<' => {:value => "\u227A", :type => :operator},
-        '>-' => {:value => "\u227B", :type => :operator},
-        '-<=' => {:value => "\u2AAF", :type => :operator},
-        '>-=' => {:value => "\u2AB0", :type => :operator},
-        'in' => {:value => "\u2208", :type => :operator},
-        '!in' => {:value => "\u2209", :type => :operator},
-        'sub' => {:value => "\u2282", :type => :operator},
-        'sup' => {:value => "\u2283", :type => :operator},
-        'sube' => {:value => "\u2286", :type => :operator},
-        'supe' => {:value => "\u2287", :type => :operator},
-        '-=' => {:value => "\u2261", :type => :operator},
-        '~=' => {:value => "\u2245", :type => :operator},
-        '~~' => {:value => "\u2248", :type => :operator},
-        'prop' => {:value => "\u221D", :type => :operator},
+    def self.add_default_parser_symbols(b)
+      # Operation symbols
+      b.add('+', :plus, :symbol)
+      b.add('-', :minus, :symbol)
+      b.add('*', 'cdot', :cdot, :symbol)
+      b.add('**', 'ast', :ast, :symbol)
+      b.add('***', 'star', :star, :symbol)
+      b.add('//', :slash, :symbol)
+      b.add('\\\\', 'backslash', :backslash, :symbol)
+      b.add('setminus', :setminus, :symbol)
+      b.add('xx', 'times', :times, :symbol)
+      b.add('|><', 'ltimes', :ltimes, :symbol)
+      b.add('><|', 'rtimes', :rtimes, :symbol)
+      b.add('|><|', 'bowtie', :bowtie, :symbol)
+      b.add('-:', 'div', 'divide', :div, :symbol)
+      b.add('@', 'circ', :circ, :symbol)
+      b.add('o+', 'oplus', :oplus, :symbol)
+      b.add('ox', 'otimes', :otimes, :symbol)
+      b.add('o.', 'odot', :odot, :symbol)
+      b.add('sum', :sum, :symbol)
+      b.add('prod', :prod, :symbol)
+      b.add('^^', 'wedge', :wedge, :symbol)
+      b.add('^^^', 'bigwedge', :bigwedge, :symbol)
+      b.add('vv', 'vee', :vee, :symbol)
+      b.add('vvv', 'bigvee', :bigvee, :symbol)
+      b.add('nn', 'cap', :cap, :symbol)
+      b.add('nnn', 'bigcap', :bigcap, :symbol)
+      b.add('uu', 'cup', :cup, :symbol)
+      b.add('uuu', 'bigcup', :bigcup, :symbol)
 
-        # Logical symbols
-        'and' => {:value => 'and', :type => :text},
-        'or' => {:value => 'or', :type => :text},
-        'not' => {:value => "\u00AC", :type => :operator},
-        '=>' => {:value => "\u21D2", :type => :operator},
-        'if' => {:value => 'if', :type => :operator},
-        '<=>' => {:value => "\u21D4", :type => :operator},
-        'AA' => {:value => "\u2200", :type => :operator},
-        'EE' => {:value => "\u2203", :type => :operator},
-        '_|_' => {:value => "\u22A5", :type => :operator},
-        'TT' => {:value => "\u22A4", :type => :operator},
-        '|--' => {:value => "\u22A2", :type => :operator},
-        '|==' => {:value => "\u22A8", :type => :operator},
+      # Relation symbols
+      b.add('=', :eq, :symbol)
+      b.add('!=', 'ne', :ne, :symbol)
+      b.add(':=', :assign, :symbol)
+      b.add('<', 'lt', :lt, :symbol)
+      b.add('mlt', :mlt, :symbol)
+      b.add('>', 'gt', :gt, :symbol)
+      b.add('mgt', :mgt, :symbol)
+      b.add('<=', 'le', :le, :symbol)
+      b.add('>=', 'ge', :ge, :symbol)
+      b.add('-<', '-lt', 'prec', :prec, :symbol)
+      b.add('>-', 'succ', :succ, :symbol)
+      b.add('-<=', 'preceq', :preceq, :symbol)
+      b.add('>-=', 'succeq', :succeq, :symbol)
+      b.add('in', :in, :symbol)
+      b.add('!in', 'notin', :notin, :symbol)
+      b.add('sub', 'subset', :subset, :symbol)
+      b.add('sup', 'supset', :supset, :symbol)
+      b.add('sube', 'subseteq', :subseteq, :symbol)
+      b.add('supe', 'supseteq', :supseteq, :symbol)
+      b.add('-=', 'equiv', :equiv, :symbol)
+      b.add('~', 'sim', :sim, :symbol)
+      b.add('~=', 'cong', :cong, :symbol)
+      b.add('~~', 'approx', :approx, :symbol)
+      b.add('prop', 'propto', :propto, :symbol)
 
-        # Grouping brackets
-        '(' => {:value => '(', :type => :lparen},
-        ')' => {:value => ')', :type => :rparen},
-        '[' => {:value => '[', :type => :lparen},
-        ']' => {:value => ']', :type => :rparen},
-        '{' => {:value => '{', :type => :lparen},
-        '}' => {:value => '}', :type => :rparen},
-        '(:' => {:value => "\u2329", :type => :lparen},
-        ':)' => {:value => "\u232A", :type => :rparen},
-        '<<' => {:value => "\u2329", :type => :lparen},
-        '>>' => {:value => "\u232A", :type => :rparen},
-        '|' => {:value => '|', :type => :lrparen},
-        '||' => {:value => '||', :type => :lrparen},
-        '{:' => {:value => nil, :type => :lparen},
-        ':}' => {:value => nil, :type => :rparen},
+      # Logical symbols
+      b.add('and', :and, :symbol)
+      b.add('or', :or, :symbol)
+      b.add('not', 'neg', :not, :symbol)
+      b.add('=>', 'implies', :implies, :symbol)
+      b.add('if', :if, :symbol)
+      b.add('<=>', 'iff', :iff, :symbol)
+      b.add('AA', 'forall', :forall, :symbol)
+      b.add('EE', 'exists', :exists, :symbol)
+      b.add('_|_', 'bot', :bot, :symbol)
+      b.add('TT', 'top', :top, :symbol)
+      b.add('|--', 'vdash', :vdash, :symbol)
+      b.add('|==', 'models', :models, :symbol)
 
-        # Miscellaneous symbols
-        'int' => {:value => "\u222B", :type => :operator},
-        'dx' => {:value => 'dx', :type => :identifier},
-        'dy' => {:value => 'dy', :type => :identifier},
-        'dz' => {:value => 'dz', :type => :identifier},
-        'dt' => {:value => 'dt', :type => :identifier},
-        'oint' => {:value => "\u222E", :type => :operator},
-        'del' => {:value => "\u2202", :type => :operator},
-        'grad' => {:value => "\u2207", :type => :operator},
-        '+-' => {:value => "\u00B1", :type => :operator},
-        'O/' => {:value => "\u2205", :type => :operator},
-        'oo' => {:value => "\u221E", :type => :operator},
-        'aleph' => {:value => "\u2135", :type => :operator},
-        '...' => {:value => '...', :type => :operator},
-        ':.' => {:value => "\u2234", :type => :operator},
-        '/_' => {:value => "\u2220", :type => :operator},
-        '\\ ' => {:value => "\u00A0", :type => :operator},
-        'quad' => {:value => '\u00A0\u00A0', :type => :operator},
-        'qquad' => {:value => '\u00A0\u00A0\u00A0\u00A0', :type => :operator},
-        'cdots' => {:value => "\u22EF", :type => :operator},
-        'vdots' => {:value => "\u22EE", :type => :operator},
-        'ddots' => {:value => "\u22F1", :type => :operator},
-        'diamond' => {:value => "\u22C4", :type => :operator},
-        'square' => {:value => "\u25A1", :type => :operator},
-        '|__' => {:value => "\u230A", :type => :operator},
-        '__|' => {:value => "\u230B", :type => :operator},
-        '|~' => {:value => "\u2308", :type => :operator},
-        '~|' => {:value => "\u2309", :type => :operator},
-        'CC' => {:value => "\u2102", :type => :operator},
-        'NN' => {:value => "\u2115", :type => :operator},
-        'QQ' => {:value => "\u211A", :type => :operator},
-        'RR' => {:value => "\u211D", :type => :operator},
-        'ZZ' => {:value => "\u2124", :type => :operator},
+      # Grouping brackets
+      b.add('(', 'left(', :lparen, :lparen)
+      b.add(')', 'right)', :rparen, :rparen)
+      b.add('[', 'left[', :lbracket, :lparen)
+      b.add(']', 'right]', :rbracket, :rparen)
+      b.add('{', :lbrace, :lparen)
+      b.add('}', :rbrace, :rparen)
+      b.add('|', :vbar, :lrparen)
+      b.add(':|:', :vbar, :symbol)
+      b.add('|:', :vbar, :lparen)
+      b.add(':|', :vbar, :rparen)
+      # b.add('||', '||', :lrparen)
+      b.add('(:', '<<', 'langle', :langle, :lparen)
+      b.add(':)', '>>', 'rangle', :rangle, :rparen)
+      b.add('{:', nil, :lparen)
+      b.add(':}', nil, :rparen)
 
-        'lim' => {:value => 'lim', :type => :operator, :underover => true},
-        'Lim' => {:value => 'Lim', :type => :operator, :underover => true},
+      # Miscellaneous symbols
+      b.add('int', :integral, :symbol)
+      b.add('dx', :dx, :symbol)
+      b.add('dy', :dy, :symbol)
+      b.add('dz', :dz, :symbol)
+      b.add('dt', :dt, :symbol)
+      b.add('oint', :contourintegral, :symbol)
+      b.add('del', 'partial', :partial, :symbol)
+      b.add('grad', 'nabla', :nabla, :symbol)
+      b.add('+-', 'pm', :pm, :symbol)
+      b.add('-+', 'mp', :mp, :symbol)
+      b.add('O/', 'emptyset', :emptyset, :symbol)
+      b.add('oo', 'infty', :infty, :symbol)
+      b.add('aleph', :aleph, :symbol)
+      b.add('...', 'ldots', :ellipsis, :symbol)
+      b.add(':.', 'therefore', :therefore, :symbol)
+      b.add(':\'', 'because', :because, :symbol)
+      b.add('/_', 'angle', :angle, :symbol)
+      b.add('/_\\', 'triangle', :triangle, :symbol)
+      b.add('\'', 'prime', :prime, :symbol)
+      b.add('tilde', :tilde, :unary)
+      b.add('\\ ', :nbsp, :symbol)
+      b.add('frown', :frown, :symbol)
+      b.add('quad', :quad, :symbol)
+      b.add('qquad', :qquad, :symbol)
+      b.add('cdots', :cdots, :symbol)
+      b.add('vdots', :vdots, :symbol)
+      b.add('ddots', :ddots, :symbol)
+      b.add('diamond', :diamond, :symbol)
+      b.add('square', :square, :symbol)
+      b.add('|__', 'lfloor', :lfloor, :symbol)
+      b.add('__|', 'rfloor', :rfloor, :symbol)
+      b.add('|~', 'lceiling', :lceiling, :symbol)
+      b.add('~|', 'rceiling', :rceiling, :symbol)
+      b.add('CC', :dstruck_captial_c, :symbol)
+      b.add('NN', :dstruck_captial_n, :symbol)
+      b.add('QQ', :dstruck_captial_q, :symbol)
+      b.add('RR', :dstruck_captial_r, :symbol)
+      b.add('ZZ', :dstruck_captial_z, :symbol)
+      b.add('f', :f, :symbol)
+      b.add('g', :g, :symbol)
 
-        # Standard functions
-        'sin' => {:value => 'sin', :type => :identifier},
-        'cos' => {:value => 'cos', :type => :identifier},
-        'tan' => {:value => 'tan', :type => :identifier},
-        'sec' => {:value => 'sec', :type => :identifier},
-        'csc' => {:value => 'csc', :type => :identifier},
-        'cot' => {:value => 'cot', :type => :identifier},
-        'arcsin' => {:value => 'arcsin', :type => :identifier},
-        'arccos' => {:value => 'arccos', :type => :identifier},
-        'arctan' => {:value => 'arctan', :type => :identifier},
-        'sinh' => {:value => 'sinh', :type => :identifier},
-        'cosh' => {:value => 'cosh', :type => :identifier},
-        'tanh' => {:value => 'tanh', :type => :identifier},
-        'sech' => {:value => 'sech', :type => :identifier},
-        'csch' => {:value => 'csch', :type => :identifier},
-        'coth' => {:value => 'coth', :type => :identifier},
-        'exp' => {:value => 'exp', :type => :identifier},
-        'log' => {:value => 'log', :type => :identifier},
-        'ln' => {:value => 'ln', :type => :identifier},
-        'det' => {:value => 'det', :type => :identifier},
-        'dim' => {:value => 'dim', :type => :identifier},
-        'mod' => {:value => 'mod', :type => :identifier},
-        'gcd' => {:value => 'gcd', :type => :identifier},
-        'lcm' => {:value => 'lcm', :type => :identifier},
-        'lub' => {:value => 'lub', :type => :identifier},
-        'glb' => {:value => 'glb', :type => :identifier},
-        'min' => {:value => 'min', :type => :identifier, :underover => true},
-        'max' => {:value => 'max', :type => :identifier, :underover => true},
-        'f' => {:value => 'f', :type => :identifier},
-        'g' => {:value => 'g', :type => :identifier},
 
-        # Accents
-        'hat' => {:value => "\u005E", :type => :accent, :position => :over},
-        'bar' => {:value => "\u00AF", :type => :accent, :position => :over},
-        'ul' => {:value => '_', :type => :accent, :position => :under},
-        'vec' => {:value => "\u2192", :type => :accent, :position => :over},
-        'dot' => {:value => '.', :type => :accent, :position => :over},
-        'ddot' => {:value => '..', :type => :accent, :position => :over},
-        'obrace' => {:value => "\u23DE", :type => :accent, :position => :over},
-        'ubrace' => {:value => "\u23DF", :type => :accent, :position => :under},
+      # Standard functions
+      b.add('lim', :lim, :symbol)
+      b.add('Lim', :Lim, :symbol)
+      b.add('min', :min, :symbol)
+      b.add('max', :max, :symbol)
+      b.add('sin', :sin, :symbol)
+      b.add('Sin', :Sin, :symbol)
+      b.add('cos', :cos, :symbol)
+      b.add('Cos', :Cos, :symbol)
+      b.add('tan', :tan, :symbol)
+      b.add('Tan', :Tan, :symbol)
+      b.add('sinh', :sinh, :symbol)
+      b.add('Sinh', :Sinh, :symbol)
+      b.add('cosh', :cosh, :symbol)
+      b.add('Cosh', :Cosh, :symbol)
+      b.add('tanh', :tanh, :symbol)
+      b.add('Tanh', :Tanh, :symbol)
+      b.add('cot', :cot, :symbol)
+      b.add('Cot', :Cot, :symbol)
+      b.add('sec', :sec, :symbol)
+      b.add('Sec', :Sec, :symbol)
+      b.add('csc', :csc, :symbol)
+      b.add('Csc', :Csc, :symbol)
+      b.add('arcsin', :arcsin, :symbol)
+      b.add('arccos', :arccos, :symbol)
+      b.add('arctan', :arctan, :symbol)
+      b.add('coth', :coth, :symbol)
+      b.add('sech', :sech, :symbol)
+      b.add('csch', :csch, :symbol)
+      b.add('exp', :exp, :symbol)
+      b.add('abs', :abs, :unary)
+      b.add('Abs', :abs, :unary)
+      b.add('norm', :norm, :unary)
+      b.add('floor', :floor, :unary)
+      b.add('ceil', :ceil, :unary)
+      b.add('log', :log, :symbol)
+      b.add('Log', :Log, :symbol)
+      b.add('ln', :ln, :symbol)
+      b.add('Ln', :Ln, :symbol)
+      b.add('det', :det, :symbol)
+      b.add('dim', :dim, :symbol)
+      b.add('ker', :ker, :symbol)
+      b.add('mod', :mod, :symbol)
+      b.add('gcd', :gcd, :symbol)
+      b.add('lcm', :lcm, :symbol)
+      b.add('lub', :lub, :symbol)
+      b.add('glb', :glb, :symbol)
 
-        # Arrows
-        'uarr' => {:value => "\u2191", :type => :operator},
-        'darr' => {:value => "\u2193", :type => :operator},
-        'rarr' => {:value => "\u2192", :type => :operator},
-        '->' => {:value => "\u2192", :type => :operator},
-        '>->' => {:value => "\u21A3", :type => :operator},
-        '->>' => {:value => "\u21A0", :type => :operator},
-        '>->>' => {:value => "\u2916", :type => :operator},
-        '|->' => {:value => "\u21A6", :type => :operator},
-        'larr' => {:value => "\u2190", :type => :operator},
-        'harr' => {:value => "\u2194", :type => :operator},
-        'rArr' => {:value => "\u21D2", :type => :operator},
-        'lArr' => {:value => "\u21D0", :type => :operator},
-        'hArr' => {:value => "\u21D4", :type => :operator},
+      # Arrows
+      b.add('uarr', 'uparrow', :uparrow, :symbol)
+      b.add('darr', 'downarrow', :downarrow, :symbol)
+      b.add('rarr', 'rightarrow', :rightarrow, :symbol)
+      b.add('->', 'to', :to, :symbol)
+      b.add('>->', 'rightarrowtail', :rightarrowtail, :symbol)
+      b.add('->>', 'twoheadrightarrow', :twoheadrightarrow, :symbol)
+      b.add('>->>', 'twoheadrightarrowtail', :twoheadrightarrowtail, :symbol)
+      b.add('|->', 'mapsto', :mapsto, :symbol)
+      b.add('larr', 'leftarrow', :leftarrow, :symbol)
+      b.add('harr', 'leftrightarrow', :leftrightarrow, :symbol)
+      b.add('rArr', 'Rightarrow', :Rightarrow, :symbol)
+      b.add('lArr', 'Leftarrow', :Leftarrow, :symbol)
+      b.add('hArr', 'Leftrightarrow', :Leftrightarrow, :symbol)
 
-        # Other
-        'sqrt' => {:value => :sqrt, :type => :unary},
-        'text' => {:value => :text, :type => :unary},
-        'bb' => {:value => :bold, :type => :font},
-        'bbb' => {:value => :double_struck, :type => :font},
-        'ii' => {:value => :italic, :type => :font},
-        'bii' => {:value => :bold_italic, :type => :font},
-        'cc' => {:value => :script, :type => :font},
-        'bcc' => {:value => :bold_script, :type => :font},
-        'tt' => {:value => :monospace, :type => :font},
-        'fr' => {:value => :fraktur, :type => :font},
-        'bfr' => {:value => :bold_fraktur, :type => :font},
-        'sf' => {:value => :sans_serif, :type => :font},
-        'bsf' => {:value => :bold_sans_serif, :type => :font},
-        'sfi' => {:value => :sans_serif_italic, :type => :font},
-        'sfbi' => {:value => :sans_serif_bold_italic, :type => :font},
-        'frac' => {:value => :frac, :type => :binary},
-        'root' => {:value => :root, :type => :binary},
-        'stackrel' => {:value => :over, :type => :binary},
-        '/' => {:value => :frac, :type => :infix},
-        '_' => {:value => :sub, :type => :infix},
-        '^' => {:value => :sup, :type => :infix},
+      # Other
+      b.add('sqrt', :sqrt, :unary)
+      b.add('root', :root, :binary)
+      b.add('frac', :frac, :binary)
+      b.add('/', :frac, :infix)
+      b.add('stackrel', :stackrel, :binary)
+      b.add('overset', :overset, :binary)
+      b.add('underset', :underset, :binary)
+      b.add('color', :color, :binary, :convert_operand1 => ::AsciiMath::Parser.instance_method(:convert_to_color))
+      b.add('_', :sub, :infix)
+      b.add('^', :sup, :infix)
+      b.add('hat', :hat, :unary)
+      b.add('bar', :overline, :unary)
+      b.add('vec', :vec, :unary)
+      b.add('dot', :dot, :unary)
+      b.add('ddot', :ddot, :unary)
+      b.add('overarc', 'overparen', :overarc, :unary)
+      b.add('ul', 'underline', :underline, :unary)
+      b.add('ubrace', 'underbrace', :underbrace, :unary)
+      b.add('obrace', 'overbrace', :overbrace, :unary)
+      b.add('cancel', :cancel, :unary)
+      b.add('bb', :bold, :unary)
+      b.add('bbb', :double_struck, :unary)
+      b.add('ii', :italic, :unary)
+      b.add('bii', :bold_italic, :unary)
+      b.add('cc', :script, :unary)
+      b.add('bcc', :bold_script, :unary)
+      b.add('tt', :monospace, :unary)
+      b.add('fr', :fraktur, :unary)
+      b.add('bfr', :bold_fraktur, :unary)
+      b.add('sf', :sans_serif, :unary)
+      b.add('bsf', :bold_sans_serif, :unary)
+      b.add('sfi', :sans_serif_italic, :unary)
+      b.add('sfbi', :sans_serif_bold_italic, :unary)
+      b.add('rm', :roman, :unary)
 
-        # Greek letters
-        'alpha' => {:value => "\u03b1", :type => :identifier},
-        'Alpha' => {:value => "\u0391", :type => :identifier},
-        'beta' => {:value => "\u03b2", :type => :identifier},
-        'Beta' => {:value => "\u0392", :type => :identifier},
-        'gamma' => {:value => "\u03b3", :type => :identifier},
-        'Gamma' => {:value => "\u0393", :type => :operator},
-        'delta' => {:value => "\u03b4", :type => :identifier},
-        'Delta' => {:value => "\u0394", :type => :operator},
-        'epsilon' => {:value => "\u03b5", :type => :identifier},
-        'Epsilon' => {:value => "\u0395", :type => :identifier},
-        'varepsilon' => {:value => "\u025b", :type => :identifier},
-        'zeta' => {:value => "\u03b6", :type => :identifier},
-        'Zeta' => {:value => "\u0396", :type => :identifier},
-        'eta' => {:value => "\u03b7", :type => :identifier},
-        'Eta' => {:value => "\u0397", :type => :identifier},
-        'theta' => {:value => "\u03b8", :type => :identifier},
-        'Theta' => {:value => "\u0398", :type => :operator},
-        'vartheta' => {:value => "\u03d1", :type => :identifier},
-        'iota' => {:value => "\u03b9", :type => :identifier},
-        'Iota' => {:value => "\u0399", :type => :identifier},
-        'kappa' => {:value => "\u03ba", :type => :identifier},
-        'Kappa' => {:value => "\u039a", :type => :identifier},
-        'lambda' => {:value => "\u03bb", :type => :identifier},
-        'Lambda' => {:value => "\u039b", :type => :operator},
-        'mu' => {:value => "\u03bc", :type => :identifier},
-        'Mu' => {:value => "\u039c", :type => :identifier},
-        'nu' => {:value => "\u03bd", :type => :identifier},
-        'Nu' => {:value => "\u039d", :type => :identifier},
-        'xi' => {:value => "\u03be", :type => :identifier},
-        'Xi' => {:value => "\u039e", :type => :operator},
-        'omicron' => {:value => "\u03bf", :type => :identifier},
-        'Omicron' => {:value => "\u039f", :type => :identifier},
-        'pi' => {:value => "\u03c0", :type => :identifier},
-        'Pi' => {:value => "\u03a0", :type => :operator},
-        'rho' => {:value => "\u03c1", :type => :identifier},
-        'Rho' => {:value => "\u03a1", :type => :identifier},
-        'sigma' => {:value => "\u03c3", :type => :identifier},
-        'Sigma' => {:value => "\u03a3", :type => :operator},
-        'tau' => {:value => "\u03c4", :type => :identifier},
-        'Tau' => {:value => "\u03a4", :type => :identifier},
-        'upsilon' => {:value => "\u03c5", :type => :identifier},
-        'Upsilon' => {:value => "\u03a5", :type => :identifier},
-        'phi' => {:value => "\u03c6", :type => :identifier},
-        'Phi' => {:value => "\u03a6", :type => :identifier},
-        'varphi' => {:value => "\u03d5", :type => :identifier},
-        'chi' => {:value => '\u03b3c7', :type => :identifier},
-        'Chi' => {:value => '\u0393a7', :type => :identifier},
-        'psi' => {:value => "\u03c8", :type => :identifier},
-        'Psi' => {:value => "\u03a8", :type => :identifier},
-        'omega' => {:value => "\u03c9", :type => :identifier},
-        'Omega' => {:value => "\u03a9", :type => :operator},
-    }
+      # Greek letters
+      b.add('alpha', :alpha, :symbol)
+      b.add('Alpha', :Alpha, :symbol)
+      b.add('beta', :beta, :symbol)
+      b.add('Beta', :Beta, :symbol)
+      b.add('gamma', :gamma, :symbol)
+      b.add('Gamma', :Gamma, :symbol)
+      b.add('delta', :delta, :symbol)
+      b.add('Delta', :Delta, :symbol)
+      b.add('epsi', 'epsilon', :epsilon, :symbol)
+      b.add('Epsilon', :Epsilon, :symbol)
+      b.add('varepsilon', :varepsilon, :symbol)
+      b.add('zeta', :zeta, :symbol)
+      b.add('Zeta', :Zeta, :symbol)
+      b.add('eta', :eta, :symbol)
+      b.add('Eta', :Eta, :symbol)
+      b.add('theta', :theta, :symbol)
+      b.add('Theta', :Theta, :symbol)
+      b.add('vartheta', :vartheta, :symbol)
+      b.add('iota', :iota, :symbol)
+      b.add('Iota', :Iota, :symbol)
+      b.add('kappa', :kappa, :symbol)
+      b.add('Kappa', :Kappa, :symbol)
+      b.add('lambda', :lambda, :symbol)
+      b.add('Lambda', :Lambda, :symbol)
+      b.add('mu', :mu, :symbol)
+      b.add('Mu', :Mu, :symbol)
+      b.add('nu', :nu, :symbol)
+      b.add('Nu', :Nu, :symbol)
+      b.add('xi', :xi, :symbol)
+      b.add('Xi', :Xi, :symbol)
+      b.add('omicron', :omicron, :symbol)
+      b.add('Omicron', :Omicron, :symbol)
+      b.add('pi', :pi, :symbol)
+      b.add('Pi', :Pi, :symbol)
+      b.add('rho', :rho, :symbol)
+      b.add('Rho', :Rho, :symbol)
+      b.add('sigma', :sigma, :symbol)
+      b.add('Sigma', :Sigma, :symbol)
+      b.add('tau', :tau, :symbol)
+      b.add('Tau', :Tau, :symbol)
+      b.add('upsilon', :upsilon, :symbol)
+      b.add('Upsilon', :Upsilon, :symbol)
+      b.add('phi', :phi, :symbol)
+      b.add('Phi', :Phi, :symbol)
+      b.add('varphi', :varphi, :symbol)
+      b.add('chi', :chi, :symbol)
+      b.add('Chi', :Chi, :symbol)
+      b.add('psi', :psi, :symbol)
+      b.add('Psi', :Psi, :symbol)
+      b.add('omega', :omega, :symbol)
+      b.add('Omega', :Omega, :symbol)
+
+      b
+    end
+
+    def initialize(symbol_table, color_table)
+      @symbol_table = symbol_table
+      @color_table = color_table
+    end
 
     def parse(input)
       Expression.new(
           input,
-          parse_expression(Tokenizer.new(input, SYMBOLS), 0)
+          parse_expression(Tokenizer.new(input, @symbol_table), nil)
       )
     end
 
     private
-    def parse_expression(tok, depth)
-      e = []
 
-      while (s1 = parse_simple_expression(tok, depth))
+    include AsciiMath::AST
+
+    def parse_expression(tok, close_paren_type)
+      e = nil
+
+      while (i1 = parse_intermediate_expression(tok, close_paren_type))
         t1 = tok.next_token
 
-        if t1[:type] == :infix
-          s2 = parse_simple_expression(tok, depth)
-          t2 = tok.next_token
-          if t1[:value] == :sub && t2[:value] == :sup
-            s3 = parse_simple_expression(tok, depth)
-            operator = s1[:underover] ? :underover : :subsup
-            e << {:type => :ternary, :operator => operator, :s1 => s1, :s2 => s2, :s3 => s3}
+        if t1[:type] == :infix && t1[:value] == :frac
+          i2 = parse_intermediate_expression(tok, close_paren_type)
+          if i2
+            e = concat_expressions(e, infix(unwrap_paren(i1), token_to_symbol(t1), unwrap_paren(i2)))
           else
-            operator = s1[:underover] ? (t1[:value] == :sub ? :under : :over) : t1[:value]
-            e << {:type => :binary, :operator => operator, :s1 => s1, :s2 => s2}
-            tok.push_back(t2)
-            if (t2[:type] == :lrparen || t2[:type] == :rparen) && depth > 0
-              break
-            end
+            e = concat_expressions(e, i1)
           end
         elsif t1[:type] == :eof
-          e << s1
+          e = concat_expressions(e, i1)
           break
         else
-          e << s1
+          e = concat_expressions(e, i1)
           tok.push_back(t1)
-          if (t1[:type] == :lrparen || t1[:type] == :rparen) && depth > 0
+          if t1[:type] == close_paren_type
             break
           end
         end
@@ -500,110 +547,260 @@ module AsciiMath
       e
     end
 
-    def parse_simple_expression(tok, depth)
+    def parse_intermediate_expression(tok, close_paren_type)
+      s = parse_simple_expression(tok, close_paren_type)
+      sub = nil
+      sup = nil
+
+      t1 = tok.next_token
+      case t1[:type]
+        when :infix
+          case t1[:value]
+            when :sub
+              sub = parse_simple_expression(tok, close_paren_type)
+              if sub
+                t2 = tok.next_token
+                if t2[:type] == :infix && t2[:value] == :sup
+                  sup = parse_simple_expression(tok, close_paren_type)
+                else
+                  tok.push_back(t2)
+                end
+              end
+            when :sup
+              sup = parse_simple_expression(tok, close_paren_type)
+            else
+              tok.push_back(t1)
+          end
+        else
+          tok.push_back(t1)
+      end
+
+      if sub && sup
+        subsup(s, unwrap_paren(sub), unwrap_paren(sup))
+      elsif sub
+        sub(s, unwrap_paren(sub))
+      elsif sup
+        sup(s, unwrap_paren(sup))
+      else
+        s
+      end
+    end
+
+    def parse_simple_expression(tok, close_paren_type)
       t1 = tok.next_token
 
       case t1[:type]
         when :lparen, :lrparen
+          if t1[:type] == :lparen
+            close_with = :rparen
+          else
+            close_with = :lrparen
+          end
+
           t2 = tok.next_token
-          case t2[:type]
-            when :rparen, :lrparen
-              {:type => :paren, :e => nil, :lparen => t1[:value], :rparen => t2[:value]}
+          if t2[:type] == close_with
+            paren(token_to_symbol(t1), nil, token_to_symbol(t2))
+          else
+            tok.push_back(t2)
+
+            e = parse_expression(tok, close_with)
+
+            t2 = tok.next_token
+            if t2[:type] == close_with
+              convert_to_matrix(paren(token_to_symbol(t1), e, token_to_symbol(t2)))
             else
               tok.push_back(t2)
-
-              e = parse_expression(tok, depth + 1)
-
-              t2 = tok.next_token
-              case t2[:type]
-                when :rparen, :lrparen
-                  convert_to_matrix({:type => :paren, :e => e, :lparen => t1[:value], :rparen => t2[:value]})
-                else
-                  tok.push_back(t2)
-                  {:type => :paren, :e => e, :lparen => t1[:value]}
+              if t1[:type] == :lrparen
+                concat_expressions(token_to_symbol(t1), e)
+              else
+                paren(token_to_symbol(t1), e, nil)
               end
+            end
           end
-        when :accent
-          s = parse_simple_expression(tok, depth)
-          {:type => :binary, :s1 => s, :s2 => {:type => :operator, :c => t1[:value]}, :operator => t1[:position]}
-        when :unary, :font
-          s = parse_simple_expression(tok, depth)
-          {:type => t1[:type], :s => s, :operator => t1[:value]}
+        when :rparen
+          if close_paren_type.nil?
+            token_to_symbol(t1)
+          else
+            tok.push_back(t1)
+            nil
+          end
+        when :unary
+          parse_simple_expression = parse_simple_expression(tok, close_paren_type)
+          s = unwrap_paren(parse_simple_expression)
+          s = identifier('') if s.nil?
+          s = convert_node(s, t1[:convert_operand])
+          unary(token_to_symbol(t1), s)
         when :binary
-          s1 = parse_simple_expression(tok, depth)
-          s2 = parse_simple_expression(tok, depth)
-          {:type => :binary, :s1 => s1, :s2 => s2, :operator => t1[:value]}
+          s1 = unwrap_paren(parse_simple_expression(tok, close_paren_type))
+          s1 = identifier('') if s1.nil?
+          s2 = unwrap_paren(parse_simple_expression(tok, close_paren_type))
+          s2 = identifier('') if s2.nil?
+
+          s1 = convert_node(s1, t1[:convert_operand1])
+          s2 = convert_node(s2, t1[:convert_operand2])
+
+          binary(token_to_symbol(t1), s1, s2)
         when :eof
           nil
+        when :number
+          number(t1[:value])
+        when :text
+          text(t1[:value])
+        when :identifier
+          identifier(t1[:value])
         else
-          {:type => t1[:type], :c => t1[:value], :underover => t1[:underover]}
+          token_to_symbol(t1)
       end
     end
 
-    def convert_to_matrix(expression)
-      return expression unless expression.is_a?(Hash) && expression[:type] == :paren
+    def concat_expressions(e1, e2)
+      case e1
+        when Sequence
+          case e2
+            when Sequence
+              expression(*(e1.to_a), *(e2.to_a))
+            when nil
+              e1
+            else
+              expression(*(e1.to_a), e2)
+          end
+        when nil
+          e2
+        else
+          case e2
+            when Sequence
+              expression(e1, *(e2.to_a))
+            when nil
+              e1
+            else
+              expression(e1, e2)
+          end
+      end
+    end
 
-      rows, separators = expression[:e].partition.with_index { |obj, i| i.even? }
-      return expression unless rows.length > 1 &&
+    def token_to_symbol(t1)
+      symbol(t1[:value], t1[:text], t1[:type])
+    end
+
+    def unwrap_paren(node)
+      if node.is_a?(::AsciiMath::AST::Paren) && (node.lparen.nil? || node.lparen.type == :lparen) && (node.rparen.nil? || node.rparen.type == :rparen)
+        group(node.lparen, node.expression, node.rparen)
+      else
+        node
+      end
+    end
+
+    def convert_to_matrix(node)
+      return node unless node.is_a?(::AsciiMath::AST::Paren) && node.expression.is_a?(::AsciiMath::AST::Sequence)
+
+      rows, separators = node.expression.partition.with_index { |obj, i| i.even? }
+      return node unless rows.length > 1 &&
           rows.length > separators.length &&
           separators.all? { |item| is_matrix_separator(item) } &&
-          (rows.all? { |item| item[:type] == :paren && item[:lparen] == '(' && item[:rparen] == ')' } ||
-              rows.all? { |item| item[:type] == :paren && item[:lparen] == '[' && item[:rparen] == ']' })
+          (rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lparen, '(', :lparen) && item.rparen == symbol(:rparen, ')', :rparen) } ||
+              rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lbracket, '[', :lparen) && item.rparen == symbol(:rbracket, ']', :rparen) })
 
       rows = rows.map do |row|
         chunks = []
         current_chunk = []
-        row[:e].each do |item|
-          if is_matrix_separator(item)
-            chunks << current_chunk
-            current_chunk = []
-          else
-            current_chunk << item
+
+        row_content = row.expression
+        unless row_content.is_a?(::AsciiMath::AST::Sequence)
+          [expression(row_content)]
+        else
+          row_content.each do |item|
+            if is_matrix_separator(item)
+              chunks << current_chunk
+              current_chunk = []
+            else
+              current_chunk << item
+            end
           end
+
+          chunks << current_chunk
+
+          chunks.map { |c| c.length == 1 ? c[0] : expression(*c) }.to_a
         end
-
-        chunks << current_chunk
-
-        chunks.map {|c| c.length == 1 ? c[0] : c }.to_a
       end
 
-      return expression unless rows.all? { |row| row.length == rows[0].length }
+      return node unless rows.all? { |row| row.length == rows[0].length }
 
-      {:type => :matrix, :rows => rows, :lparen => expression[:lparen], :rparen => expression[:rparen]}
+      matrix(node.lparen, rows, node.rparen)
     end
 
-    def is_matrix_separator(item)
-      item[:type] == :identifier && item[:c] == ','
+    def is_matrix_separator(node)
+      node.is_a?(Identifier) && node.value == ','
     end
 
-    def matrix?(expression)
-      return false unless expression.is_a?(Hash) && expression[:type] == :paren
-
-      rows, separators = expression[:e].partition.with_index { |obj, i| i.even? }
-
-      rows.length > 1 &&
-          rows.length > separators.length &&
-          separators.all?(&method(:is_matrix_separator)) &&
-          (rows.all? { |item| item[:type] == :paren && item[:lparen] == '(' && item[:rparen] == ')' } ||
-              rows.all? { |item| item[:type] == :paren && item[:lparen] == '[' && item[:rparen] == ']' }) &&
-          rows.all? { |item| item[:e].length == rows[0][:e].length } &&
-          rows.all? { |item| matrix_cols?(item[:e]) }
+    def convert_node(node, converter)
+      case converter
+        when nil
+          node
+        when UnboundMethod
+          converter.bind(self).call(node)
+        when Method, Proc
+          converter.call(node)
+      end
     end
 
-    def matrix_cols?(expression)
-      return false unless expression.is_a?(Array)
+    def convert_to_color(color_expression)
+      s = ""
+      append_color_text(s, color_expression)
 
-      cols, separators = expression.partition.with_index { |obj, i| i.even? }
+      case s
+        when /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i
+          color_value = {:r => $1.to_i(16), :g => $2.to_i(16), :b => $3.to_i(16), }
+        when /#([0-9a-f])([0-9a-f])([0-9a-f])/i
+          color_value = {:r => "#{$1}#{$1}".to_i(16), :g => "#{$2}#{$2}".to_i(16), :b => "#{$3}#{$3}".to_i(16), }
+        else
+          color_value = @color_table[s.downcase] || {:r => 0, :g => 0, :b => 0}
+      end
 
-      cols.all? { |item| item[:type] != :identifier || item[:c] != ',' } &&
-          separators.all?(&method(:is_col_separator))
+      color(color_value[:r], color_value[:g], color_value[:b], s)
     end
+
+    def append_color_text(s, node)
+      case node
+        when ::AsciiMath::AST::Sequence
+          node.each { |n| append_color_text(s, n) }
+        when ::AsciiMath::AST::Number, ::AsciiMath::AST::Identifier, ::AsciiMath::AST::Text
+          s << node.value
+        when ::AsciiMath::AST::Symbol
+          s << node.text
+        when ::AsciiMath::AST::Group
+          append_color_text(s, node.expression)
+        when ::AsciiMath::AST::Paren
+          append_color_text(s, node.lparen)
+          append_color_text(s, node.expression)
+          append_color_text(s, node.rparen)
+        when ::AsciiMath::AST::SubSup
+          append_color_text(s, node.base_expression)
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand2)
+        when ::AsciiMath::AST::UnaryOp
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand)
+        when ::AsciiMath::AST::BinaryOp
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand1)
+          append_color_text(s, node.operand2)
+        when ::AsciiMath::AST::InfixOp
+          append_color_text(s, node.operand1)
+          append_color_text(s, node.operator)
+          append_color_text(s, node.operand2)
+      end
+    end
+
+    DEFAULT_COLOR_TABLE = ::AsciiMath::Parser.add_default_colors(AsciiMath::ColorTableBuilder.new).build
+    DEFAULT_PARSER_SYMBOL_TABLE = ::AsciiMath::Parser.add_default_parser_symbols(AsciiMath::SymbolTableBuilder.new).build
   end
 
   class Expression
-    def initialize(asciimath, parsed_expression)
+    attr_accessor :ast
+
+    def initialize(asciimath, ast)
       @asciimath = asciimath
-      @parsed_expression = parsed_expression
+      @ast = ast
     end
 
     def to_s
@@ -611,7 +808,7 @@ module AsciiMath
     end
   end
 
-  def self.parse(asciimath)
-    Parser.new.parse(asciimath)
+  def self.parse(asciimath, parser_symbol_table = ::AsciiMath::Parser::DEFAULT_PARSER_SYMBOL_TABLE, parser_color_table = ::AsciiMath::Parser::DEFAULT_COLOR_TABLE)
+    Parser.new(parser_symbol_table, parser_color_table).parse(asciimath)
   end
 end
