@@ -1,5 +1,58 @@
 = Asciimath Changelog
 
+== 2.0.3
+
+Enhancements::
+
+  * Issue #59: make escaping of non-ASCII characters in MathML and HTML output optional.
+
+Bug fixes::
+
+  * Issue #58: produce `<mo>` tags instead of `<mi>` tags for non-alphanumeric strings.
+  * Issue #62: resolve infinite recursion in LaTeX generator.
+
+== 2.0.2
+
+Enhancements::
+
+  * Issue #51: generate `accent` and `accentunder` attributes on `munder`, `mover`, and `munderover` tags when appropriate
+  * Issue #52: map `phi` to U+03D5 and `varphi` to U+03C6 by default.
+  * Issue #53: Add support for Roman style font command `rm`.
+
+Bug fixes::
+
+  * Issue #50: fix parsing error when unary and binary operators are missing an operand
+
+== 2.0.1
+
+Enhancements::
+
+  * Issue #40: add `ker` as standard symbol (@GarkGarcia)
+  * Issue #46: allow customisation of the parsing and rendering symbol tables (@GarkGarcia)
+
+Bug fixes::
+
+  * Issue #48: fix parsing of single column matrices (@ronaldtse)
+
+== 2.0.0
+
+Enhancements::
+
+  * The AsciiMath parser has been significantly improved and should now have reached feature parity with the original Javascript implementation.
+  * Issue #16: add initial LaTeX output support (@GarkGarcia)
+  * Issue #26: avoid generating `<mfenced>` tags in MathML output
+
+Bug fixes::
+
+  * Issue #14: add support for additional symbols and functions that are supported by Asciimath JS
+
+== 1.0.9
+
+Bug fixes::
+
+  * Issue #13: Improve matrix parsing
+  * Output `mfenced` tags instead of `mo` pairs to improve MathML compatbility with Microsoft Office (@opoudjis)
+
 == 1.0.8
 
 Bug fixes::
@@ -12,7 +65,6 @@ Bug fixes::
 
   * Issue #6: Mark standard functions as identifiers instead of operators
   * Issue #7: Correct parsing of TeX altenative style (`text()`) text strings
-  * Issue #13: Improve matrix parsing
 
 == 1.0.6
 
