@@ -328,6 +328,15 @@ RSpec.shared_examples 'AsciiMath Examples' do
       :latex => '\\left ( \\begin{matrix} 1 \\\\ 42 \\end{matrix} \\right )',
   ))
 
+=begin
+  example('((1,42))', &should_generate(
+      :ast => matrix([%w[1], %w[42]]),
+      :mathml => '<math><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mn>42</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>',
+      :html => '<span class="math-inline"><span class="math-row"><span class="math-brace" style="font-size: 200%;">(</span><span class="math-matrix" style="grid-template-columns:repeat(1,1fr);grid-template-rows:repeat(2,1fr);"><span class="math-row"><span class="math-number">1</span></span><span class="math-row"><span class="math-number">42</span></span></span><span class="math-brace" style="font-size: 200%;">)</span></span></span>',
+      :latex => '\\left ( \\begin{matrix} 1 \\\\ 42 \\end{matrix} \\right )',
+  ))
+=end
+
   example('((1,2,3),(4,5,6),(7,8,9))', &should_generate(
       :ast => matrix([%w[1 2 3], %w[4 5 6], %w[7 8 9]]),
       :mathml => '<math><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd></mtr><mtr><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>',

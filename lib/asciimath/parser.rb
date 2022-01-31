@@ -691,35 +691,60 @@ module AsciiMath
     end
 
     def convert_to_matrix(node)
-      return node unless node.is_a?(::AsciiMath::AST::Paren) && node.expression.is_a?(::AsciiMath::AST::Sequence)
+      double_bracket_matrix = node.is_a?(::AsciiMath::AST::Paren) && node.expression.is_a?(::AsciiMath::AST::Paren) && node.expression.partition.first.is_a?(::AsciiMath::AST::Sequence)
+      return node unless node.is_a?(::AsciiMath::AST::Paren) &&
+        (node.expression.is_a?(::AsciiMath::AST::Sequence) || double_bracket_matrix)
 
-      rows, separators = node.expression.partition.with_index { |obj, i| i.even? }
+      rows, separators = if double_bracket_matrix
+                           node.expression.partition.first.partition.with_index { |obj, i| i.even? }
+                           else
+                             node.expression.partition.with_index { |obj, i| i.even? }
+                           end
       return node unless rows.length > 1 &&
-          rows.length > separators.length &&
-          separators.all? { |item| is_matrix_separator(item) } &&
-          (rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lparen, '(', :lparen) && item.rparen == symbol(:rparen, ')', :rparen) } ||
-              rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lbracket, '[', :lparen) && item.rparen == symbol(:rbracket, ']', :rparen) })
+        rows.length > separators.length &&
+        separators.all? { |item| is_matrix_separator(item) } &&
+        ( double_bracket_matrix ||
+         (rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lparen, '(', :lparen) && item.rparen == symbol(:rparen, ')', :rparen) } ||
+rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lbracket, '[', :lparen) && item.rparen == symbol(:rbracket, ']', :rparen) }))
 
-      rows = rows.map do |row|
+      if double_bracket_matrix
         chunks = []
         current_chunk = []
 
-        row_content = row.expression
-        unless row_content.is_a?(::AsciiMath::AST::Sequence)
-          [expression(row_content)]
-        else
-          row_content.each do |item|
-            if is_matrix_separator(item)
-              chunks << current_chunk
-              current_chunk = []
-            else
-              current_chunk << item
-            end
+        node.expression.partition.first.each do |item|
+          if is_matrix_separator(item)
+            chunks << current_chunk
+            current_chunk = []
+          else
+            current_chunk << item
           end
+        end
 
           chunks << current_chunk
 
-          chunks.map { |c| c.length == 1 ? c[0] : expression(*c) }.to_a
+          rows = [chunks.map { |c| c.length == 1 ? c[0] : expression(*c) }.to_a]
+      else
+        rows = rows.map do |row|
+          chunks = []
+          current_chunk = []
+
+          row_content = row.expression
+          unless row_content.is_a?(::AsciiMath::AST::Sequence)
+            [expression(row_content)]
+          else
+            row_content.each do |item|
+              if is_matrix_separator(item)
+                chunks << current_chunk
+                current_chunk = []
+              else
+                current_chunk << item
+              end
+            end
+
+            chunks << current_chunk
+
+            chunks.map { |c| c.length == 1 ? c[0] : expression(*c) }.to_a
+          end
         end
       end
 
