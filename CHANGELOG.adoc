@@ -4,6 +4,7 @@
 
 Bug fixes::
 
+  * Issue #70: fix MathML output for `frac`.
   * Issue #71: correctly parse row vectors.
 
 == 2.0.3

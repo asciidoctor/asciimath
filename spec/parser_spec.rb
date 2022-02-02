@@ -29,9 +29,7 @@ def should_generate(expected_output)
         case variant
           when :ast
             expect(parsed.ast).to eq(expected)
-        when :mathml
-          puts parsed.to_mathml
-          puts expected
+          when :mathml
             expect(parsed.to_mathml).to eq(expected)
             if defined?(RUBY_ENGINE) && RUBY_ENGINE != 'jruby'
               xml_dom = Xml.parse(parsed.to_mathml(:xmlns => 'http://www.w3.org/1998/Math/MathML'))
@@ -337,10 +335,6 @@ RSpec.shared_examples 'AsciiMath Examples' do
     :latex => '\\left ( \\begin{matrix} 1 & 42 \\end{matrix} \\right )',
     ))
 
-  example('vec r = {((0,0,1))^T xx vec n}/{norm{((0,0,1))^T xx vec n}}', &should_generate(
-    :mathml => '<math><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>42</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>'
-  ))
-
   example('((1,2,3),(4,5,6),(7,8,9))', &should_generate(
       :ast => matrix([%w[1 2 3], %w[4 5 6], %w[7 8 9]]),
       :mathml => '<math><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd></mtr><mtr><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>',
@@ -643,6 +637,11 @@ RSpec.shared_examples 'AsciiMath Examples' do
     :mathml => '<math><mi>a</mi><mo>+</mo><mi>b</mi><mo>+</mo><mo>&#x2026;</mo><mo>+</mo><mi>c</mi></math>'
     ))
 
+  example('frac{a}{b}', &should_generate(
+    :ast => binary('frac', group(symbol('{'), 'a', symbol('}')), group(symbol('{'), 'b', symbol('}'))),
+    :latex => '\frac{a}{b}',
+    :mathml => '<math><mfrac><mi>a</mi><mi>b</mi></mfrac></math>'
+  ))
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
 
