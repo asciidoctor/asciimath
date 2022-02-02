@@ -29,7 +29,9 @@ def should_generate(expected_output)
         case variant
           when :ast
             expect(parsed.ast).to eq(expected)
-          when :mathml
+        when :mathml
+          puts parsed.to_mathml
+          puts expected
             expect(parsed.to_mathml).to eq(expected)
             if defined?(RUBY_ENGINE) && RUBY_ENGINE != 'jruby'
               xml_dom = Xml.parse(parsed.to_mathml(:xmlns => 'http://www.w3.org/1998/Math/MathML'))
@@ -326,6 +328,17 @@ RSpec.shared_examples 'AsciiMath Examples' do
       :mathml => '<math><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mn>42</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>',
       :html => '<span class="math-inline"><span class="math-row"><span class="math-brace" style="font-size: 200%;">(</span><span class="math-matrix" style="grid-template-columns:repeat(1,1fr);grid-template-rows:repeat(2,1fr);"><span class="math-row"><span class="math-number">1</span></span><span class="math-row"><span class="math-number">42</span></span></span><span class="math-brace" style="font-size: 200%;">)</span></span></span>',
       :latex => '\\left ( \\begin{matrix} 1 \\\\ 42 \\end{matrix} \\right )',
+  ))
+
+  example('((1,42))', &should_generate(
+    :ast => matrix([%w[1 42]]),
+    :mathml => '<math><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>42</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>',
+    :html => '<span class="math-inline"><span class="math-row"><span class="math-brace" style="font-size: 100%;">(</span><span class="math-matrix" style="grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(1,1fr);"><span class="math-row"><span class="math-number">1</span></span><span class="math-row"><span class="math-number">42</span></span></span><span class="math-brace" style="font-size: 100%;">)</span></span></span>',
+    :latex => '\\left ( \\begin{matrix} 1 & 42 \\end{matrix} \\right )',
+    ))
+
+  example('vec r = {((0,0,1))^T xx vec n}/{norm{((0,0,1))^T xx vec n}}', &should_generate(
+    :mathml => '<math><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>42</mn></mtd></mtr></mtable><mo>)</mo></mrow></math>'
   ))
 
   example('((1,2,3),(4,5,6),(7,8,9))', &should_generate(
@@ -629,7 +642,7 @@ RSpec.shared_examples 'AsciiMath Examples' do
     :latex => 'a + b + \ldots + c',
     :mathml => '<math><mi>a</mi><mo>+</mo><mi>b</mi><mo>+</mo><mo>&#x2026;</mo><mo>+</mo><mi>c</mi></math>'
     ))
-    
+
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
 
