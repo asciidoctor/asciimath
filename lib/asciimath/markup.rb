@@ -389,6 +389,8 @@ module AsciiMath
                 append_root(node.operand2, node.operand1)
               when :color
                 append_color(node.operand1.to_hex_rgb, node.operand2)
+              when :frac
+                append_fraction(node.operand1, node.operand2)
             end
           end
         when ::AsciiMath::AST::InfixOp

@@ -691,10 +691,19 @@ module AsciiMath
     end
 
     def convert_to_matrix(node)
-      return node unless node.is_a?(::AsciiMath::AST::Paren) && node.expression.is_a?(::AsciiMath::AST::Sequence)
+      return node unless node.is_a?(::AsciiMath::AST::Paren)
 
-      rows, separators = node.expression.partition.with_index { |obj, i| i.even? }
-      return node unless rows.length > 1 &&
+      case node.expression
+      when ::AsciiMath::AST::Sequence
+        rows, separators = node.expression.partition.with_index { |obj, i| i.even? }
+      when ::AsciiMath::AST::Paren
+        rows = [node.expression]
+        separators = []
+      else
+        return node
+      end
+
+      return node unless rows.length >= 1 &&
           rows.length > separators.length &&
           separators.all? { |item| is_matrix_separator(item) } &&
           (rows.all? { |item| item.is_a?(::AsciiMath::AST::Paren) && item.lparen == symbol(:lparen, '(', :lparen) && item.rparen == symbol(:rparen, ')', :rparen) } ||
