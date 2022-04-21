@@ -4,6 +4,7 @@
 
 Bug fixes::
 
+  * Issue #69: correctly render sub and superscripts as following `obrace` and `ubrace`.
   * Issue #70: fix MathML output for `frac`.
   * Issue #71: correctly parse row vectors.
 
