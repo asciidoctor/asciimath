@@ -169,7 +169,12 @@ module AsciiMath
           sup = expression.sup_expression
           e = expression.base_expression
 
+          if e.is_a?(AsciiMath::AST::UnaryOp) &&
+            %i[underbrace overbrace].include?(e.operator.value)
+            append(e)
+        else
           curly(e)
+        end
 
           if sub
             @latex << "_"

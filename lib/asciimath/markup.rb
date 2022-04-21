@@ -210,8 +210,8 @@ module AsciiMath
       b.add(:ddot, '..', :accent, :position => :over)
       b.add(:overarc, "\u23DC", :accent, :position => :over)
       b.add(:underline, '_', :accent, :position => :under)
-      b.add(:underbrace, "\u23DF", :accent, :position => :under)
-      b.add(:overbrace, "\u23DE", :accent, :position => :over)
+      b.add(:underbrace, "\u23DF", :accent, :position => :under, :underover => true)
+      b.add(:overbrace, "\u23DE", :accent, :position => :over, :underover => true)
       b.add(:bold, :bold, :font)
       b.add(:double_struck, :double_struck, :font)
       b.add(:italic, :italic, :font)
@@ -348,7 +348,9 @@ module AsciiMath
         when ::AsciiMath::AST::Paren
           append_paren(resolve_paren(node.lparen), node.expression, resolve_paren(node.rparen), opts)
         when ::AsciiMath::AST::SubSup
-          if (resolve_symbol(node.base_expression) || {})[:underover]
+          if node.base_expression.is_a?(AsciiMath::AST::UnaryOp) && @symbol_table[node.base_expression.operator.value][:underover]
+            append_underover(node.base_expression, node.sub_expression, node.sup_expression)
+          elsif (resolve_symbol(node.base_expression) || {})[:underover]
             append_underover(node.base_expression, node.sub_expression, node.sup_expression)
           else
             append_subsup(node.base_expression, node.sub_expression, node.sup_expression)

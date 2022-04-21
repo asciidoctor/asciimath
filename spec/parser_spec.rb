@@ -643,6 +643,13 @@ RSpec.shared_examples 'AsciiMath Examples' do
     :mathml => '<math><mfrac><mi>a</mi><mi>b</mi></mfrac></math>'
   ))
 
+  example('ubrace(((1, 0),(0, 1)))_("Adjustment to texture space")', &should_generate(
+    :ast => subsup(unary(symbol('ubrace'), group(matrix([%w[1 0], %w[0 1]]))), group("Adjustment to texture space"), []),
+    :latex => '\underbrace{\left ( \begin{matrix} 1 & 0 \\\\ 0 & 1 \end{matrix} \right )}_{\text{Adjustment to texture space}}',
+    :mathml => '<math><munder><munder accentunder="true"><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>)</mo></mrow><mo>&#x23DF;</mo></munder><mtext>Adjustment to texture space</mtext></munder></math>'
+  ))
+
+
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
 
   if version[0] > 1 || version[1] > 8
