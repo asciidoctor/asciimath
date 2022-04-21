@@ -348,9 +348,7 @@ module AsciiMath
         when ::AsciiMath::AST::Paren
           append_paren(resolve_paren(node.lparen), node.expression, resolve_paren(node.rparen), opts)
         when ::AsciiMath::AST::SubSup
-          if node.base_expression.is_a?(AsciiMath::AST::UnaryOp) && @symbol_table[node.base_expression.operator.value][:underover]
-            append_underover(node.base_expression, node.sub_expression, node.sup_expression)
-          elsif (resolve_symbol(node.base_expression) || {})[:underover]
+          if is_underover(node.base_expression)
             append_underover(node.base_expression, node.sub_expression, node.sup_expression)
           else
             append_subsup(node.base_expression, node.sub_expression, node.sup_expression)
@@ -512,6 +510,17 @@ module AsciiMath
     def is_accent(node)
       resolved = resolve_symbol(node)
       !resolved.nil? && resolved[:type] == :accent
+    end
+
+    def is_underover(node)
+      case node
+      when AsciiMath::AST::UnaryOp
+        symbol = node.operator
+      else
+        symbol = node
+      end
+
+      (resolve_symbol(symbol) || {})[:underover]
     end
   end
 end
