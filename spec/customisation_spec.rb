@@ -25,4 +25,10 @@ describe 'AsciiMath::Parser', :variant => :ast do
     parsed = AsciiMath::parse("a + b", my_tokens_table.build)
     expect(parsed.ast).to eq(seq(identifier('a'), ::AsciiMath::AST::Symbol.new(:foo, '+', :symbol), identifier('b')))
   end
+
+  it "should support disallowing symbol overwrites" do
+    my_tokens_table = AsciiMath::SymbolTableBuilder.new(allow_symbol_overwrites: false)
+    AsciiMath::Parser.add_default_parser_symbols(my_tokens_table)
+    expect{my_tokens_table.add('+', :foo, :symbol)}.to raise_error 'Symbol overwrites are disallowed, but were attempted for +'
+  end
 end
