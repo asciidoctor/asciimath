@@ -1,7 +1,8 @@
 module AsciiMath
   class SymbolTableBuilder
-    def initialize()
+    def initialize(allow_symbol_overwrites: true)
       @table = {}
+      @allow_symbol_overwrites = allow_symbol_overwrites
     end
 
     def add(*args)
@@ -15,7 +16,11 @@ module AsciiMath
       entry[:value] = args.pop
 
       entry.freeze
-      args.each { |name| @table[name.freeze] = entry }
+      args.map(&:freeze).each do |name|
+        raise "Symbol overwrites are disallowed, but were attempted for #{name}" if !@allow_symbol_overwrites && !@table[name].nil?
+
+        @table[name] = entry
+      end
     end
 
     def build
