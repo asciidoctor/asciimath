@@ -1,3 +1,3 @@
 module AsciiMath
-  VERSION = "2.0.5.next1"
+  VERSION = "2.0.5"
 end
