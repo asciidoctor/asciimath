@@ -73,7 +73,7 @@ module AsciiMath
       :glb => "\\operatorname{glb}",
       :partial => "\\del",
       :prime => ?',
-      :tilde => "\\~",
+      :tilde => "\\tilde",
       :nbsp => "\\;",
       :lceiling => "\\lceil",
       :rceiling => "\\rceil",

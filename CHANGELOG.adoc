@@ -1,5 +1,11 @@
 = Asciimath Changelog
 
+== 2.0.5
+
+Bug fixes::
+
+  * Issue #75: render `tilde x` as `\tilde{x}` instead of `\~{x}` in LaTeX output.
+
 == 2.0.4
 
 Bug fixes::

@@ -649,6 +649,11 @@ RSpec.shared_examples 'AsciiMath Examples' do
     :mathml => '<math><munder><munder accentunder="true"><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>)</mo></mrow><mo>&#x23DF;</mo></munder><mtext>Adjustment to texture space</mtext></munder></math>'
   ))
 
+  example('tilde x', &should_generate(
+    :ast => unary(symbol('tilde'), 'x'),
+    :latex => '\\tilde{x}'
+    ))
+
 
   version = RUBY_VERSION.split('.').map { |s| s.to_i }
 
