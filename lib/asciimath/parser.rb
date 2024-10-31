@@ -753,7 +753,7 @@ module AsciiMath
     end
 
     def convert_to_color(color_expression)
-      s = ""
+      s = "".dup
       append_color_text(s, color_expression)
 
       case s

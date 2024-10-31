@@ -5,7 +5,7 @@ module AsciiMath
     attr_reader :symbol_table
 
     def initialize(symbol_table = nil)
-      @latex = ''
+      @latex = ''.dup
       @symbol_table = symbol_table.nil? ? DEFAULT_DISPLAY_SYMBOL_TABLE : symbol_table
     end
 

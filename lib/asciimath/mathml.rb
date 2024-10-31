@@ -7,7 +7,7 @@ module AsciiMath
     def initialize(opts = {})
       super(opts[:symbol_table] || ::AsciiMath::MarkupBuilder.default_display_symbol_table(fix_phi: opts.fetch(:fix_phi, true)))
       @prefix = opts[:prefix] || ''
-      @mathml = ''
+      @mathml = ''.dup
       if opts[:msword]
         @row_mode = :force
         @fence_mode = :fenced
