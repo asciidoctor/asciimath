@@ -8,7 +8,7 @@ module AsciiMath
       @prefix = opts[:prefifx] || ''
       @inline = opts[:inline]
       @escape_non_ascii = opts.fetch(:escape_non_ascii, true)
-      @html = ''
+      @html = ''.dup
     end
 
     def to_s
